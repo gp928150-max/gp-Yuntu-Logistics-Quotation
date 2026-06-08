@@ -950,11 +950,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getChannelIcon(name) {
-        if (!name) return '✈️';
-        if (name.includes('小包') || name.includes('Post') || name.includes('Mail')) return '✉️';
-        if (name.includes('特快') || name.includes('Faster') || name.includes('Priority') || name.includes('快') || name.includes('Express')) return '🚀';
-        if (name.includes('专线') || name.includes('Direct') || name.includes('Driect') || name.includes('Line')) return '✈️';
-        return '📦';
+        if (!name) {
+            return `
+                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V14L13 9V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"></path>
+                </svg>
+            `;
+        }
+        if (name.includes('小包') || name.includes('Post') || name.includes('Mail')) {
+            return `
+                <svg class="channel-svg-icon icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            `;
+        }
+        if (name.includes('特快') || name.includes('Faster') || name.includes('Priority') || name.includes('快') || name.includes('Express')) {
+            return `
+                <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5 2 0 4-1 5.5-2.5L18.8 8.2c1-1 .7-2.7-.6-4-1.3-1.3-3-1.6-4-.6L4.5 16.5z"></path>
+                    <path d="m12 8 4 4"></path>
+                    <path d="m9 11 4 4"></path>
+                </svg>
+            `;
+        }
+        if (name.includes('专线') || name.includes('Direct') || name.includes('Driect') || name.includes('Line')) {
+            return `
+                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V14L13 9V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"></path>
+                </svg>
+            `;
+        }
+        return `
+            <svg class="channel-svg-icon icon-parcel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="12" y1="12" x2="12" y2="21"></line>
+            </svg>
+        `;
     }
 
     function getExcelTransit(excelMap, cname) {

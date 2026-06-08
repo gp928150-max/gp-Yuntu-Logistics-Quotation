@@ -1087,6 +1087,32 @@ body {
     background: #e8e8ed;
 }
 
+.channel-brand-icon-bg svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.channel-brand-icon-bg svg.icon-mail {
+    color: #096dd9;
+}
+
+.channel-brand-icon-bg svg.icon-express {
+    color: #ff9500;
+}
+
+.channel-brand-icon-bg svg.icon-direct {
+    color: #0071e3;
+}
+
+.channel-brand-icon-bg svg.icon-parcel {
+    color: #86868b;
+}
+
+.quote-channel-card:hover .channel-brand-icon-bg svg {
+    transform: scale(1.1);
+}
+
 .channel-info-area {
     flex: 1;
     display: flex;
