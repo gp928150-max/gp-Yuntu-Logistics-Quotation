@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gp928150-max.github.io/gp-Yuntu-Logistics-Quotation/sitemap.xml
