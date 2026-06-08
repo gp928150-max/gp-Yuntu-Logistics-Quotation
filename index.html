@@ -11,9 +11,29 @@
     <!-- Style Sheet -->
     <link rel="stylesheet" href="style.css">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.1" defer></script>
+    <script src="app.js?v=1.5.2" defer></script>
 </head>
 <body>
+    <!-- Top Status Bar -->
+    <div class="top-status-bar">
+        <div class="status-bar-content">
+            <div class="status-bar-left">
+                <span class="status-indicator-dot"></span>
+                <span class="status-bar-text" id="api-status-text">云途 OMS API 正常 (200 OK)</span>
+                <span class="status-bar-divider">/</span>
+                <span class="status-bar-text version">V1.5.2 Enterprise</span>
+            </div>
+            <div class="status-bar-right">
+                <span class="status-bar-rate-label">当前外汇折算价 (实时更新):</span>
+                <span class="status-bar-rate-item">1 USD ≈ <span id="rate-ticker-usd">7.2500</span> CNY</span>
+                <span class="status-bar-rate-divider">|</span>
+                <span class="status-bar-rate-item">1 EUR ≈ <span id="rate-ticker-eur">7.8500</span> CNY</span>
+                <span class="status-bar-rate-divider">|</span>
+                <span class="status-bar-rate-item">1 HKD ≈ <span id="rate-ticker-hkd">0.9300</span> CNY</span>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         <!-- Navigation Bar -->
         <nav class="app-nav">
@@ -25,19 +45,12 @@
                 <div class="nav-links">
                     <a href="https://www.graypoplar.com/" target="_blank" class="nav-link">官网首页</a>
                     <a href="https://wa.me/85262508059" target="_blank" class="nav-link">客服咨询</a>
-                    <span class="nav-separator">/</span>
-                    <span class="nav-version">V1.5.1 Enterprise</span>
                 </div>
             </div>
             <div class="nav-right">
-                <div class="nav-rates-display">
-                    <span class="rate-indicator"><span class="bullet"></span>USD <span id="rate-ticker-usd">7.25</span></span>
-                    <span class="rate-indicator"><span class="bullet"></span>EUR <span id="rate-ticker-eur">7.85</span></span>
-                    <span class="rate-indicator"><span class="bullet"></span>HKD <span id="rate-ticker-hkd">0.93</span></span>
-                </div>
                 <div class="custom-select-container currency-select-container" id="currency-select-container">
                     <button type="button" class="custom-select-trigger currency-select-trigger" id="currency-select-trigger">
-                        <span class="trigger-label" id="currency-trigger-label">CNY - 人民币 (¥)</span>
+                        <span class="trigger-label" id="currency-trigger-label">CNY (¥)</span>
                         <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
@@ -50,23 +63,19 @@
                             </li>
                             <li data-value="USD">
                                 <span class="currency-name-lbl">USD - 美元 ($)</span>
-                                <span class="currency-rate-lbl" id="rate-dropdown-usd">汇率: 7.25</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-usd">1 USD ≈ 7.2500 CNY</span>
                             </li>
                             <li data-value="EUR">
                                 <span class="currency-name-lbl">EUR - 欧元 (€)</span>
-                                <span class="currency-rate-lbl" id="rate-dropdown-eur">汇率: 7.85</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-eur">1 EUR ≈ 7.8500 CNY</span>
                             </li>
                             <li data-value="HKD">
                                 <span class="currency-name-lbl">HKD - 港币 (HK$)</span>
-                                <span class="currency-rate-lbl" id="rate-dropdown-hkd">汇率: 0.93</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-hkd">1 HKD ≈ 0.9300 CNY</span>
                             </li>
                         </ul>
                     </div>
                     <input type="hidden" id="quote-currency" value="CNY">
-                </div>
-                <div class="api-status-badge">
-                    <span class="status-pulse-dot"></span>
-                    <span class="status-text">云途 API 连通正常 (200 OK)</span>
                 </div>
             </div>
         </nav>
@@ -176,23 +185,7 @@
                                 <span class="times">&times;</span>
                                 <input type="number" id="quote-height" min="1" placeholder="高" value="1">
                         </div>
-                        <div class="exchange-rates-widget">
-                            <span class="widget-title">参考折算汇率</span>
-                            <div class="rates-row">
-                                <div class="rate-chip">
-                                    <span class="chip-curr">USD</span>
-                                    <span class="chip-val" id="rate-chip-usd">7.25</span>
-                                </div>
-                                <div class="rate-chip">
-                                    <span class="chip-curr">EUR</span>
-                                    <span class="chip-val" id="rate-chip-eur">7.85</span>
-                                </div>
-                                <div class="rate-chip">
-                                    <span class="chip-curr">HKD</span>
-                                    <span class="chip-val" id="rate-chip-hkd">0.93</span>
-                                </div>
-                            </div>
-                        </div>
+
                         <button type="submit" class="submit-btn full-width">
                             <span>开始测算报价</span>
                             <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

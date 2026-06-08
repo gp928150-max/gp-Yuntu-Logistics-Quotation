@@ -51,6 +51,77 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Top Status Bar (Frosted glass announcement ribbon) */
+.top-status-bar {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.72rem; /* 11px */
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    z-index: 1001;
+    position: relative;
+}
+
+.status-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-bar-left, .status-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.status-bar-divider {
+    color: rgba(0, 0, 0, 0.08);
+    font-weight: 300;
+    margin: 0 4px;
+}
+
+.status-bar-text.version {
+    color: var(--text-muted);
+}
+
+.status-indicator-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 rgba(52, 199, 89, 0.4);
+    animation: statusPulse 1.8s infinite;
+}
+
+.status-bar-rate-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-right: 4px;
+}
+
+.status-bar-rate-item {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.status-bar-rate-divider {
+    color: rgba(0, 0, 0, 0.06);
+    user-select: none;
+    margin: 0 4px;
+}
+
 /* App Container */
 .app-container {
     width: 100%;
@@ -141,34 +212,7 @@ body {
     gap: 16px;
 }
 
-/* Navbar Exchange Rates Ticker Display */
-.nav-rates-display {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin-right: 4px;
-    border-right: 1px solid rgba(0, 0, 0, 0.08);
-    padding-right: 16px;
-}
 
-.rate-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-family: var(--font-body);
-    user-select: none;
-}
-
-.rate-indicator .bullet {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--success); /* Green dot for rate status */
-    display: inline-block;
-}
 
 /* Custom Currency Dropdown Selector - Apple Glassmorphism styling */
 .currency-select-container {
@@ -294,26 +338,6 @@ body {
     background: rgba(0, 113, 227, 0.08);
 }
 
-/* API Status Indicator Badge */
-.api-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(52, 199, 89, 0.08);
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(52, 199, 89, 0.15);
-}
-
-.status-pulse-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--success);
-    box-shadow: 0 0 0 rgba(52, 199, 89, 0.4);
-    animation: statusPulse 1.8s infinite;
-}
-
 @keyframes statusPulse {
     0% {
         box-shadow: 0 0 0 0px rgba(52, 199, 89, 0.7);
@@ -324,13 +348,6 @@ body {
     100% {
         box-shadow: 0 0 0 0px rgba(52, 199, 89, 0);
     }
-}
-
-.status-text {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #1a7f37;
-    letter-spacing: -0.01em;
 }
 
 /* Header */
@@ -438,18 +455,14 @@ body {
 }
 
 .metric-converted-sub {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.92rem;
+    font-weight: 500;
     color: var(--primary);
-    background: var(--primary-light);
-    padding: 2px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 113, 227, 0.1);
     margin-left: 8px;
     font-family: var(--font-body);
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
 }
 
 .metric-desc {
@@ -570,55 +583,7 @@ body {
     font-size: 1rem;
 }
 
-.exchange-rates-widget {
-    margin-top: 24px;
-    margin-bottom: 24px;
-    padding: 12px 14px;
-    background: #f5f5f7;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-}
 
-.widget-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 8px;
-    display: block;
-    user-select: none;
-}
-
-.rates-row {
-    display: flex;
-    gap: 8px;
-}
-
-.rate-chip {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 10px;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.01);
-}
-
-.chip-curr {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-}
-
-.chip-val {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-family: var(--font-heading);
-}
 
 .submit-btn {
     display: inline-flex;
@@ -1027,27 +992,23 @@ body {
     text-align: right;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 3px;
     align-items: flex-end;
 }
 
 .channel-total-badge {
     display: inline-flex;
     align-items: baseline;
-    gap: 2px;
-    padding: 6px 16px;
-    border-radius: 10px;
-    background: #f5f5f7;
     color: var(--text-primary);
 }
 
 .channel-total-badge .currency {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
 .channel-total-badge .amount {
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     font-weight: 700;
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
@@ -1056,17 +1017,11 @@ body {
 .channel-converted-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.88rem;
+    font-weight: 500;
     color: var(--primary);
-    background: var(--primary-light);
-    padding: 3px 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(0, 113, 227, 0.12);
-    margin-top: 4px;
     font-family: var(--font-body);
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
 }
 
 .channel-price-breakdown {
@@ -1290,24 +1245,32 @@ body {
     
     .nav-right {
         display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-        gap: 10px;
-    }
-    
-    .nav-rates-display {
-        border-right: none;
-        padding-right: 0;
-        margin-right: 0;
-        justify-content: center;
-        width: 100%;
-        gap: 16px;
+        align-items: center;
+        gap: 12px;
     }
     
     .currency-select-container {
         margin-right: 0;
+        justify-content: flex-end;
+    }
+
+    /* Top Status Bar Responsive Stack */
+    .top-status-bar {
+        font-size: 0.68rem;
+    }
+    
+    .status-bar-content {
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 16px;
+        text-align: center;
+    }
+    
+    .status-bar-left, .status-bar-right {
         justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 6px;
     }
     
     .main-title {

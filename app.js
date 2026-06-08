@@ -80,29 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateRatesUI() {
         try {
-            // Update navbar ticker
+            // Update top status bar tickers (4 decimal places)
             const tickerUsd = document.getElementById('rate-ticker-usd');
             const tickerEur = document.getElementById('rate-ticker-eur');
             const tickerHkd = document.getElementById('rate-ticker-hkd');
-            if (tickerUsd) tickerUsd.textContent = EXCHANGE_RATES.USD.toFixed(2);
-            if (tickerEur) tickerEur.textContent = EXCHANGE_RATES.EUR.toFixed(2);
-            if (tickerHkd) tickerHkd.textContent = EXCHANGE_RATES.HKD.toFixed(2);
+            if (tickerUsd) tickerUsd.textContent = EXCHANGE_RATES.USD.toFixed(4);
+            if (tickerEur) tickerEur.textContent = EXCHANGE_RATES.EUR.toFixed(4);
+            if (tickerHkd) tickerHkd.textContent = EXCHANGE_RATES.HKD.toFixed(4);
 
-            // Update custom dropdown labels
+            // Update custom dropdown labels (4 decimal places)
             const dropUsd = document.getElementById('rate-dropdown-usd');
             const dropEur = document.getElementById('rate-dropdown-eur');
             const dropHkd = document.getElementById('rate-dropdown-hkd');
-            if (dropUsd) dropUsd.textContent = `汇率: ${EXCHANGE_RATES.USD.toFixed(2)}`;
-            if (dropEur) dropEur.textContent = `汇率: ${EXCHANGE_RATES.EUR.toFixed(2)}`;
-            if (dropHkd) dropHkd.textContent = `汇率: ${EXCHANGE_RATES.HKD.toFixed(2)}`;
-
-            // Update sidebar chips
-            const chipUsd = document.getElementById('rate-chip-usd');
-            const chipEur = document.getElementById('rate-chip-eur');
-            const chipHkd = document.getElementById('rate-chip-hkd');
-            if (chipUsd) chipUsd.textContent = EXCHANGE_RATES.USD.toFixed(2);
-            if (chipEur) chipEur.textContent = EXCHANGE_RATES.EUR.toFixed(2);
-            if (chipHkd) chipHkd.textContent = EXCHANGE_RATES.HKD.toFixed(2);
+            if (dropUsd) dropUsd.textContent = `1 USD ≈ ${EXCHANGE_RATES.USD.toFixed(4)} CNY`;
+            if (dropEur) dropEur.textContent = `1 EUR ≈ ${EXCHANGE_RATES.EUR.toFixed(4)} CNY`;
+            if (dropHkd) dropHkd.textContent = `1 HKD ≈ ${EXCHANGE_RATES.HKD.toFixed(4)} CNY`;
         } catch (err) {
             console.error('Error updating rates UI:', err);
         }
@@ -325,10 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
         quoteCurrencyInput.value = val;
         
         const labelText = {
-            CNY: 'CNY - 人民币 (¥)',
-            USD: 'USD - 美元 ($)',
-            EUR: 'EUR - 欧元 (€)',
-            HKD: 'HKD - 港币 (HK$)'
+            CNY: 'CNY (¥)',
+            USD: 'USD ($)',
+            EUR: 'EUR (€)',
+            HKD: 'HKD (HK$)'
         };
         currencyTriggerLabel.textContent = labelText[val] || val;
 
@@ -617,9 +609,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
                 const base = `¥${parseFloat(cnyVal).toFixed(2)}`;
                 if (target === 'CNY') {
-                    return `${label}:${base}`;
+                    return `${label}: ${base}`;
                 }
-                return `${label}:${base}(≈ ${targetSymbol}${convertedVal.toFixed(2)})`;
+                return `${label}: ${base} (≈ ${targetSymbol}${convertedVal.toFixed(2)})`;
             };
 
             // Generate detailed billing tooltip / breakdown subtext
