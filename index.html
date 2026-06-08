@@ -11,7 +11,7 @@
     <!-- Style Sheet -->
     <link rel="stylesheet" href="style.css">
     <!-- App Logic -->
-    <script src="app.js?v=1.4.4" defer></script>
+    <script src="app.js?v=1.4.5" defer></script>
 </head>
 <body>
     <div class="app-container">
@@ -26,7 +26,7 @@
                     <a href="https://www.graypoplar.com/" target="_blank" class="nav-link">官网首页</a>
                     <a href="https://wa.me/85262508059" target="_blank" class="nav-link">客服咨询</a>
                     <span class="nav-separator">/</span>
-                    <span class="nav-version">V1.4.4 Enterprise</span>
+                    <span class="nav-version">V1.4.5 Enterprise</span>
                 </div>
             </div>
             <div class="nav-right">
@@ -142,6 +142,16 @@
                                 <span class="times">&times;</span>
                                 <input type="number" id="quote-height" min="1" placeholder="高" value="1">
                             </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="quote-currency">展示币种</label>
+                            <select id="quote-currency">
+                                <option value="CNY" selected>人民币 (CNY - ¥)</option>
+                                <option value="USD">美元 (USD - $)</option>
+                                <option value="EUR">欧元 (EUR - €)</option>
+                                <option value="HKD">港币 (HKD - HK$)</option>
+                            </select>
+                            <span class="field-hint">结算汇率: 1 USD = 7.25 CNY | 1 EUR = 7.85 CNY | 1 HKD = 0.93 CNY</span>
                         </div>
                         <button type="submit" class="submit-btn full-width">
                             <span>开始测算报价</span>

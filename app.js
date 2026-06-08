@@ -40,6 +40,36 @@ document.addEventListener('DOMContentLoaded', () => {
     let isQuoteSortAscending = true; // Lowest price first by default
     let selectedCountryCode = '';
 
+    const EXCHANGE_RATES = {
+        CNY: 1.0,
+        USD: 7.25,
+        EUR: 7.85,
+        HKD: 0.93
+    };
+
+    function getSelectedCurrency() {
+        const select = document.getElementById('quote-currency');
+        return select ? select.value : 'CNY';
+    }
+
+    function getDisplayPrice(amountInCNY) {
+        if (amountInCNY === null || amountInCNY === undefined) return 0;
+        const target = getSelectedCurrency();
+        const rate = EXCHANGE_RATES[target] || 1.0;
+        return amountInCNY / rate;
+    }
+
+    function getCurrencySymbol() {
+        const target = getSelectedCurrency();
+        const symbols = {
+            CNY: '¥',
+            USD: '$',
+            EUR: '€',
+            HKD: 'HK$'
+        };
+        return symbols[target] || '¥';
+    }
+
     // Secure token credentials (embedded client-side for GitHub Pages deployment)
     const CLIENT_CODE = 'CN3949603';
     const API_SECRET = '3ihcklF2g/g1NdP1ZhzhXw==';
@@ -179,6 +209,16 @@ document.addEventListener('DOMContentLoaded', () => {
         closeDropdown();
     }
 
+    // Currency toggle change
+    const quoteCurrencySelect = document.getElementById('quote-currency');
+    if (quoteCurrencySelect) {
+        quoteCurrencySelect.addEventListener('change', () => {
+            if (!quoteData || quoteData.length === 0) return;
+            updateMetrics();
+            renderQuotationChannels();
+        });
+    }
+
     // Form submit
     quoteForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -268,31 +308,53 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (response.ok && data.Code === '0000' && data.Items) {
-                // Apply 13% profit markup and 2 RMB packaging fee client-side
+                // Apply 22% profit markup and 2 RMB packaging fee client-side in CNY
                 quoteData = data.Items.map(item => {
-                    const originalTotal = parseFloat(item.TotalFee) || 0;
+                    const originalCurrency = item.Currency || 'CNY';
+                    const usdToCnyRate = EXCHANGE_RATES['USD'];
                     
-                    // Add 13% profit to individual fields
-                    item.ShippingFee = (parseFloat(item.ShippingFee) || 0) * 1.13;
-                    item.RegistrationFee = (parseFloat(item.RegistrationFee) || 0) * 1.13;
-                    item.FuelFee = (parseFloat(item.FuelFee) || 0) * 1.13;
-                    item.SundryFee = (parseFloat(item.SundryFee) || 0) * 1.13;
+                    const toCNY = (val) => {
+                        const num = parseFloat(val) || 0;
+                        return originalCurrency === 'USD' ? num * usdToCnyRate : num;
+                    };
+                    
+                    // Convert original values to CNY
+                    const originalShippingFee = toCNY(item.ShippingFee);
+                    const originalRegistrationFee = toCNY(item.RegistrationFee);
+                    const originalFuelFee = toCNY(item.FuelFee);
+                    const originalSundryFee = toCNY(item.SundryFee);
+                    const originalTariffPrepayFee = toCNY(item.TariffPrepayFee);
+                    const originalInsuredFee = toCNY(item.InsuredFee);
+                    const originalSignatureFee = toCNY(item.SignatureFee);
+                    const originalTotalFee = toCNY(item.TotalFee);
+                    
+                    // Add 22% profit markup (1.22) in CNY
+                    item.ShippingFeeCNY = originalShippingFee * 1.22;
+                    item.RegistrationFeeCNY = originalRegistrationFee * 1.22;
+                    item.FuelFeeCNY = originalFuelFee * 1.22;
+                    item.SundryFeeCNY = originalSundryFee * 1.22;
                     
                     if (item.TariffPrepayFee !== null && item.TariffPrepayFee !== undefined) {
-                        item.TariffPrepayFee = (parseFloat(item.TariffPrepayFee) || 0) * 1.13;
+                        item.TariffPrepayFeeCNY = originalTariffPrepayFee * 1.22;
+                    } else {
+                        item.TariffPrepayFeeCNY = null;
                     }
                     if (item.InsuredFee !== null && item.InsuredFee !== undefined) {
-                        item.InsuredFee = (parseFloat(item.InsuredFee) || 0) * 1.13;
+                        item.InsuredFeeCNY = originalInsuredFee * 1.22;
+                    } else {
+                        item.InsuredFeeCNY = null;
                     }
                     if (item.SignatureFee !== null && item.SignatureFee !== undefined) {
-                        item.SignatureFee = (parseFloat(item.SignatureFee) || 0) * 1.13;
+                        item.SignatureFeeCNY = originalSignatureFee * 1.22;
+                    } else {
+                        item.SignatureFeeCNY = null;
                     }
                     
                     // Add packaging fee (2 RMB)
-                    item.PackagingFee = 2;
+                    item.PackagingFeeCNY = 2;
                     
-                    // Total is marked up by 1.13 + 2 packaging fee
-                    item.TotalFee = (originalTotal * 1.13) + 2;
+                    // Total is marked up by 1.22 + 2 packaging fee
+                    item.TotalFeeCNY = (originalTotalFee * 1.22) + 2;
                     
                     return item;
                 });
@@ -328,15 +390,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Cheapest Channel
         let cheapest = quoteData[0];
         quoteData.forEach(item => {
-            const fee = parseFloat(item.TotalFee) || 0;
-            const cheapestFee = parseFloat(cheapest.TotalFee) || 0;
+            const fee = parseFloat(item.TotalFeeCNY) || 0;
+            const cheapestFee = parseFloat(cheapest.TotalFeeCNY) || 0;
             if (fee < cheapestFee) {
                 cheapest = item;
             }
         });
         
-        const cheapestSymbol = cheapest.Currency === 'USD' ? '$' : '¥';
-        metricCheapestVal.textContent = `${cheapestSymbol}${parseFloat(cheapest.TotalFee).toFixed(2)}`;
+        const cheapestDisplay = getDisplayPrice(cheapest.TotalFeeCNY);
+        const cheapestSymbol = getCurrencySymbol();
+        metricCheapestVal.textContent = `${cheapestSymbol}${cheapestDisplay.toFixed(2)}`;
         metricCheapestName.textContent = cheapest.CName || cheapest.Code;
 
         // 2. Fastest Channel (smallest min day in "X-Y" range)
@@ -390,40 +453,40 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Sort quoteData by total fee
+        // Sort quoteData by total fee in CNY
         quoteData.sort((a, b) => {
-            const feeA = parseFloat(a.TotalFee) || 0;
-            const feeB = parseFloat(b.TotalFee) || 0;
+            const feeA = parseFloat(a.TotalFeeCNY) || 0;
+            const feeB = parseFloat(b.TotalFeeCNY) || 0;
             return isQuoteSortAscending ? feeA - feeB : feeB - feeA;
         });
+
+        const targetSymbol = getCurrencySymbol();
 
         quoteData.forEach((channel) => {
             const cardEl = document.createElement('div');
             cardEl.className = 'quote-channel-card';
 
-            const total = parseFloat(channel.TotalFee) || 0;
-            const sf = parseFloat(channel.ShippingFee) || 0;
-            const rf = parseFloat(channel.RegistrationFee) || 0;
-            const ff = parseFloat(channel.FuelFee) || 0;
-            const sundry = parseFloat(channel.SundryFee) || 0;
-            const tariff = parseFloat(channel.TariffPrepayFee) || 0;
-            const insured = parseFloat(channel.InsuredFee) || 0;
-            const sig = parseFloat(channel.SignatureFee) || 0;
-            const pack = parseFloat(channel.PackagingFee) || 0;
+            const total = getDisplayPrice(channel.TotalFeeCNY);
+            const sf = getDisplayPrice(channel.ShippingFeeCNY);
+            const rf = getDisplayPrice(channel.RegistrationFeeCNY);
+            const ff = getDisplayPrice(channel.FuelFeeCNY);
+            const sundry = getDisplayPrice(channel.SundryFeeCNY);
+            const tariff = getDisplayPrice(channel.TariffPrepayFeeCNY);
+            const insured = getDisplayPrice(channel.InsuredFeeCNY);
+            const sig = getDisplayPrice(channel.SignatureFeeCNY);
+            const pack = getDisplayPrice(channel.PackagingFeeCNY);
             
             // Generate detailed billing tooltip / breakdown subtext
             const breakdownParts = [];
-            if (sf > 0) breakdownParts.push(`运费:¥${sf.toFixed(2)}`);
-            if (rf > 0) breakdownParts.push(`挂号:¥${rf.toFixed(2)}`);
-            if (ff > 0) breakdownParts.push(`燃油:¥${ff.toFixed(2)}`);
-            if (sundry > 0) breakdownParts.push(`杂费:¥${sundry.toFixed(2)}`);
-            if (tariff > 0) breakdownParts.push(`预付税:¥${tariff.toFixed(2)}`);
-            if (insured > 0) breakdownParts.push(`保价:¥${insured.toFixed(2)}`);
-            if (sig > 0) breakdownParts.push(`签名:¥${sig.toFixed(2)}`);
-            if (pack > 0) breakdownParts.push(`打包费:¥${pack.toFixed(2)}`);
+            if (sf > 0) breakdownParts.push(`运费:${targetSymbol}${sf.toFixed(2)}`);
+            if (rf > 0) breakdownParts.push(`挂号:${targetSymbol}${rf.toFixed(2)}`);
+            if (ff > 0) breakdownParts.push(`燃油:${targetSymbol}${ff.toFixed(2)}`);
+            if (sundry > 0) breakdownParts.push(`杂费:${targetSymbol}${sundry.toFixed(2)}`);
+            if (tariff > 0) breakdownParts.push(`预付税:${targetSymbol}${tariff.toFixed(2)}`);
+            if (insured > 0) breakdownParts.push(`保价:${targetSymbol}${insured.toFixed(2)}`);
+            if (sig > 0) breakdownParts.push(`签名:${targetSymbol}${sig.toFixed(2)}`);
+            if (pack > 0) breakdownParts.push(`打包费:${targetSymbol}${pack.toFixed(2)}`);
             const breakdownText = breakdownParts.join(' + ');
-
-            const currencySymbol = channel.Currency === 'USD' ? '$' : '¥';
 
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
@@ -447,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${pack > 0 ? `
                         <div class="channel-meta-item packaging-fee">
-                            <span>📦 打包费: <strong>¥${pack.toFixed(2)}</strong></span>
+                            <span>📦 打包费: <strong>${targetSymbol}${pack.toFixed(2)}</strong></span>
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
@@ -457,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="channel-price-area">
                     <div class="channel-total-badge">
-                        <span class="currency">${currencySymbol}</span>
+                        <span class="currency">${targetSymbol}</span>
                         <span class="amount">${total.toFixed(2)}</span>
                     </div>
                     <div class="channel-price-breakdown">${breakdownText}</div>
