@@ -884,17 +884,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return excelTransit || item.DeliveryDays;
         };
 
-        // 2. Fastest Channel (smallest min day in prioritized transit range)
+        // 2. Fastest Channel (smallest max day in prioritized transit range)
         let fastest = quoteData[0];
         let fastestTransitStr = getEffectiveTransitString(fastest);
-        let fastestMinDays = getMinDays(fastestTransitStr);
+        let fastestMaxDays = getMaxDays(fastestTransitStr);
         
         quoteData.forEach(item => {
             const transitStr = getEffectiveTransitString(item);
-            const minDays = getMinDays(transitStr);
-            if (minDays < fastestMinDays) {
+            const maxDays = getMaxDays(transitStr);
+            if (maxDays < fastestMaxDays) {
                 fastest = item;
-                fastestMinDays = minDays;
+                fastestMaxDays = maxDays;
                 fastestTransitStr = transitStr;
             }
         });
@@ -920,6 +920,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!daysString) return 999;
         const match = daysString.match(/^(\d+)/);
         return match ? parseInt(match[1]) : 999;
+    }
+
+    // Parse "3-8" or "7" delivery days string to extract maximum days (upper bound of range)
+    function getMaxDays(daysString) {
+        if (!daysString) return 999;
+        const rangeMatch = daysString.match(/(\d+)\s*[-~至~to]\s*(\d+)/i);
+        if (rangeMatch) {
+            return parseInt(rangeMatch[2]);
+        }
+        const singleMatch = daysString.match(/(\d+)/);
+        return singleMatch ? parseInt(singleMatch[1]) : 999;
     }
 
     function getGoodsTypeClass(goodsType) {
@@ -989,15 +1000,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentSortMode === 'price_desc') {
             quoteData.sort((a, b) => (parseFloat(b.TotalFeeCNY) || 0) - (parseFloat(a.TotalFeeCNY) || 0));
         } else if (currentSortMode === 'time_asc') {
-            const getEffectiveMinDays = (item) => {
+            const getEffectiveMaxDays = (item) => {
                 const excelTransitMap = transitTimesData[item.Code];
                 const excelTransit = getExcelTransit(excelTransitMap, countryCName);
                 const transitStr = excelTransit || item.DeliveryDays;
-                return getMinDays(transitStr);
+                return getMaxDays(transitStr);
             };
             quoteData.sort((a, b) => {
-                const daysA = getEffectiveMinDays(a);
-                const daysB = getEffectiveMinDays(b);
+                const daysA = getEffectiveMaxDays(a);
+                const daysB = getEffectiveMaxDays(b);
                 if (daysA !== daysB) {
                     return daysA - daysB;
                 }

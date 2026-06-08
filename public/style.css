@@ -200,7 +200,7 @@ body {
 }
 
 .nav-logo .logo-img {
-    height: 42px; /* Clean profile inside navbar */
+    height: 56px; /* Clean profile inside navbar */
     width: auto;
     object-fit: contain;
 }
