@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.27">
+    <link rel="stylesheet" href="style.css?v=1.5.28">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.27" defer></script>
+    <script src="app.js?v=1.5.28" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -36,7 +36,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.27 Enterprise</span>
+                <span class="status-bar-text version">V1.5.28 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -307,13 +307,20 @@
                             <h3 class="panel-section-title" data-translate="results_title">渠道估算报价清单</h3>
                             <p id="quote-summary-details" class="quote-summary-details">测算详情: -</p>
                         </div>
-                        <button id="quote-sort-btn" class="text-btn">
+                        <div class="sort-select-wrapper">
                             <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <polyline points="19 12 12 19 5 12"></polyline>
                             </svg>
-                            <span data-translate="sort_asc">价格从低到高</span>
-                        </button>
+                            <select id="quote-sort-select" class="sort-select">
+                                <option value="price_asc" data-translate="sort_price_asc">价格从低到高</option>
+                                <option value="price_desc" data-translate="sort_price_desc">价格从高到低</option>
+                                <option value="time_asc" data-translate="sort_time_asc">时效从快到慢</option>
+                            </select>
+                            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
                     </div>
 
                     <!-- Alert Notice Bar -->

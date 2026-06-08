@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Results List elements
     const quoteSummaryDetails = document.getElementById('quote-summary-details');
     const quoteChannelsContainer = document.getElementById('quote-channels-container');
-    const quoteSortBtn = document.getElementById('quote-sort-btn');
+    const quoteSortSelect = document.getElementById('quote-sort-select');
 
     // Language configuration
     const TRANSLATIONS = {
@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
             results_title: "渠道估算报价清单",
             sort_asc: "价格从低到高",
             sort_desc: "价格从高到低",
+            sort_price_asc: "价格从低到高",
+            sort_price_desc: "价格从高到低",
+            sort_time_asc: "时效从快到慢",
             alert_text: "云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>graypoplar</strong> 客服团队核实。",
             whatsapp_btn: "WhatsApp 咨询",
             footer_text: "© 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。",
@@ -145,6 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
             results_title: "Channel Quotation Estimates",
             sort_asc: "Price: Low to High",
             sort_desc: "Price: High to Low",
+            sort_price_asc: "Price: Low to High",
+            sort_price_desc: "Price: High to Low",
+            sort_time_asc: "Transit: Fast to Slow",
             alert_text: "Estimated delivery times from the YunExpress API may vary. For official transit times and special services, please contact the <strong>graypoplar</strong> customer support team.",
             whatsapp_btn: "WhatsApp Support",
             footer_text: "© 2026 graypoplar. All Rights Reserved. This system is independently developed. Syncing live YunExpress APIs for shipping evaluation only.",
@@ -209,12 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        if (quoteSortBtn) {
-            const sortText = quoteSortBtn.querySelector('span');
-            if (sortText) {
-                sortText.textContent = isQuoteSortAscending ? TRANSLATIONS[CURRENT_LANG]['sort_asc'] : TRANSLATIONS[CURRENT_LANG]['sort_desc'];
-            }
-        }
+
 
         if (countryTriggerLabel) {
             if (selectedCountryCode) {
@@ -265,9 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // State variables
+    let rawQuoteItems = [];
     let quoteData = [];
-    let rawQuoteItems = []; // Raw items cache for dynamic recalculation
-    let isQuoteSortAscending = true; // Lowest price first by default
+    let currentSortMode = 'price_asc'; // Default sorting mode
     let selectedCountryCode = '';
     let transitTimesData = {}; // Transit times data from Excel
 
@@ -744,22 +746,13 @@ document.addEventListener('DOMContentLoaded', () => {
         performQuotationQuery();
     });
 
-    // Sort toggle
-    quoteSortBtn.addEventListener('click', () => {
-        if (!quoteData || quoteData.length === 0) return;
-        isQuoteSortAscending = !isQuoteSortAscending;
-        
-        const sortText = quoteSortBtn.querySelector('span');
-        if (isQuoteSortAscending) {
-            quoteSortBtn.classList.remove('sort-reverse');
-            sortText.textContent = '价格从低到高';
-        } else {
-            quoteSortBtn.classList.add('sort-reverse');
-            sortText.textContent = '价格从高到低';
-        }
-        
-        renderQuotationChannels();
-    });
+    // Sort dropdown change
+    if (quoteSortSelect) {
+        quoteSortSelect.addEventListener('change', (e) => {
+            currentSortMode = e.target.value;
+            renderQuotationChannels();
+        });
+    }
 
     function showState(state) {
         // Hide all states
@@ -990,12 +983,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
         const countryCName = selectedCountryObj ? selectedCountryObj.CName : '';
 
-        // Sort quoteData by total fee in CNY
-        quoteData.sort((a, b) => {
-            const feeA = parseFloat(a.TotalFeeCNY) || 0;
-            const feeB = parseFloat(b.TotalFeeCNY) || 0;
-            return isQuoteSortAscending ? feeA - feeB : feeB - feeA;
-        });
+        // Sort quoteData by active sort mode
+        if (currentSortMode === 'price_asc') {
+            quoteData.sort((a, b) => (parseFloat(a.TotalFeeCNY) || 0) - (parseFloat(b.TotalFeeCNY) || 0));
+        } else if (currentSortMode === 'price_desc') {
+            quoteData.sort((a, b) => (parseFloat(b.TotalFeeCNY) || 0) - (parseFloat(a.TotalFeeCNY) || 0));
+        } else if (currentSortMode === 'time_asc') {
+            const getEffectiveMinDays = (item) => {
+                const excelTransitMap = transitTimesData[item.Code];
+                const excelTransit = getExcelTransit(excelTransitMap, countryCName);
+                const transitStr = excelTransit || item.DeliveryDays;
+                return getMinDays(transitStr);
+            };
+            quoteData.sort((a, b) => {
+                const daysA = getEffectiveMinDays(a);
+                const daysB = getEffectiveMinDays(b);
+                if (daysA !== daysB) {
+                    return daysA - daysB;
+                }
+                return (parseFloat(a.TotalFeeCNY) || 0) - (parseFloat(b.TotalFeeCNY) || 0); // secondary sort by price ascending
+            });
+        }
 
         const target = getSelectedCurrency();
         const targetSymbol = getCurrencySymbol();

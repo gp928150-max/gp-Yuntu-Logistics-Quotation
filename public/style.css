@@ -915,35 +915,53 @@ body {
     margin-top: 6px;
 }
 
-.text-btn {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
+.sort-select-wrapper {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 8px;
     background: #f5f5f7;
+    border-radius: 8px;
+    padding: 0 12px 0 16px;
+    height: 36px;
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-.text-btn:hover {
+.sort-select-wrapper:hover {
     background: #e8e8ed;
 }
 
-.sort-icon {
+.sort-select-wrapper .sort-icon {
     width: 14px;
     height: 14px;
-    transition: transform 0.2s ease;
+    color: var(--primary);
+    margin-right: 6px;
+    pointer-events: none;
 }
 
-.sort-reverse .sort-icon {
-    transform: rotate(180deg);
+.sort-select-wrapper select.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--primary);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.90rem;
+    cursor: pointer;
+    height: 100%;
+    padding: 0 20px 0 0;
+    margin: 0;
+}
+
+.sort-select-wrapper .chevron-icon {
+    position: absolute;
+    right: 12px;
+    width: 12px;
+    height: 12px;
+    color: var(--primary);
+    pointer-events: none;
 }
 
 /* Quotation Channels list and cards */
