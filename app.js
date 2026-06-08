@@ -175,8 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let CURRENT_LANG = localStorage.getItem('gp_lang') || 'zh';
+    if (CURRENT_LANG !== 'zh' && CURRENT_LANG !== 'en') {
+        CURRENT_LANG = 'zh';
+    }
 
     function updateLanguageDOM() {
+        if (!TRANSLATIONS[CURRENT_LANG]) {
+            CURRENT_LANG = 'zh';
+        }
+
         document.querySelectorAll('[data-translate]').forEach(el => {
             const key = el.getAttribute('data-translate');
             const translation = TRANSLATIONS[CURRENT_LANG][key];
@@ -197,25 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const sortText = quoteSortBtn.querySelector('span');
-        if (sortText) {
-            sortText.textContent = isQuoteSortAscending ? TRANSLATIONS[CURRENT_LANG]['sort_asc'] : TRANSLATIONS[CURRENT_LANG]['sort_desc'];
-        }
-
-        if (selectedCountryCode) {
-            const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
-            if (selectedCountryObj) {
-                const flag = getFlagEmoji(selectedCountryCode);
-                const name = getCountryDisplayName(selectedCountryObj);
-                countryTriggerLabel.innerHTML = `${flag} ${name} (${selectedCountryCode})`;
+        if (quoteSortBtn) {
+            const sortText = quoteSortBtn.querySelector('span');
+            if (sortText) {
+                sortText.textContent = isQuoteSortAscending ? TRANSLATIONS[CURRENT_LANG]['sort_asc'] : TRANSLATIONS[CURRENT_LANG]['sort_desc'];
             }
-        } else {
-            countryTriggerLabel.textContent = TRANSLATIONS[CURRENT_LANG]['select_country_placeholder'];
         }
 
-        const baseCurrencyLbl = currencyOptionsList.querySelector('li[data-value="CNY"] .currency-rate-lbl');
-        if (baseCurrencyLbl) {
-            baseCurrencyLbl.textContent = TRANSLATIONS[CURRENT_LANG]['currency_base'];
+        if (countryTriggerLabel) {
+            if (selectedCountryCode) {
+                const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
+                if (selectedCountryObj) {
+                    const flag = getFlagEmoji(selectedCountryCode);
+                    const name = getCountryDisplayName(selectedCountryObj);
+                    countryTriggerLabel.innerHTML = `${flag} ${name} (${selectedCountryCode})`;
+                }
+            } else {
+                countryTriggerLabel.textContent = TRANSLATIONS[CURRENT_LANG]['select_country_placeholder'];
+            }
+        }
+
+        if (currencyOptionsList) {
+            const baseCurrencyLbl = currencyOptionsList.querySelector('li[data-value="CNY"] .currency-rate-lbl');
+            if (baseCurrencyLbl) {
+                baseCurrencyLbl.textContent = TRANSLATIONS[CURRENT_LANG]['currency_base'];
+            }
         }
     }
 
