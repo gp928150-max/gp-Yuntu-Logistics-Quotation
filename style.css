@@ -138,7 +138,36 @@ body {
 .nav-right {
     display: flex;
     align-items: center;
+    gap: 16px;
+}
+
+/* Navbar Exchange Rates Ticker Display */
+.nav-rates-display {
+    display: inline-flex;
+    align-items: center;
     gap: 12px;
+    margin-right: 4px;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    padding-right: 16px;
+}
+
+.rate-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    user-select: none;
+}
+
+.rate-indicator .bullet {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--success); /* Green dot for rate status */
+    display: inline-block;
 }
 
 /* Custom Currency Dropdown Selector - Apple Glassmorphism styling */
@@ -1260,13 +1289,25 @@ body {
     }
     
     .nav-right {
-        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         width: 100%;
-        gap: 12px;
+        gap: 10px;
+    }
+    
+    .nav-rates-display {
+        border-right: none;
+        padding-right: 0;
+        margin-right: 0;
+        justify-content: center;
+        width: 100%;
+        gap: 16px;
     }
     
     .currency-select-container {
         margin-right: 0;
+        justify-content: center;
     }
     
     .main-title {
