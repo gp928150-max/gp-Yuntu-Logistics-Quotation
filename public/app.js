@@ -830,6 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminPackInput = document.getElementById('admin-pack-input');
     const adminTokenInput = document.getElementById('admin-token-input');
     const adminApiBaseInput = document.getElementById('admin-api-base-input');
+    const adminBackendUrlInput = document.getElementById('admin-backend-url-input');
     const adminSaveStatus = document.getElementById('admin-save-status');
     const adminSaveBtn = document.getElementById('admin-save-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
@@ -850,6 +851,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (adminApiBaseInput) {
         adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
+    }
+    if (adminBackendUrlInput) {
+        adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
     }
 
     // Modal Events
@@ -905,6 +909,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminApiBaseInput) {
                 adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
             }
+            if (adminBackendUrlInput) {
+                adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
+            }
             adminSaveStatus.textContent = '';
         } else {
             adminVerifyError.textContent = '密码错误，认证失败！';
@@ -924,7 +931,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // First, try using our backend proxy (/api/github-sync)
-            const proxyUrl = '/api/github-sync';
+            let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
+            if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
+                backendUrl = 'https://' + backendUrl;
+            }
+            backendUrl = backendUrl.replace(/\/+$/, '');
+
+            const proxyUrl = backendUrl ? `${backendUrl}/api/github-sync` : '/api/github-sync';
             const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
@@ -1008,14 +1021,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (fetchErr) {
                     if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
-                        throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                        const isGithubPages = window.location.hostname.includes('github.io');
+                        if (isGithubPages) {
+                            throw new Error(`连接 GitHub 接口失败。由于您部署在 GitHub Pages 静态托管上，国内访问受阻，请确保您在下方配置了 Vercel 后端服务地址来进行安全中转。`);
+                        } else {
+                            throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                        }
                     }
                     throw fetchErr;
                 }
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.12)`,
+                    message: `Update ${path} from admin panel (V1.5.15)`,
                     content: base64Content
                 };
                 if (sha) {
@@ -1039,7 +1057,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (fetchErr) {
                     if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
-                        throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                        const isGithubPages = window.location.hostname.includes('github.io');
+                        if (isGithubPages) {
+                            throw new Error(`连接 GitHub 接口失败。由于您部署在 GitHub Pages 静态托管上，国内访问受阻，请确保您在下方配置了 Vercel 后端服务地址来进行安全中转。`);
+                        } else {
+                            throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                        }
                     }
                     throw fetchErr;
                 }
@@ -1108,6 +1131,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.setItem('gp_github_api_base', apiBaseVal);
                     } else {
                         localStorage.removeItem('gp_github_api_base');
+                    }
+                }
+
+                // Save custom backend API proxy if configured
+                if (adminBackendUrlInput) {
+                    const backendUrlVal = adminBackendUrlInput.value.trim();
+                    if (backendUrlVal) {
+                        localStorage.setItem('gp_backend_url', backendUrlVal);
+                    } else {
+                        localStorage.removeItem('gp_backend_url');
                     }
                 }
                 
