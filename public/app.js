@@ -1008,8 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Cache-Control': 'no-cache'
+                            'Accept': 'application/vnd.github.v3+json'
                         }
                     });
 
