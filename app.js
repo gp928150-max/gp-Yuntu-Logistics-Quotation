@@ -252,6 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function rebuildCountryNamesMap() {
+        countriesList.forEach(c => {
+            const flag = getFlagEmoji(c.CountryCode);
+            const name = getCountryDisplayName(c);
+            countryNames[c.CountryCode] = `${flag} ${name} (${c.CountryCode})`;
+        });
+    }
+
     let quoteData = [];
     let rawQuoteItems = []; // Raw items cache for dynamic recalculation
     let isQuoteSortAscending = true; // Lowest price first by default
