@@ -1033,6 +1033,8 @@ body {
     flex-direction: column;
     gap: 3px;
     align-items: flex-end;
+    flex-shrink: 0;
+    min-width: 180px;
 }
 
 .channel-total-badge {
@@ -1068,6 +1070,10 @@ body {
     color: var(--text-secondary);
     line-height: 1.4;
     letter-spacing: 0;
+    max-width: 320px;
+    word-wrap: break-word;
+    white-space: normal;
+    text-align: right;
 }
 
 /* Custom Searchable Country Select Dropdown - Apple Glassmorphism list */

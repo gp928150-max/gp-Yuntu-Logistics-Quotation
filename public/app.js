@@ -640,14 +640,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const sig = getDisplayPrice(channel.SignatureFeeCNY);
             const pack = getDisplayPrice(channel.PackagingFeeCNY);
             
-            // Helper to format individual breakdown sub-fees in dual currency with tilde
+            // Helper to format individual breakdown sub-fees in the selected currency
             const formatBreakdownItem = (label, cnyVal, convertedVal) => {
                 if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
-                const base = `¥${parseFloat(cnyVal).toFixed(2)}`;
                 if (target === 'CNY') {
-                    return `${label}: ${base}`;
+                    return `${label}: ¥${parseFloat(cnyVal).toFixed(2)}`;
                 }
-                return `${label}: ${base} (≈ ${targetSymbol}${convertedVal.toFixed(2)})`;
+                return `${label}: ${targetSymbol}${convertedVal.toFixed(2)}`;
             };
 
             // Generate detailed billing tooltip / breakdown subtext
