@@ -949,43 +949,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'type-general';
     }
 
+    function getChannelIconClass(name) {
+        if (!name) return 'direct';
+        const lowerName = name.toLowerCase();
+        if (lowerName.includes('小包') || lowerName.includes('post') || lowerName.includes('mail')) return 'mail';
+        if (lowerName.includes('特快') || lowerName.includes('faster') || lowerName.includes('priority') || lowerName.includes('快') || lowerName.includes('express')) return 'express';
+        if (lowerName.includes('专线') || lowerName.includes('direct') || lowerName.includes('driect') || lowerName.includes('line')) return 'direct';
+        return 'parcel';
+    }
+
     function getChannelIcon(name) {
-        if (!name) {
+        const iconClass = getChannelIconClass(name);
+        if (iconClass === 'mail') {
             return `
-                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 16V14L13 9V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"></path>
+                <svg class="channel-svg-icon icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.9 1.9 0 0 1-2.06 0L2 7"></path>
                 </svg>
             `;
         }
-        if (name.includes('小包') || name.includes('Post') || name.includes('Mail')) {
+        if (iconClass === 'express') {
             return `
-                <svg class="channel-svg-icon icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
+                <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                 </svg>
             `;
         }
-        if (name.includes('特快') || name.includes('Faster') || name.includes('Priority') || name.includes('快') || name.includes('Express')) {
+        if (iconClass === 'direct') {
             return `
-                <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4.5 16.5c-1.5 1.5-2.5 3.5-2.5 5.5 2 0 4-1 5.5-2.5L18.8 8.2c1-1 .7-2.7-.6-4-1.3-1.3-3-1.6-4-.6L4.5 16.5z"></path>
-                    <path d="m12 8 4 4"></path>
-                    <path d="m9 11 4 4"></path>
+                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.8 19.2L16 11l3.5-3.5C20.3 6.7 20.3 5.3 19.5 4.5C18.7 3.7 17.3 3.7 16.5 4.5L13 8 4.8 6.2 3 8l7.1 2.9-4.2 4.2-2.8-.7L1.7 16l3 2 2 3 1.2-1.4-.7-2.8 4.2-4.2 2.9 7.1z"></path>
                 </svg>
             `;
         }
-        if (name.includes('专线') || name.includes('Direct') || name.includes('Driect') || name.includes('Line')) {
-            return `
-                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 16V14L13 9V3.5A1.5 1.5 0 0 0 11.5 2A1.5 1.5 0 0 0 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"></path>
-                </svg>
-            `;
-        }
+        // Fallback: parcel
         return `
-            <svg class="channel-svg-icon icon-parcel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="21 8 21 21 3 21 3 8"></polyline>
-                <rect x="1" y="3" width="22" height="5"></rect>
-                <line x1="12" y1="12" x2="12" y2="21"></line>
+            <svg class="channel-svg-icon icon-parcel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
             </svg>
         `;
     }
@@ -1140,10 +1142,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const subName = CURRENT_LANG === 'en' ? (channel.CName || '') : (channel.EName || '');
             const displaySubName = subName && subName !== mainName ? subName : '';
 
+            const iconName = channel.EName || channel.CName || channel.Code;
+            const iconClass = getChannelIconClass(iconName);
+            const iconHtml = getChannelIcon(iconName);
+
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
-                    <div class="channel-brand-icon-bg">
-                        <span>${getChannelIcon(channel.EName || channel.CName || channel.Code)}</span>
+                    <div class="channel-brand-icon-bg brand-icon-${iconClass}">
+                        <span>${iconHtml}</span>
                     </div>
                 </div>
                 <div class="channel-info-area">

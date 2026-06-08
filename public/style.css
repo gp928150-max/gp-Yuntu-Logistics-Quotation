@@ -1084,7 +1084,46 @@ body {
 
 .quote-channel-card:hover .channel-brand-icon-bg {
     transform: scale(1.05);
-    background: #e8e8ed;
+}
+
+.channel-brand-icon-bg.brand-icon-mail {
+    background: rgba(9, 109, 217, 0.07);
+    border-color: rgba(9, 109, 217, 0.12);
+}
+
+.channel-brand-icon-bg.brand-icon-express {
+    background: rgba(255, 149, 0, 0.07);
+    border-color: rgba(255, 149, 0, 0.12);
+}
+
+.channel-brand-icon-bg.brand-icon-direct {
+    background: rgba(0, 113, 227, 0.07);
+    border-color: rgba(0, 113, 227, 0.12);
+}
+
+.channel-brand-icon-bg.brand-icon-parcel {
+    background: rgba(134, 134, 139, 0.07);
+    border-color: rgba(134, 134, 139, 0.12);
+}
+
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail {
+    background: rgba(9, 109, 217, 0.13);
+    border-color: rgba(9, 109, 217, 0.2);
+}
+
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express {
+    background: rgba(255, 149, 0, 0.13);
+    border-color: rgba(255, 149, 0, 0.2);
+}
+
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct {
+    background: rgba(0, 113, 227, 0.13);
+    border-color: rgba(0, 113, 227, 0.2);
+}
+
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel {
+    background: rgba(134, 134, 139, 0.13);
+    border-color: rgba(134, 134, 139, 0.2);
 }
 
 .channel-brand-icon-bg svg {
