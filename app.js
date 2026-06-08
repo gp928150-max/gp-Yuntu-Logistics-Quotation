@@ -829,6 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminProfitInput = document.getElementById('admin-profit-input');
     const adminPackInput = document.getElementById('admin-pack-input');
     const adminTokenInput = document.getElementById('admin-token-input');
+    const adminApiBaseInput = document.getElementById('admin-api-base-input');
     const adminSaveStatus = document.getElementById('admin-save-status');
     const adminSaveBtn = document.getElementById('admin-save-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
@@ -846,6 +847,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (adminTokenInput) {
         adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
+    }
+    if (adminApiBaseInput) {
+        adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
     }
 
     // Modal Events
@@ -898,6 +902,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminTokenInput) {
                 adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
             }
+            if (adminApiBaseInput) {
+                adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
+            }
             adminSaveStatus.textContent = '';
         } else {
             adminVerifyError.textContent = '密码错误，认证失败！';
@@ -911,29 +918,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveConfigToGitHub(token, profit, pack) {
         const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
-        const path = 'config.json';
-        const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+        let apiBase = (localStorage.getItem('gp_github_api_base') || 'https://api.github.com').trim();
+        if (!apiBase) {
+            apiBase = 'https://api.github.com';
+        }
+        apiBase = apiBase.replace(/\/+$/, '');
         
         try {
             adminSaveStatus.style.color = 'var(--text-secondary)';
             adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
-
-            const getRes = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Cache-Control': 'no-cache'
-                }
-            });
-
-            let sha = '';
-            if (getRes.ok) {
-                const fileData = await getRes.json();
-                sha = fileData.sha;
-            } else if (getRes.status !== 404) {
-                throw new Error(`获取文件 SHA 失败: HTTP ${getRes.status}`);
-            }
 
             const configObj = {
                 profit_margin: profit,
@@ -942,31 +935,71 @@ document.addEventListener('DOMContentLoaded', () => {
             const configString = JSON.stringify(configObj, null, 2);
             const base64Content = btoa(configString);
 
-            const putBody = {
-                message: `Update config.json from admin panel (V1.5.9)`,
-                content: base64Content
-            };
-            if (sha) {
-                putBody.sha = sha;
-            }
+            // Synchronize both root config and public config to prevent desync in deployments
+            const paths = ['public/config.json', 'config.json'];
+            
+            for (const path of paths) {
+                const url = `${apiBase}/repos/${repo}/contents/${path}`;
+                
+                // 1. Get SHA of existing file (if any)
+                let sha = '';
+                try {
+                    const getRes = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
 
-            const putRes = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/vnd.github.v3+json'
-                },
-                body: JSON.stringify(putBody)
-            });
+                    if (getRes.ok) {
+                        const fileData = await getRes.json();
+                        sha = fileData.sha;
+                    } else if (getRes.status !== 404) {
+                        throw new Error(`获取 ${path} 的 SHA 失败: HTTP ${getRes.status}`);
+                    }
+                } catch (fetchErr) {
+                    if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
+                        throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                    }
+                    throw fetchErr;
+                }
 
-            if (!putRes.ok) {
-                const errData = await putRes.json();
-                throw new Error(errData.message || `HTTP ${putRes.status}`);
+                // 2. Put updated config
+                const putBody = {
+                    message: `Update ${path} from admin panel (V1.5.11)`,
+                    content: base64Content
+                };
+                if (sha) {
+                    putBody.sha = sha;
+                }
+
+                try {
+                    const putRes = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify(putBody)
+                    });
+
+                    if (!putRes.ok) {
+                        const errData = await putRes.json();
+                        throw new Error(`更新 ${path} 失败: ${errData.message || `HTTP ${putRes.status}`}`);
+                    }
+                } catch (fetchErr) {
+                    if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
+                        throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
+                    }
+                    throw fetchErr;
+                }
             }
 
             adminSaveStatus.style.color = 'var(--success)';
-            adminSaveStatus.textContent = '配置已同步至云端！GitHub Pages 会在1分钟内自动刷新生效。';
+            adminSaveStatus.textContent = '配置已同步至云端！部署系统会在1分钟内自动刷新生效。';
             
             // Close modal softly
             setTimeout(() => {
@@ -1020,6 +1053,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // GitHub cloud sync
             if (adminTokenInput) {
                 const tokenVal = adminTokenInput.value.trim();
+                
+                // Save custom API base proxy if configured
+                if (adminApiBaseInput) {
+                    const apiBaseVal = adminApiBaseInput.value.trim();
+                    if (apiBaseVal) {
+                        localStorage.setItem('gp_github_api_base', apiBaseVal);
+                    } else {
+                        localStorage.removeItem('gp_github_api_base');
+                    }
+                }
+                
                 if (tokenVal) {
                     localStorage.setItem('gp_github_token', tokenVal);
                     saveConfigToGitHub(tokenVal, SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
