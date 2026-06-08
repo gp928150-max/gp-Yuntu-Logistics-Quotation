@@ -17,6 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const countrySearchInput = document.getElementById('country-search-input');
     const countryOptionsList = document.getElementById('country-options-list');
 
+    // Custom Currency Select elements
+    const currencySelectContainer = document.getElementById('currency-select-container');
+    const currencySelectTrigger = document.getElementById('currency-select-trigger');
+    const currencyTriggerLabel = document.getElementById('currency-trigger-label');
+    const currencySelectDropdown = document.getElementById('currency-select-dropdown');
+    const currencyOptionsList = document.getElementById('currency-options-list');
+    const quoteCurrencyInput = document.getElementById('quote-currency');
+
     // States
     const welcomeState = document.getElementById('welcome-state');
     const loadingState = document.getElementById('loading-state');
@@ -146,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function openDropdown() {
+        closeCurrencyDropdown(); // Close currency select
         countrySelectContainer.classList.add('open');
         countrySelectTrigger.classList.remove('input-error');
         countrySearchInput.focus();
@@ -159,10 +168,33 @@ document.addEventListener('DOMContentLoaded', () => {
         countrySelectContainer.classList.remove('open');
     }
 
-    // Close dropdown when clicking outside
+    // Toggle currency dropdown
+    currencySelectTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = currencySelectContainer.classList.contains('open');
+        if (isOpen) {
+            closeCurrencyDropdown();
+        } else {
+            openCurrencyDropdown();
+        }
+    });
+
+    function openCurrencyDropdown() {
+        closeDropdown(); // Close country select
+        currencySelectContainer.classList.add('open');
+    }
+
+    function closeCurrencyDropdown() {
+        currencySelectContainer.classList.remove('open');
+    }
+
+    // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
         if (!countrySelectContainer.contains(e.target)) {
             closeDropdown();
+        }
+        if (currencySelectContainer && !currencySelectContainer.contains(e.target)) {
+            closeCurrencyDropdown();
         }
     });
 
@@ -222,14 +254,42 @@ document.addEventListener('DOMContentLoaded', () => {
         closeDropdown();
     }
 
-    // Currency toggle change
-    const quoteCurrencySelect = document.getElementById('quote-currency');
-    if (quoteCurrencySelect) {
-        quoteCurrencySelect.addEventListener('change', () => {
-            if (!quoteData || quoteData.length === 0) return;
+    // Currency custom options click selection
+    const currencyOptions = currencyOptionsList.querySelectorAll('li');
+    currencyOptions.forEach(opt => {
+        opt.dataset.value = opt.getAttribute('data-value'); // Ensure dataset is set from attribute
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const val = opt.dataset.value;
+            selectCurrency(val);
+        });
+    });
+
+    function selectCurrency(val) {
+        quoteCurrencyInput.value = val;
+        
+        const labelText = {
+            CNY: 'CNY - 人民币 (¥)',
+            USD: 'USD - 美元 ($)',
+            EUR: 'EUR - 欧元 (€)',
+            HKD: 'HKD - 港币 (HK$)'
+        };
+        currencyTriggerLabel.textContent = labelText[val] || val;
+
+        currencyOptions.forEach(opt => {
+            if (opt.dataset.value === val) {
+                opt.classList.add('selected');
+            } else {
+                opt.classList.remove('selected');
+            }
+        });
+
+        closeCurrencyDropdown();
+
+        if (quoteData && quoteData.length > 0) {
             updateMetrics();
             renderQuotationChannels();
-        });
+        }
     }
 
     // Form submit
@@ -417,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const cheapestDisplay = getDisplayPrice(cheapestCNY);
             const cheapestSymbol = getCurrencySymbol();
-            metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)} <span class="metric-converted-val">(${cheapestSymbol}${cheapestDisplay.toFixed(2)})</span>`;
+            metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)} <span class="metric-converted-sub">≈ ${cheapestSymbol}${cheapestDisplay.toFixed(2)}</span>`;
         }
         metricCheapestName.textContent = cheapest.CName || cheapest.Code;
 
@@ -496,14 +556,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const sig = getDisplayPrice(channel.SignatureFeeCNY);
             const pack = getDisplayPrice(channel.PackagingFeeCNY);
             
-            // Helper to format individual breakdown sub-fees in dual currency
+            // Helper to format individual breakdown sub-fees in dual currency with tilde
             const formatBreakdownItem = (label, cnyVal, convertedVal) => {
                 if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
                 const base = `¥${parseFloat(cnyVal).toFixed(2)}`;
                 if (target === 'CNY') {
                     return `${label}:${base}`;
                 }
-                return `${label}:${base}(${targetSymbol}${convertedVal.toFixed(2)})`;
+                return `${label}:${base}(≈ ${targetSymbol}${convertedVal.toFixed(2)})`;
             };
 
             // Generate detailed billing tooltip / breakdown subtext
@@ -548,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${pack > 0 ? `
                         <div class="channel-meta-item packaging-fee">
-                            <span>📦 打包费: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
+                            <span>📦 打包费: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (≈ ${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
@@ -559,8 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="channel-price-area">
                     <div class="channel-total-badge">
                         <span class="amount">¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</span>
-                        ${target !== 'CNY' ? `<span class="converted-price">(${targetSymbol}${total.toFixed(2)})</span>` : ''}
                     </div>
+                    ${target !== 'CNY' ? `<div class="channel-converted-badge">≈ ${targetSymbol}${total.toFixed(2)}</div>` : ''}
                     <div class="channel-price-breakdown">${breakdownText}</div>
                 </div>
             `;

@@ -141,81 +141,128 @@ body {
     gap: 12px;
 }
 
-/* Nav Currency Selector Wrapper */
-.nav-currency-wrapper {
+/* Custom Currency Dropdown Selector - Apple Glassmorphism styling */
+.currency-select-container {
+    display: inline-flex;
+    position: relative;
+}
+
+.currency-select-trigger {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background: rgba(0, 0, 0, 0.03);
-    padding: 6px 12px;
-    border-radius: 16px;
+    padding: 8px 14px;
+    border-radius: 18px;
     border: 1px solid rgba(0, 0, 0, 0.04);
-    transition: all 0.2s ease;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: var(--font-body);
 }
 
-.nav-currency-wrapper:hover {
+.currency-select-trigger:hover {
     background: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.08);
+    transform: translateY(-0.5px);
 }
 
-.nav-currency-label {
-    font-size: 0.72rem;
-    font-weight: 700;
+.currency-select-container.open .currency-select-trigger {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.currency-select-trigger .chevron-icon {
+    width: 12px;
+    height: 12px;
     color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    user-select: none;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
 }
 
-.select-pill-container {
-    display: inline-flex;
-    align-items: center;
-    position: relative;
+.currency-select-container.open .chevron-icon {
+    transform: rotate(180deg);
 }
 
-.nav-currency-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right center;
-    background-size: 11px;
-    padding: 2px 20px 2px 4px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    border: none;
-    background-color: transparent;
-    outline: none;
-    cursor: pointer;
-    font-family: var(--font-body);
-    transition: color 0.15s ease;
+.currency-select-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 240px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 14px;
+    box-shadow: var(--shadow-dropdown);
+    padding: 6px 0;
+    z-index: 1000;
+    display: none;
+    transform-origin: top right;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.nav-currency-select:hover {
-    color: var(--primary);
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.nav-currency-select:focus {
-    color: var(--primary);
-}
-
-.currency-rates-tooltip {
-    display: inline-flex;
-    align-items: center;
-    color: var(--text-muted);
-    cursor: help;
-    transition: color 0.2s ease;
-}
-
-.currency-rates-tooltip:hover {
-    color: var(--text-secondary);
-}
-
-.currency-rates-tooltip .info-icon {
-    width: 14px;
-    height: 14px;
-    color: inherit;
+.currency-select-container.open .currency-select-dropdown {
     display: block;
+}
+
+.currency-select-dropdown .custom-select-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.currency-select-dropdown .custom-select-options li {
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none !important;
+}
+
+.currency-select-dropdown .custom-select-options li:hover {
+    background: rgba(0, 113, 227, 0.06);
+}
+
+.currency-select-dropdown .custom-select-options li.selected {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.currency-name-lbl {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.currency-select-dropdown .custom-select-options li.selected .currency-name-lbl {
+    color: var(--primary);
+}
+
+.currency-rate-lbl {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.04);
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.currency-select-dropdown .custom-select-options li.selected .currency-rate-lbl {
+    color: var(--primary);
+    background: rgba(0, 113, 227, 0.08);
 }
 
 /* API Status Indicator Badge */
@@ -361,13 +408,19 @@ body {
     flex-wrap: wrap;
 }
 
-.metric-converted-val {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-left: 6px;
+.metric-converted-sub {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 113, 227, 0.1);
+    margin-left: 8px;
     font-family: var(--font-body);
     letter-spacing: 0;
+    display: inline-flex;
+    align-items: center;
 }
 
 .metric-desc {
@@ -921,11 +974,18 @@ body {
     letter-spacing: -0.02em;
 }
 
-.channel-total-badge .converted-price {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-left: 6px;
+.channel-converted-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 113, 227, 0.12);
+    margin-top: 4px;
     font-family: var(--font-body);
     letter-spacing: 0;
 }
@@ -1155,7 +1215,7 @@ body {
         gap: 12px;
     }
     
-    .nav-currency-wrapper {
+    .currency-select-container {
         margin-right: 0;
     }
     
