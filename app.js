@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         zh: {
             nav_home: "官网首页",
             nav_support: "客服咨询",
+            nav_badge: "一件代发 • 订单履约 • 3PL 仓储",
             main_title: "智能物流测算系统",
-            main_subtitle: "由 graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。",
+            main_subtitle: "graypoplar 专注提供跨境电商 一件代发 (Dropshipping) / 订单履约 (Fulfillment) / 3PL 仓储服务。测算价格实时对接云途官方运费报价接口。",
             metric_cheapest: "最划算渠道",
             metric_fastest: "最快捷时效",
             metric_total: "服务商可用渠道",
@@ -117,8 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
         en: {
             nav_home: "Official Website",
             nav_support: "Support",
+            nav_badge: "DROPSHIPPING • FULFILLMENT • 3PL",
             main_title: "Smart Shipping Cost Calculator",
-            main_subtitle: "Developed independently by graypoplar. Estimated rates are synced in real-time with the official YunExpress API.",
+            main_subtitle: "graypoplar specializes in cross-border Dropshipping, Order Fulfillment, and 3PL warehousing. Estimated rates are synced in real-time with the official YunExpress API.",
             metric_cheapest: "Cheapest Channel",
             metric_fastest: "Fastest Transit",
             metric_total: "Available Channels",

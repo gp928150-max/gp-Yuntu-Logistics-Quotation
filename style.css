@@ -204,7 +204,7 @@ body {
 }
 
 .nav-logo .logo-img {
-    height: 112px; /* Double brand profile inside navbar */
+    height: 84px; /* Clean premium profile inside navbar */
     width: auto;
     object-fit: contain;
 }
@@ -1447,7 +1447,7 @@ body {
     }
     
     .nav-logo .logo-img {
-        height: 64px;
+        height: 56px;
     }
     
     .nav-left {
