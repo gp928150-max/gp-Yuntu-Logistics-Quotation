@@ -955,6 +955,16 @@ body {
     color: #b25e00;
 }
 
+.transit-api-badge {
+    background: rgba(9, 109, 217, 0.08) !important;
+    color: #096dd9 !important;
+}
+
+.transit-excel-badge {
+    background: rgba(82, 196, 26, 0.08) !important;
+    color: #2f8e0a !important;
+}
+
 .channel-ename {
     font-size: 0.88rem;
     color: var(--text-secondary);

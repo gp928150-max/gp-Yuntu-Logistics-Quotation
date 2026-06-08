@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let rawQuoteItems = []; // Raw items cache for dynamic recalculation
     let isQuoteSortAscending = true; // Lowest price first by default
     let selectedCountryCode = '';
+    let transitTimesData = {}; // Transit times data from Excel
 
     const EXCHANGE_RATES = {
         CNY: 1.0,
@@ -124,6 +125,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.warn('Failed to load real-time exchange rates, utilizing static fallback values:', error);
+        }
+    }
+
+    async function loadTransitTimes() {
+        try {
+            const response = await fetch('transit_times.json');
+            if (!response.ok) throw new Error('Failed to load transit times');
+            transitTimesData = await response.json();
+            console.log('Successfully loaded transit times:', Object.keys(transitTimesData).length, 'channels.');
+        } catch (error) {
+            console.warn('Failed to load transit times from transit_times.json:', error);
         }
     }
 
@@ -560,6 +572,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return '📦';
     }
 
+    function getExcelTransit(excelMap, cname) {
+        if (!excelMap || !cname) return null;
+        
+        const cleanCName = cname.trim().replace(/\s+/g, '');
+        if (excelMap[cleanCName]) return excelMap[cleanCName];
+        
+        // Explicit alias map to prevent substring collision (e.g. "俄罗斯" matching "白俄罗斯")
+        const countryAliases = {
+            '阿拉伯联合酋长国': ['阿联酋', '阿拉伯联合酋长国'],
+            '阿联酋': ['阿拉伯联合酋长国', '阿联酋'],
+            '俄罗斯': ['俄罗斯联邦', '俄罗斯'],
+            '俄罗斯联邦': ['俄罗斯', '俄罗斯联邦']
+        };
+        
+        // Check aliases
+        const aliases = countryAliases[cleanCName];
+        if (aliases) {
+            for (const alias of aliases) {
+                if (excelMap[alias]) return excelMap[alias];
+            }
+        }
+        
+        // Final fallback: try to find key that exactly matches cleanCName after cleaning whitespaces
+        const keys = Object.keys(excelMap);
+        for (const key of keys) {
+            if (key.trim().replace(/\s+/g, '') === cleanCName) {
+                return excelMap[key];
+            }
+        }
+        
+        return null;
+    }
+
     function renderQuotationChannels() {
         quoteChannelsContainer.innerHTML = '';
         
@@ -567,6 +612,9 @@ document.addEventListener('DOMContentLoaded', () => {
             quoteChannelsContainer.innerHTML = '<div class="timeline-empty">暂无可用运输渠道报价</div>';
             return;
         }
+
+        const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
+        const countryCName = selectedCountryObj ? selectedCountryObj.CName : '';
 
         // Sort quoteData by total fee in CNY
         quoteData.sort((a, b) => {
@@ -622,6 +670,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (packItem) breakdownParts.push(packItem);
             const breakdownText = breakdownParts.join(' + ');
 
+            const excelTransitMap = transitTimesData[channel.Code];
+            const excelTransit = getExcelTransit(excelTransitMap, countryCName);
+
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
                     <div class="channel-brand-icon-bg">
@@ -632,7 +683,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="channel-title-row">
                         <span class="channel-name">${channel.CName || '未知渠道'}</span>
                         <span class="channel-code">${channel.Code || '-'}</span>
-                        ${channel.DeliveryDays ? `<span class="channel-days-badge">⏱️ ${channel.DeliveryDays} 天</span>` : ''}
+                        ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge">⏱️ API时效: ${channel.DeliveryDays} 天</span>` : ''}
+                        ${excelTransit ? `<span class="channel-days-badge transit-excel-badge">📄 报价表时效: ${excelTransit}</span>` : ''}
                     </div>
                     <div class="channel-ename">${channel.EName || ''}</div>
                     <div class="channel-meta-row">
@@ -886,4 +938,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch live exchange rates dynamically
     fetchRealTimeExchangeRates();
+    loadTransitTimes();
 });
