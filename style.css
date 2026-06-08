@@ -1272,7 +1272,7 @@ body {
 
 @media (max-width: 768px) {
     .app-container {
-        padding: 40px 16px;
+        padding: 20px 16px 40px 16px;
     }
     
     .app-nav {
@@ -1297,34 +1297,64 @@ body {
     .currency-select-container {
         margin-right: 0;
         justify-content: flex-end;
+        width: 100%;
+    }
+    
+    .currency-select-trigger {
+        width: 100%;
+        justify-content: space-between;
     }
 
-    /* Top Status Bar Responsive Stack */
+    /* Top Status Bar Responsive Ticker */
     .top-status-bar {
         font-size: 0.68rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .status-bar-content {
-        flex-direction: column;
-        gap: 6px;
-        padding: 8px 16px;
-        text-align: center;
+        flex-direction: row;
+        white-space: nowrap;
+        gap: 16px;
+        padding: 10px 16px;
     }
     
     .status-bar-left, .status-bar-right {
-        justify-content: center;
-        flex-wrap: wrap;
-        width: 100%;
-        gap: 6px;
+        width: auto;
+        gap: 12px;
+        flex-wrap: nowrap;
     }
     
     .main-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        letter-spacing: -0.02em;
     }
     
+    /* Horizontal Scrolling Metrics Grid on Mobile (Saves vital screen height!) */
     .metrics-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 12px;
+        padding: 4px 0 12px 0;
+        margin-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .metric-card {
+        flex: 0 0 85%;
+        scroll-snap-align: start;
+        margin-bottom: 0;
+        padding: 16px;
+    }
+
+    /* Form fields legibility - prevent iOS Safari auto-zoom by setting font-size to 16px */
+    .form-field input, 
+    .form-field select, 
+    #country-search-input,
+    .admin-input-group input,
+    .admin-input-with-suffix input {
+        font-size: 16px !important;
     }
     
     .quote-channel-card {
@@ -1334,13 +1364,48 @@ body {
         gap: 16px;
     }
     
+    /* Clean flex alignment for mobile prices and breakdown */
     .channel-price-area {
         width: 100%;
-        flex-direction: row;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        border-top: 1px solid rgba(0, 0, 0, 0.06);
-        padding-top: 16px;
+        gap: 8px;
+    }
+    
+    .channel-total-badge {
+        order: 1;
+    }
+    
+    .channel-converted-badge {
+        order: 2;
+        margin-left: auto;
+    }
+    
+    .channel-price-breakdown {
+        order: 3;
+        width: 100%;
+        text-align: left;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        max-width: 100% !important;
+    }
+
+    /* WhatsApp Alert Box Mobile Layout */
+    .info-alert-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .whatsapp-btn {
+        justify-content: center;
+        width: 100%;
     }
 }
 
