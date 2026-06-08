@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>graypoplar 智能物流测算系统 | 实时云途运价</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- App Logic -->
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Bar -->
+        <nav class="app-nav">
+            <div class="nav-left">
+                <a href="https://www.graypoplar.com/" target="_blank" class="nav-logo">
+                    <img class="logo-img" src="https://cdn.prod.website-files.com/63a5ada0760c9d2120c7b490/68ca27eb6ee3b226c2054264_1111.png" alt="graypoplar Logo">
+                </a>
+                <span class="badge">LOGISTICS HUB</span>
+                <div class="nav-links">
+                    <a href="https://www.graypoplar.com/" target="_blank" class="nav-link">官网首页</a>
+                    <a href="https://wa.me/85262508059" target="_blank" class="nav-link">客服咨询</a>
+                    <span class="nav-separator">/</span>
+                    <span class="nav-version">V1.4.2 Enterprise</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="api-status-badge">
+                    <span class="status-pulse-dot"></span>
+                    <span class="status-text">云途 API 连通正常 (200 OK)</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="main-title">智能物流测算系统</h1>
+            <p class="main-subtitle">由 graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。</p>
+        </header>
+
+        <!-- Metrics Section (Dynamically updated) -->
+        <div class="metrics-grid hidden" id="metrics-section">
+            <div class="metric-card cheapest">
+                <div class="metric-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">最划算渠道</span>
+                    <h3 class="metric-val" id="metric-cheapest-val">-</h3>
+                    <span class="metric-desc" id="metric-cheapest-name">-</span>
+                </div>
+            </div>
+            <div class="metric-card fastest">
+                <div class="metric-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">最快捷时效</span>
+                    <h3 class="metric-val" id="metric-fastest-val">-</h3>
+                    <span class="metric-desc" id="metric-fastest-name">-</span>
+                </div>
+            </div>
+            <div class="metric-card total-channels">
+                <div class="metric-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="metric-info">
+                    <span class="metric-label">服务商可用渠道</span>
+                    <h3 class="metric-val" id="metric-total-val">-</h3>
+                    <span class="metric-desc">数据源：云途官方运价</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Layout -->
+        <div class="dashboard-layout">
+            <!-- Left Panel: Form Config -->
+            <aside class="sidebar-panel">
+                <div class="panel-card">
+                    <h2 class="panel-title">包裹估算参数</h2>
+                    <form id="quote-form" class="quote-form">
+                        <div class="form-field">
+                            <label for="quote-country">目的国家 <span class="req">*</span></label>
+                            <div class="custom-select-container" id="country-select-container">
+                                <button type="button" class="custom-select-trigger" id="country-select-trigger">
+                                    <span class="trigger-label" id="country-trigger-label">选择目的国家...</span>
+                                    <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="custom-select-dropdown" id="country-select-dropdown">
+                                    <div class="dropdown-search-wrapper">
+                                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input type="text" id="country-search-input" placeholder="输入国家名称或简码搜索..." autocomplete="off">
+                                    </div>
+                                    <ul class="custom-select-options" id="country-options-list">
+                                        <li class="loading-option">正在加载国家列表...</li>
+                                    </ul>
+                                </div>
+                                <input type="hidden" id="quote-country" required>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="quote-weight">包裹重量 (kg) <span class="req">*</span></label>
+                            <input type="number" id="quote-weight" step="0.001" min="0.001" placeholder="重量, 例如: 0.5" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="quote-goods-type">货物类型</label>
+                            <select id="quote-goods-type">
+                                <option value="0" selected>普货 (General Goods)</option>
+                                <option value="1">带电 (Contains Batteries)</option>
+                                <option value="2">特货 (Special Goods)</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="quote-postcode">邮区编码 (选填)</label>
+                            <input type="text" id="quote-postcode" placeholder="目的国邮编">
+                        </div>
+                        <div class="form-field">
+                            <label>包裹尺寸 (cm, 选填)</label>
+                            <div class="dimensions-input-group">
+                                <input type="number" id="quote-length" min="1" placeholder="长" value="1">
+                                <span class="times">&times;</span>
+                                <input type="number" id="quote-width" min="1" placeholder="宽" value="1">
+                                <span class="times">&times;</span>
+                                <input type="number" id="quote-height" min="1" placeholder="高" value="1">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn full-width">
+                            <span>开始测算报价</span>
+                            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Right Panel: Results -->
+            <main class="main-content-panel">
+                <!-- Welcome State -->
+                <div id="welcome-state" class="state-panel active">
+                    <div class="empty-graphic">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                    </div>
+                    <h3>配置估算参数</h3>
+                    <p>请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，graypoplar 将实时通过云途接口计算运费详情与最优通道报价。</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="state-panel">
+                    <div class="skeleton-wrapper">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                    <h3>正在调用实时云途报价接口...</h3>
+                    <p>请稍候，我们正在为您测算最佳的运输专线报价</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="state-panel">
+                    <div class="error-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h3 id="error-title">运费估算失败</h3>
+                    <p id="error-message">请核对您的输入参数是否正确，或稍后再试。</p>
+                </div>
+
+                <!-- Results State -->
+                <div id="quote-results-state" class="state-panel">
+                    <div class="results-header-actions">
+                        <div class="results-meta-summary">
+                            <h3 class="panel-section-title">渠道估算报价清单</h3>
+                            <p id="quote-summary-details" class="quote-summary-details">测算详情: -</p>
+                        </div>
+                        <button id="quote-sort-btn" class="text-btn">
+                            <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                            </svg>
+                            <span>价格从低到高</span>
+                        </button>
+                    </div>
+
+                    <!-- Alert Notice Bar -->
+                    <div class="info-alert-bar">
+                        <div class="alert-content">
+                            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <span class="alert-text">云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>graypoplar</strong> 客服团队核实。</span>
+                        </div>
+                        <a href="https://wa.me/85262508059" target="_blank" class="whatsapp-btn">
+                            <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.62.962 3.21 1.6 5.321 1.6 5.487 0 9.953-4.467 9.957-9.96.002-2.66-1.033-5.162-2.909-7.039C17.142 1.88 14.65 .843 12.01.84c-5.49 0-9.957 4.467-9.96 9.961-.002 2.052.544 3.715 1.579 5.424L2.617 21.6l5.59-1.465zM17.842 14.7c-.318-.16-1.886-.93-2.185-1.04-.298-.11-.515-.16-.73.16-.217.318-.84 1.057-1.03 1.277-.189.22-.377.245-.695.085a8.761 8.761 0 0 1-2.58-1.594 9.65 9.65 0 0 1-1.785-2.223c-.19-.323-.02-.497.14-.657.143-.143.318-.372.477-.557.16-.186.213-.318.319-.53.106-.212.053-.397-.027-.557-.08-.16-.73-1.758-1.002-2.414-.265-.636-.53-.55-.73-.56-.19-.01-.407-.01-.624-.01-.217 0-.57.08-.868.407-.298.326-1.137 1.112-1.137 2.71 0 1.598 1.164 3.14 1.323 3.354.16.212 2.29 3.498 5.548 4.906.775.335 1.38.535 1.85.684.78.248 1.488.213 2.049.13.625-.093 1.886-.77 2.152-1.478.265-.707.265-1.313.186-1.44-.08-.124-.298-.2-.616-.36z"></path>
+                            </svg>
+                            <span>WhatsApp 咨询</span>
+                        </a>
+                    </div>
+                    
+                    <div id="quote-channels-container" class="quote-channels-container">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。</p>
+        </footer>
+    </div>
+</body>
+</html>
