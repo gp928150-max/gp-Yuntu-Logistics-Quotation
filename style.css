@@ -628,7 +628,11 @@ body {
     gap: 12px;
 }
 
-.form-row .form-field {
+.form-row .form-field.col-left {
+    flex: 0 0 35%;
+}
+
+.form-row .form-field.col-right {
     flex: 1;
     min-width: 0;
 }
@@ -1910,5 +1914,17 @@ body {
 
 .admin-shake {
     animation: shake 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .form-row .form-field.col-left,
+    .form-row .form-field.col-right {
+        flex: 1;
+        width: 100%;
+    }
 }
 

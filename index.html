@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.31">
+    <link rel="stylesheet" href="style.css?v=1.5.32">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.31" defer></script>
+    <script src="app.js?v=1.5.32" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -36,7 +36,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.31 Enterprise</span>
+                <span class="status-bar-text version">V1.5.32 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -200,11 +200,11 @@
                     <h2 class="panel-title" data-translate="sidebar_title">包裹估算参数</h2>
                     <form id="quote-form" class="quote-form">
                         <div class="form-row">
-                            <div class="form-field">
+                            <div class="form-field col-left">
                                 <label data-translate="label_origin">发货国家</label>
                                 <div class="form-field-static" data-translate="val_origin">中国 (China)</div>
                             </div>
-                            <div class="form-field">
+                            <div class="form-field col-right">
                                 <label for="quote-country" data-translate="label_country">目的国家 <span class="req">*</span></label>
                                 <div class="custom-select-container" id="country-select-container">
                                     <button type="button" class="custom-select-trigger" id="country-select-trigger">
@@ -230,11 +230,11 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-field">
+                            <div class="form-field col-left">
                                 <label for="quote-weight" data-translate="label_weight">包裹重量 (kg) <span class="req">*</span></label>
                                 <input type="number" id="quote-weight" step="0.001" min="0.001" data-translate-placeholder="weight_placeholder" placeholder="重量, 例如: 0.5" required>
                             </div>
-                            <div class="form-field">
+                            <div class="form-field col-right">
                                 <label for="quote-goods-type" data-translate="label_goods_type">货物类型</label>
                                 <select id="quote-goods-type">
                                     <option value="0" selected data-translate="goods_type_general">普货 (General Goods)</option>
