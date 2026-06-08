@@ -255,11 +255,54 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Common country aliases/abbreviations mapping for major logistics destinations
+        const aliases = {
+            'us': ['usa', 'united states', 'america', '美国', '美'],
+            'gb': ['uk', 'united kingdom', 'britain', 'england', '英国', '英'],
+            'ca': ['can', 'canada', '加拿大', '加'],
+            'au': ['aus', 'australia', '澳大利亚', '澳'],
+            'de': ['ger', 'germany', 'deutschland', '德国', '德'],
+            'fr': ['fra', 'france', '法国', '法'],
+            'jp': ['jpn', 'japan', '日本', '日'],
+            'kr': ['kor', 'korea', '韩国', '韩'],
+            'ru': ['rus', 'russia', '俄罗斯', '俄'],
+            'cn': ['chn', 'china', '中国', '中'],
+            'ae': ['uae', 'united arab emirates', '阿联酋'],
+            'nz': ['nzl', 'new zealand', '新西兰', '新'],
+            'es': ['esp', 'spain', '西班牙', '西'],
+            'it': ['ita', 'italy', '意大利', '意'],
+            'nl': ['nld', 'netherlands', 'holland', '荷兰', '荷'],
+            'be': ['bel', 'belgium', '比利时', '比'],
+            'pl': ['pol', 'poland', '波兰', '波'],
+            'ch': ['sui', 'che', 'switzerland', 'swiss', '瑞士', '瑞'],
+            'sg': ['sgp', 'sin', 'singapore', '新加坡', '新'],
+            'my': ['mys', 'mas', 'malaysia', '马来西亚', '马'],
+            'ph': ['phl', 'philippines', '菲律宾', '菲'],
+            'vn': ['vnm', 'vietnam', '越南', '越'],
+            'th': ['tha', 'thailand', '泰国', '泰'],
+            'in': ['ind', 'india', '印度', '印'],
+            'br': ['bra', 'brazil', '巴西', '巴'],
+            'mx': ['mex', 'mexico', '墨西哥', '墨'],
+            'za': ['zaf', 'south africa', '南非']
+        };
+
         const filtered = countriesList.filter(c => {
             const code = c.CountryCode.toLowerCase();
             const cname = c.CName.toLowerCase();
             const ename = c.EName ? c.EName.toLowerCase() : '';
-            return code.includes(query) || cname.includes(query) || ename.includes(query);
+            
+            // Check standard search fields
+            if (code.includes(query) || cname.includes(query) || ename.includes(query)) {
+                return true;
+            }
+            
+            // Check aliases mapping
+            const countryAliases = aliases[code];
+            if (countryAliases) {
+                return countryAliases.some(alias => alias.includes(query) || query.includes(alias));
+            }
+            
+            return false;
         });
 
         renderCountryOptions(filtered);
