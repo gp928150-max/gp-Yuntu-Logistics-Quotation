@@ -1598,12 +1598,14 @@ body {
     z-index: 2000;
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .admin-modal.open {
     opacity: 1;
     pointer-events: auto;
+    visibility: visible;
 }
 
 .admin-modal-card {
