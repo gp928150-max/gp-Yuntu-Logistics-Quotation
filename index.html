@@ -22,6 +22,8 @@
                 <span class="status-bar-text" id="api-status-text">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text version">V1.5.4 Enterprise</span>
+                <span class="status-bar-divider">/</span>
+                <span class="status-bar-text admin-trigger" id="admin-trigger">系统管理</span>
             </div>
             <div class="status-bar-right">
                 <span class="status-bar-rate-label">当前外汇折算价 (实时更新):</span>
@@ -286,6 +288,54 @@
         <footer class="app-footer">
             <p>&copy; 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。</p>
         </footer>
+    </div>
+    <!-- Admin Management Modal -->
+    <div class="admin-modal" id="admin-modal">
+        <div class="admin-modal-card">
+            <button type="button" class="admin-modal-close" id="admin-modal-close">&times;</button>
+            
+            <!-- Verification State -->
+            <div id="admin-state-verify" class="admin-state-active">
+                <h3 class="admin-modal-title">管理员身份认证</h3>
+                <p class="admin-modal-subtitle">请输入系统管理密码进行安全认证</p>
+                <div class="admin-input-group">
+                    <input type="password" id="admin-password-input" placeholder="输入管理密码..." autocomplete="off">
+                </div>
+                <div id="admin-verify-error" class="admin-error-text"></div>
+                <button type="button" class="submit-btn full-width" id="admin-verify-btn">
+                    <span>认证并登录</span>
+                </button>
+            </div>
+
+            <!-- Dashboard State -->
+            <div id="admin-state-panel" class="admin-state-hidden">
+                <h3 class="admin-modal-title">系统参数管理</h3>
+                <p class="admin-modal-subtitle">配置实时测算系统的财务加成与打包费</p>
+                
+                <div class="admin-form-field">
+                    <label for="admin-profit-input">渠道利润加成 (%)</label>
+                    <div class="admin-input-with-suffix">
+                        <input type="number" id="admin-profit-input" min="0" max="100" step="1" value="22">
+                        <span class="suffix">%</span>
+                    </div>
+                </div>
+
+                <div class="admin-form-field">
+                    <label for="admin-pack-input">包裹打包费 (RMB)</label>
+                    <div class="admin-input-with-suffix">
+                        <input type="number" id="admin-pack-input" min="0" step="0.5" value="2.0">
+                        <span class="suffix">元</span>
+                    </div>
+                </div>
+
+                <div id="admin-save-status" class="admin-success-text"></div>
+                
+                <div class="admin-action-row">
+                    <button type="button" class="admin-btn-logout" id="admin-logout-btn">安全退出</button>
+                    <button type="button" class="submit-btn" id="admin-save-btn">保存配置</button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

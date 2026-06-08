@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteSortBtn = document.getElementById('quote-sort-btn');
 
     let quoteData = [];
+    let rawQuoteItems = []; // Raw items cache for dynamic recalculation
     let isQuoteSortAscending = true; // Lowest price first by default
     let selectedCountryCode = '';
 
@@ -429,64 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (response.ok && data.Code === '0000' && data.Items) {
-                // Apply 22% profit markup and 2 RMB packaging fee client-side in CNY
-                quoteData = data.Items.map(item => {
-                    const originalCurrency = item.Currency || 'CNY';
-                    const usdToCnyRate = EXCHANGE_RATES['USD'];
-                    
-                    const toCNY = (val) => {
-                        const num = parseFloat(val) || 0;
-                        return originalCurrency === 'USD' ? num * usdToCnyRate : num;
-                    };
-                    
-                    // Convert original values to CNY
-                    const originalShippingFee = toCNY(item.ShippingFee);
-                    const originalRegistrationFee = toCNY(item.RegistrationFee);
-                    const originalFuelFee = toCNY(item.FuelFee);
-                    const originalSundryFee = toCNY(item.SundryFee);
-                    const originalTariffPrepayFee = toCNY(item.TariffPrepayFee);
-                    const originalInsuredFee = toCNY(item.InsuredFee);
-                    const originalSignatureFee = toCNY(item.SignatureFee);
-                    const originalTotalFee = toCNY(item.TotalFee);
-                    
-                    // Add 22% profit markup (1.22) in CNY
-                    item.ShippingFeeCNY = originalShippingFee * 1.22;
-                    item.RegistrationFeeCNY = originalRegistrationFee * 1.22;
-                    item.FuelFeeCNY = originalFuelFee * 1.22;
-                    item.SundryFeeCNY = originalSundryFee * 1.22;
-                    
-                    if (item.TariffPrepayFee !== null && item.TariffPrepayFee !== undefined) {
-                        item.TariffPrepayFeeCNY = originalTariffPrepayFee * 1.22;
-                    } else {
-                        item.TariffPrepayFeeCNY = null;
-                    }
-                    if (item.InsuredFee !== null && item.InsuredFee !== undefined) {
-                        item.InsuredFeeCNY = originalInsuredFee * 1.22;
-                    } else {
-                        item.InsuredFeeCNY = null;
-                    }
-                    if (item.SignatureFee !== null && item.SignatureFee !== undefined) {
-                        item.SignatureFeeCNY = originalSignatureFee * 1.22;
-                    } else {
-                        item.SignatureFeeCNY = null;
-                    }
-                    
-                    // Add packaging fee (2 RMB)
-                    item.PackagingFeeCNY = 2;
-                    
-                    // Total is marked up by 1.22 + 2 packaging fee
-                    item.TotalFeeCNY = (originalTotalFee * 1.22) + 2;
-                    
-                    return item;
-                });
-
-                // Update summary details text
-                const countryText = countryNames[country] || country;
-                const goodsTypeText = quoteGoodsType.options[quoteGoodsType.selectedIndex].text;
-                quoteSummaryDetails.textContent = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText} ${postcode ? `| 邮编: ${postcode}` : ''}`;
-                
-                updateMetrics();
-                renderQuotationChannels();
+                rawQuoteItems = data.Items; // Store raw API items
+                calculateAndRenderQuoteData(); // Dynamic calculation and render
                 showState('results');
             } else {
                 const errorTitle = document.getElementById('error-title');
@@ -676,6 +621,216 @@ document.addEventListener('DOMContentLoaded', () => {
             quoteChannelsContainer.appendChild(cardEl);
         });
     }
+
+    // Dynamic calculation and rendering with custom admin parameters
+    function calculateAndRenderQuoteData() {
+        if (!rawQuoteItems || rawQuoteItems.length === 0) return;
+
+        quoteData = rawQuoteItems.map(item => {
+            const clonedItem = { ...item };
+            const originalCurrency = clonedItem.Currency || 'CNY';
+            const usdToCnyRate = EXCHANGE_RATES['USD'];
+            
+            const toCNY = (val) => {
+                const num = parseFloat(val) || 0;
+                return originalCurrency === 'USD' ? num * usdToCnyRate : num;
+            };
+            
+            // Convert original values to CNY
+            const originalShippingFee = toCNY(clonedItem.ShippingFee);
+            const originalRegistrationFee = toCNY(clonedItem.RegistrationFee);
+            const originalFuelFee = toCNY(clonedItem.FuelFee);
+            const originalSundryFee = toCNY(clonedItem.SundryFee);
+            const originalTariffPrepayFee = toCNY(clonedItem.TariffPrepayFee);
+            const originalInsuredFee = toCNY(clonedItem.InsuredFee);
+            const originalSignatureFee = toCNY(clonedItem.SignatureFee);
+            const originalTotalFee = toCNY(clonedItem.TotalFee);
+            
+            // Add profit markup (SYSTEM_PROFIT_MARGIN) in CNY
+            clonedItem.ShippingFeeCNY = originalShippingFee * SYSTEM_PROFIT_MARGIN;
+            clonedItem.RegistrationFeeCNY = originalRegistrationFee * SYSTEM_PROFIT_MARGIN;
+            clonedItem.FuelFeeCNY = originalFuelFee * SYSTEM_PROFIT_MARGIN;
+            clonedItem.SundryFeeCNY = originalSundryFee * SYSTEM_PROFIT_MARGIN;
+            
+            if (clonedItem.TariffPrepayFee !== null && clonedItem.TariffPrepayFee !== undefined) {
+                clonedItem.TariffPrepayFeeCNY = originalTariffPrepayFee * SYSTEM_PROFIT_MARGIN;
+            } else {
+                clonedItem.TariffPrepayFeeCNY = null;
+            }
+            if (clonedItem.InsuredFee !== null && clonedItem.InsuredFee !== undefined) {
+                clonedItem.InsuredFeeCNY = originalInsuredFee * SYSTEM_PROFIT_MARGIN;
+            } else {
+                clonedItem.InsuredFeeCNY = null;
+            }
+            if (clonedItem.SignatureFee !== null && clonedItem.SignatureFee !== undefined) {
+                clonedItem.SignatureFeeCNY = originalSignatureFee * SYSTEM_PROFIT_MARGIN;
+            } else {
+                clonedItem.SignatureFeeCNY = null;
+            }
+            
+            // Add packaging fee (SYSTEM_PACKAGING_FEE) in CNY
+            clonedItem.PackagingFeeCNY = SYSTEM_PACKAGING_FEE;
+            
+            // Total is marked up by margin + packaging fee
+            clonedItem.TotalFeeCNY = (originalTotalFee * SYSTEM_PROFIT_MARGIN) + SYSTEM_PACKAGING_FEE;
+            
+            return clonedItem;
+        });
+
+        // Update summary details text
+        const country = quoteCountry.value;
+        const weight = quoteWeight.value;
+        const goodsType = quoteGoodsType.value;
+        const postcode = quotePostcode.value.trim();
+        const length = quoteLength.value || '1';
+        const width = quoteWidth.value || '1';
+        const height = quoteHeight.value || '1';
+        const countryText = countryNames[country] || country;
+        const goodsTypeText = quoteGoodsType.options[quoteGoodsType.selectedIndex].text;
+        
+        quoteSummaryDetails.textContent = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText} ${postcode ? `| 邮编: ${postcode}` : ''}`;
+
+        updateMetrics();
+        renderQuotationChannels();
+    }
+
+    // Admin Panel Logic
+    const adminTrigger = document.getElementById('admin-trigger');
+    const adminModal = document.getElementById('admin-modal');
+    const adminModalClose = document.getElementById('admin-modal-close');
+    const adminStateVerify = document.getElementById('admin-state-verify');
+    const adminStatePanel = document.getElementById('admin-state-panel');
+    
+    const adminPasswordInput = document.getElementById('admin-password-input');
+    const adminVerifyBtn = document.getElementById('admin-verify-btn');
+    const adminVerifyError = document.getElementById('admin-verify-error');
+    
+    const adminProfitInput = document.getElementById('admin-profit-input');
+    const adminPackInput = document.getElementById('admin-pack-input');
+    const adminSaveStatus = document.getElementById('admin-save-status');
+    const adminSaveBtn = document.getElementById('admin-save-btn');
+    const adminLogoutBtn = document.getElementById('admin-logout-btn');
+
+    // Load initial values from localStorage (with fallbacks)
+    let SYSTEM_PROFIT_MARGIN = parseFloat(localStorage.getItem('gp_profit_margin')) || 1.22;
+    let SYSTEM_PACKAGING_FEE = localStorage.getItem('gp_packaging_fee') !== null && !isNaN(parseFloat(localStorage.getItem('gp_packaging_fee'))) ? parseFloat(localStorage.getItem('gp_packaging_fee')) : 2.0;
+
+    // Set initial input states
+    if (adminProfitInput) {
+        adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
+    }
+    if (adminPackInput) {
+        adminPackInput.value = SYSTEM_PACKAGING_FEE;
+    }
+
+    // Modal Events
+    if (adminTrigger) {
+        adminTrigger.addEventListener('click', () => {
+            adminModal.classList.add('open');
+            adminVerifyError.textContent = '';
+            adminPasswordInput.value = '';
+            adminPasswordInput.focus();
+        });
+    }
+
+    if (adminModalClose) {
+        adminModalClose.addEventListener('click', () => {
+            adminModal.classList.remove('open');
+        });
+    }
+
+    if (adminModal) {
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) {
+                adminModal.classList.remove('open');
+            }
+        });
+    }
+
+    // Verification handler
+    function performAdminVerification() {
+        const pwd = adminPasswordInput.value;
+        if (pwd === '88') {
+            adminVerifyError.textContent = '';
+            adminStateVerify.classList.add('admin-state-hidden');
+            adminStateVerify.classList.remove('admin-state-active');
+            adminStatePanel.classList.remove('admin-state-hidden');
+            adminStatePanel.classList.add('admin-state-active');
+            
+            // Sync values to inputs
+            adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
+            adminPackInput.value = SYSTEM_PACKAGING_FEE;
+            adminSaveStatus.textContent = '';
+        } else {
+            adminVerifyError.textContent = '密码错误，认证失败！';
+            const card = adminModal.querySelector('.admin-modal-card');
+            if (card) {
+                card.classList.add('admin-shake');
+                setTimeout(() => card.classList.remove('admin-shake'), 300);
+            }
+        }
+    }
+
+    if (adminVerifyBtn) {
+        adminVerifyBtn.addEventListener('click', performAdminVerification);
+    }
+    if (adminPasswordInput) {
+        adminPasswordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') performAdminVerification();
+        });
+    }
+
+    // Save parameters logic
+    if (adminSaveBtn) {
+        adminSaveBtn.addEventListener('click', () => {
+            const percentage = parseFloat(adminProfitInput.value);
+            const packFee = parseFloat(adminPackInput.value);
+            
+            if (isNaN(percentage) || percentage < 0) {
+                adminSaveStatus.style.color = 'var(--error)';
+                adminSaveStatus.textContent = '利润比例必须是大于或等于 0 的有效数字！';
+                return;
+            }
+            if (isNaN(packFee) || packFee < 0) {
+                adminSaveStatus.style.color = 'var(--error)';
+                adminSaveStatus.textContent = '打包费用必须是大于或等于 0 的有效数字！';
+                return;
+            }
+            
+            // Store and update globals
+            SYSTEM_PROFIT_MARGIN = 1 + (percentage / 100);
+            SYSTEM_PACKAGING_FEE = packFee;
+            
+            localStorage.setItem('gp_profit_margin', SYSTEM_PROFIT_MARGIN);
+            localStorage.setItem('gp_packaging_fee', SYSTEM_PACKAGING_FEE);
+            
+            adminSaveStatus.style.color = 'var(--success)';
+            adminSaveStatus.textContent = '配置保存成功，所有价格已完成即时重算！';
+            
+            // Recalculate and redraw quotation list instantly
+            if (rawQuoteItems && rawQuoteItems.length > 0) {
+                calculateAndRenderQuoteData();
+            }
+            
+            // Close modal softly
+            setTimeout(() => {
+                adminModal.classList.remove('open');
+            }, 1200);
+        });
+    }
+
+    // Logout logic
+    if (adminLogoutBtn) {
+        adminLogoutBtn.addEventListener('click', () => {
+            adminStatePanel.classList.add('admin-state-hidden');
+            adminStatePanel.classList.remove('admin-state-active');
+            adminStateVerify.classList.remove('admin-state-hidden');
+            adminStateVerify.classList.add('admin-state-active');
+            adminPasswordInput.value = '';
+            adminPasswordInput.focus();
+        });
+    }
+
     // Fetch live exchange rates dynamically
     fetchRealTimeExchangeRates();
 });
