@@ -184,6 +184,8 @@ body {
     padding: 24px 0;
     margin-bottom: 48px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 15;
 }
 
 .nav-left {
@@ -597,6 +599,7 @@ body {
     flex: 0 0 380px;
     position: sticky;
     top: 36px;
+    z-index: 10;
 }
 
 .panel-card {
@@ -1209,6 +1212,10 @@ body {
 .custom-select-container {
     position: relative;
     width: 100%;
+}
+
+.custom-select-container.open {
+    z-index: 999;
 }
 
 .custom-select-trigger {
