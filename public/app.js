@@ -174,7 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    let CURRENT_LANG = localStorage.getItem('gp_lang') || 'zh';
+    let CURRENT_LANG = localStorage.getItem('gp_lang');
+    if (!CURRENT_LANG) {
+        const browserLang = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
+        CURRENT_LANG = browserLang.startsWith('zh') ? 'zh' : 'en';
+        localStorage.setItem('gp_lang', CURRENT_LANG);
+    }
     if (CURRENT_LANG !== 'zh' && CURRENT_LANG !== 'en') {
         CURRENT_LANG = 'zh';
     }
@@ -270,6 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
         CNY: 1.0,
         USD: 7.25,
         EUR: 7.85,
+        GBP: 9.20,
+        CAD: 5.30,
+        AUD: 4.80,
         HKD: 0.93
     };
 
@@ -291,6 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
             CNY: '¥',
             USD: '$',
             EUR: '€',
+            GBP: '£',
+            CAD: 'C$',
+            AUD: 'A$',
             HKD: 'HK$'
         };
         return symbols[target] || '¥';
@@ -301,17 +312,29 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update top status bar tickers (4 decimal places)
             const tickerUsd = document.getElementById('rate-ticker-usd');
             const tickerEur = document.getElementById('rate-ticker-eur');
+            const tickerGbp = document.getElementById('rate-ticker-gbp');
+            const tickerCad = document.getElementById('rate-ticker-cad');
+            const tickerAud = document.getElementById('rate-ticker-aud');
             const tickerHkd = document.getElementById('rate-ticker-hkd');
             if (tickerUsd) tickerUsd.textContent = EXCHANGE_RATES.USD.toFixed(4);
             if (tickerEur) tickerEur.textContent = EXCHANGE_RATES.EUR.toFixed(4);
+            if (tickerGbp) tickerGbp.textContent = EXCHANGE_RATES.GBP.toFixed(4);
+            if (tickerCad) tickerCad.textContent = EXCHANGE_RATES.CAD.toFixed(4);
+            if (tickerAud) tickerAud.textContent = EXCHANGE_RATES.AUD.toFixed(4);
             if (tickerHkd) tickerHkd.textContent = EXCHANGE_RATES.HKD.toFixed(4);
 
             // Update custom dropdown labels (4 decimal places)
             const dropUsd = document.getElementById('rate-dropdown-usd');
             const dropEur = document.getElementById('rate-dropdown-eur');
+            const dropGbp = document.getElementById('rate-dropdown-gbp');
+            const dropCad = document.getElementById('rate-dropdown-cad');
+            const dropAud = document.getElementById('rate-dropdown-aud');
             const dropHkd = document.getElementById('rate-dropdown-hkd');
             if (dropUsd) dropUsd.textContent = `1 USD ≈ ${EXCHANGE_RATES.USD.toFixed(4)} CNY`;
             if (dropEur) dropEur.textContent = `1 EUR ≈ ${EXCHANGE_RATES.EUR.toFixed(4)} CNY`;
+            if (dropGbp) dropGbp.textContent = `1 GBP ≈ ${EXCHANGE_RATES.GBP.toFixed(4)} CNY`;
+            if (dropCad) dropCad.textContent = `1 CAD ≈ ${EXCHANGE_RATES.CAD.toFixed(4)} CNY`;
+            if (dropAud) dropAud.textContent = `1 AUD ≈ ${EXCHANGE_RATES.AUD.toFixed(4)} CNY`;
             if (dropHkd) dropHkd.textContent = `1 HKD ≈ ${EXCHANGE_RATES.HKD.toFixed(4)} CNY`;
         } catch (err) {
             console.error('Error updating rates UI:', err);
@@ -324,15 +347,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             if (data && data.rates) {
-                // The rates are relative to 1 CNY. E.g. 1 CNY = 0.138 USD.
-                // So 1 USD = 1 / 0.138 CNY.
                 const usdToCny = 1 / parseFloat(data.rates.USD);
                 const eurToCny = 1 / parseFloat(data.rates.EUR);
+                const gbpToCny = 1 / parseFloat(data.rates.GBP);
+                const cadToCny = 1 / parseFloat(data.rates.CAD);
+                const audToCny = 1 / parseFloat(data.rates.AUD);
                 const hkdToCny = 1 / parseFloat(data.rates.HKD);
                 
-                if (usdToCny && eurToCny && hkdToCny) {
+                if (usdToCny && eurToCny && gbpToCny && cadToCny && audToCny && hkdToCny) {
                     EXCHANGE_RATES.USD = usdToCny;
                     EXCHANGE_RATES.EUR = eurToCny;
+                    EXCHANGE_RATES.GBP = gbpToCny;
+                    EXCHANGE_RATES.CAD = cadToCny;
+                    EXCHANGE_RATES.AUD = audToCny;
                     EXCHANGE_RATES.HKD = hkdToCny;
                     
                     updateRatesUI();
@@ -682,11 +709,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function selectCurrency(val) {
         quoteCurrencyInput.value = val;
+        localStorage.setItem('gp_currency', val);
         
         const labelText = {
             CNY: 'CNY (¥)',
             USD: 'USD ($)',
             EUR: 'EUR (€)',
+            GBP: 'GBP (£)',
+            CAD: 'CAD (C$)',
+            AUD: 'AUD (A$)',
             HKD: 'HKD (HK$)'
         };
         currencyTriggerLabel.textContent = labelText[val] || val;
@@ -1021,6 +1052,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return gType || '普货';
             };
 
+            const mainName = CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道');
+            const subName = CURRENT_LANG === 'en' ? (channel.CName || '') : (channel.EName || '');
+            const displaySubName = subName && subName !== mainName ? subName : '';
+
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
                     <div class="channel-brand-icon-bg">
@@ -1029,12 +1064,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="channel-info-area">
                     <div class="channel-title-row">
-                        <span class="channel-name">${CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道')}</span>
+                        <span class="channel-name">${mainName}</span>
                         <span class="channel-code">${channel.Code || '-'}</span>
                         ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge">⏱️ ${CURRENT_LANG === 'en' ? 'API Transit' : 'API时效'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>` : ''}
                         ${excelTransit ? `<span class="channel-days-badge transit-excel-badge">📄 ${CURRENT_LANG === 'en' ? 'Table Transit' : '报价表时效'}: ${translateTransitDays(excelTransit)}</span>` : ''}
                     </div>
-                    <div class="channel-ename">${channel.EName || ''}</div>
+                    ${displaySubName ? `<div class="channel-ename">${displaySubName}</div>` : ''}
                     <div class="channel-meta-row">
                         <div class="channel-meta-item goods-type-badge ${getGoodsTypeClass(channel.GoodsType)}">
                             <span>${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
@@ -1365,7 +1400,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.22)`,
+                    message: `Update ${path} from admin panel (V1.5.24)`,
                     content: base64Content
                 };
                 if (sha) {
@@ -1512,6 +1547,27 @@ document.addEventListener('DOMContentLoaded', () => {
             adminPasswordInput.focus();
         });
     }
+
+    // Preset currency based on browser language / country if not set
+    let CURRENT_CURRENCY = localStorage.getItem('gp_currency');
+    if (!CURRENT_CURRENCY) {
+        const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+        if (browserLang.startsWith('zh-cn')) {
+            CURRENT_CURRENCY = 'CNY';
+        } else if (browserLang.includes('uk') || browserLang.includes('gb')) {
+            CURRENT_CURRENCY = 'GBP';
+        } else if (browserLang.includes('ca')) {
+            CURRENT_CURRENCY = 'CAD';
+        } else if (browserLang.includes('au')) {
+            CURRENT_CURRENCY = 'AUD';
+        } else if (browserLang.includes('de') || browserLang.includes('fr') || browserLang.includes('it') || browserLang.includes('es') || browserLang.includes('nl') || browserLang.includes('be') || browserLang.includes('ie') || browserLang.includes('at') || browserLang.includes('fi') || browserLang.includes('pt')) {
+            CURRENT_CURRENCY = 'EUR';
+        } else {
+            CURRENT_CURRENCY = 'USD';
+        }
+        localStorage.setItem('gp_currency', CURRENT_CURRENCY);
+    }
+    selectCurrency(CURRENT_CURRENCY);
 
     // Fetch live exchange rates dynamically
     fetchRealTimeExchangeRates();

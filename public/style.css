@@ -1151,6 +1151,16 @@ body {
     box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
 }
 
+.trigger-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    margin-right: 8px;
+}
+
 .chevron-icon {
     width: 16px;
     height: 16px;

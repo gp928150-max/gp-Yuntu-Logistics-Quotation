@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.23">
+    <link rel="stylesheet" href="style.css?v=1.5.24">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.23" defer></script>
+    <script src="app.js?v=1.5.24" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -36,7 +36,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.23 Enterprise</span>
+                <span class="status-bar-text version">V1.5.24 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -45,6 +45,12 @@
                 <span class="status-bar-rate-item">1 USD ≈ <span id="rate-ticker-usd">7.2500</span> CNY</span>
                 <span class="status-bar-rate-divider">|</span>
                 <span class="status-bar-rate-item">1 EUR ≈ <span id="rate-ticker-eur">7.8500</span> CNY</span>
+                <span class="status-bar-rate-divider">|</span>
+                <span class="status-bar-rate-item">1 GBP ≈ <span id="rate-ticker-gbp">9.2000</span> CNY</span>
+                <span class="status-bar-rate-divider">|</span>
+                <span class="status-bar-rate-item">1 CAD ≈ <span id="rate-ticker-cad">5.3000</span> CNY</span>
+                <span class="status-bar-rate-divider">|</span>
+                <span class="status-bar-rate-item">1 AUD ≈ <span id="rate-ticker-aud">4.8000</span> CNY</span>
                 <span class="status-bar-rate-divider">|</span>
                 <span class="status-bar-rate-item">1 HKD ≈ <span id="rate-ticker-hkd">0.9300</span> CNY</span>
             </div>
@@ -94,6 +100,18 @@
                             <li data-value="EUR">
                                 <span class="currency-name-lbl">EUR - 欧元 (€)</span>
                                 <span class="currency-rate-lbl" id="rate-dropdown-eur">1 EUR ≈ 7.8500 CNY</span>
+                            </li>
+                            <li data-value="GBP">
+                                <span class="currency-name-lbl">GBP - 英镑 (£)</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-gbp">1 GBP ≈ 9.2000 CNY</span>
+                            </li>
+                            <li data-value="CAD">
+                                <span class="currency-name-lbl">CAD - 加拿大元 (C$)</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-cad">1 CAD ≈ 5.3000 CNY</span>
+                            </li>
+                            <li data-value="AUD">
+                                <span class="currency-name-lbl">AUD - 澳大利亚元 (A$)</span>
+                                <span class="currency-rate-lbl" id="rate-dropdown-aud">1 AUD ≈ 4.8000 CNY</span>
                             </li>
                             <li data-value="HKD">
                                 <span class="currency-name-lbl">HKD - 港币 (HK$)</span>
