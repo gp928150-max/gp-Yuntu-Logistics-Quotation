@@ -971,14 +971,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (iconClass === 'express') {
             return `
                 <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    <path d="M12 2s-5 3-5 8.5v4c0 2.5 2 4.5 5 6 3-1.5 5-3.5 5-6v-4C17 5.5 12 2 12 2z"></path>
+                    <path d="M9 15.5l-3.5 2.5v1.5L9 17.5"></path>
+                    <path d="M15 15l3.5 2.5v1.5L15 17.5"></path>
+                    <line x1="12" y1="14" x2="12" y2="17"></line>
                 </svg>
             `;
         }
         if (iconClass === 'direct') {
             return `
                 <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17.8 19.2L16 11l3.5-3.5C20.3 6.7 20.3 5.3 19.5 4.5C18.7 3.7 17.3 3.7 16.5 4.5L13 8 4.8 6.2 3 8l7.1 2.9-4.2 4.2-2.8-.7L1.7 16l3 2 2 3 1.2-1.4-.7-2.8 4.2-4.2 2.9 7.1z"></path>
+                    <path d="M12 22v-3m0-3V9m0-6.5A1.5 1.5 0 0 1 13.5 4v5.5L22 14v2l-10-3v5l3 2v1l-3-1-3 1v-1l3-2v-5L2 16v-2l8.5-4.5V4A1.5 1.5 0 0 1 12 2.5z"></path>
                 </svg>
             `;
         }
@@ -1149,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
                     <div class="channel-brand-icon-bg brand-icon-${iconClass}">
-                        <span>${iconHtml}</span>
+                        ${iconHtml}
                     </div>
                 </div>
                 <div class="channel-info-area">
