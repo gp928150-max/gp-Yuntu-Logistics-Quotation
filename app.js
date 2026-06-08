@@ -44,6 +44,201 @@ document.addEventListener('DOMContentLoaded', () => {
     const quoteChannelsContainer = document.getElementById('quote-channels-container');
     const quoteSortBtn = document.getElementById('quote-sort-btn');
 
+    // Language configuration
+    const TRANSLATIONS = {
+        zh: {
+            nav_home: "官网首页",
+            nav_support: "客服咨询",
+            main_title: "智能物流测算系统",
+            main_subtitle: "由 graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。",
+            metric_cheapest: "最划算渠道",
+            metric_fastest: "最快捷时效",
+            metric_total: "服务商可用渠道",
+            metric_total_desc: "数据源：云途官方运价",
+            sidebar_title: "包裹估算参数",
+            label_country: "目的国家",
+            select_country_placeholder: "选择目的国家...",
+            search_country_placeholder: "输入国家名称或简码搜索...",
+            loading_countries: "正在加载国家列表...",
+            label_weight: "包裹重量 (kg)",
+            weight_placeholder: "重量, 例如: 0.5",
+            label_goods_type: "货物类型",
+            goods_type_general: "普货 (General Goods)",
+            goods_type_battery: "带电 (Contains Batteries)",
+            goods_type_special: "特货 (Special Goods)",
+            label_postcode: "邮区编码 (选填)",
+            postcode_placeholder: "目的国邮编",
+            label_dimensions: "包裹尺寸 (cm, 选填)",
+            dim_length: "长",
+            dim_width: "宽",
+            dim_height: "高",
+            btn_calculate: "开始测算报价",
+            welcome_title: "配置估算参数",
+            welcome_desc: "请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，graypoplar 将实时通过云途接口计算运费详情与最优通道报价。",
+            loading_title: "正在调用实时云途报价接口...",
+            loading_desc: "请稍候，我们正在为您测算最佳的运输专线报价",
+            error_title_default: "运费估算失败",
+            error_desc_default: "请核对您的输入参数是否正确，或稍后再试。",
+            results_title: "渠道估算报价清单",
+            sort_asc: "价格从低到高",
+            sort_desc: "价格从高到低",
+            alert_text: "云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>graypoplar</strong> 客服团队核实。",
+            whatsapp_btn: "WhatsApp 咨询",
+            footer_text: "© 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。",
+            api_status_ok: "云途 OMS API 正常 (200 OK)",
+            admin_trigger: "系统管理",
+            rate_label: "当前外汇折算价 (实时更新):",
+            currency_base: "基准币种",
+            
+            // Admin
+            admin_auth_title: "管理员身份认证",
+            admin_auth_subtitle: "请输入系统管理密码进行安全认证",
+            admin_password_placeholder: "输入管理密码...",
+            admin_auth_btn: "认证并登录",
+            admin_panel_title: "系统参数管理",
+            admin_panel_subtitle: "配置实时测算系统的财务加成与打包费",
+            admin_label_profit: "渠道利润加成 (%)",
+            admin_label_pack: "包裹打包费 (RMB)",
+            unit_rmb: "元",
+            admin_label_token: "GitHub 访问令牌 (Token)",
+            admin_token_placeholder: "输入 ghp_ 开头的 Token 进行云同步...",
+            admin_label_api_base: "GitHub API 接口地址 (国内网络受阻时可填代理镜像)",
+            admin_api_base_placeholder: "默认 https://api.github.com",
+            admin_label_backend_url: "Vercel 后端接口地址 (托管于 GitHub Pages 时必填)",
+            admin_backend_url_placeholder: "例如 https://xxx.vercel.app",
+            admin_logout: "安全退出",
+            admin_save: "保存配置"
+        },
+        en: {
+            nav_home: "Official Website",
+            nav_support: "Support",
+            main_title: "Smart Shipping Cost Calculator",
+            main_subtitle: "Developed independently by graypoplar. Estimated rates are synced in real-time with the official YunExpress API.",
+            metric_cheapest: "Cheapest Channel",
+            metric_fastest: "Fastest Transit",
+            metric_total: "Available Channels",
+            metric_total_desc: "Source: YunExpress Official Rates",
+            sidebar_title: "Package Details",
+            label_country: "Destination Country",
+            select_country_placeholder: "Select Destination Country...",
+            search_country_placeholder: "Search by country name or code...",
+            loading_countries: "Loading countries...",
+            label_weight: "Package Weight (kg)",
+            weight_placeholder: "Weight, e.g., 0.5",
+            label_goods_type: "Goods Type",
+            goods_type_general: "General Goods",
+            goods_type_battery: "Contains Batteries",
+            goods_type_special: "Special Goods",
+            label_postcode: "ZIP / Postal Code (Optional)",
+            postcode_placeholder: "Destination postal code",
+            label_dimensions: "Package Dimensions (cm, Optional)",
+            dim_length: "L",
+            dim_width: "W",
+            dim_height: "H",
+            btn_calculate: "Calculate Shipping Cost",
+            welcome_title: "Configure Estimation Parameters",
+            welcome_desc: "Please configure your package destination, weight, and goods type in the left panel. Click 'Calculate Shipping Cost' to get live shipping fees and optimized routes via the YunExpress API.",
+            loading_title: "Calling live YunExpress API...",
+            loading_desc: "Please wait while we calculate the best shipping channel rates for your package...",
+            error_title_default: "Estimation Failed",
+            error_desc_default: "Please verify that your inputs are correct or try again later.",
+            results_title: "Channel Quotation Estimates",
+            sort_asc: "Price: Low to High",
+            sort_desc: "Price: High to Low",
+            alert_text: "Estimated delivery times from the YunExpress API may vary. For official transit times and special services, please contact the <strong>graypoplar</strong> customer support team.",
+            whatsapp_btn: "WhatsApp Support",
+            footer_text: "© 2026 graypoplar. All Rights Reserved. This system is independently developed. Syncing live YunExpress APIs for shipping evaluation only.",
+            api_status_ok: "YunExpress OMS API Normal (200 OK)",
+            admin_trigger: "Admin settings",
+            rate_label: "Live Exchange Rates:",
+            currency_base: "Base Currency",
+            
+            // Admin
+            admin_auth_title: "Administrator Authentication",
+            admin_auth_subtitle: "Please enter the system administration password for verification",
+            admin_password_placeholder: "Enter administration password...",
+            admin_auth_btn: "Verify & Log In",
+            admin_panel_title: "System Parameters Management",
+            admin_panel_subtitle: "Configure profit margin and package handling fees",
+            admin_label_profit: "Channel Profit Markup (%)",
+            admin_label_pack: "Package Packaging Fee (RMB)",
+            unit_rmb: "RMB",
+            admin_label_token: "GitHub Access Token",
+            admin_token_placeholder: "Enter Token starting with ghp_ to sync cloud...",
+            admin_label_api_base: "GitHub API Endpoint (Used as a proxy if GitHub is blocked)",
+            admin_api_base_placeholder: "Default: https://api.github.com",
+            admin_label_backend_url: "Vercel Backend Address (Required if hosted on GitHub Pages)",
+            admin_backend_url_placeholder: "e.g., https://xxx.vercel.app",
+            admin_logout: "Log Out",
+            admin_save: "Save Config"
+        }
+    };
+
+    let CURRENT_LANG = localStorage.getItem('gp_lang') || 'zh';
+
+    function updateLanguageDOM() {
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            const translation = TRANSLATIONS[CURRENT_LANG][key];
+            if (translation) {
+                if (key === 'alert_text' || key === 'footer_text') {
+                    el.innerHTML = translation;
+                } else {
+                    el.textContent = translation;
+                }
+            }
+        });
+
+        document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-translate-placeholder');
+            const translation = TRANSLATIONS[CURRENT_LANG][key];
+            if (translation) {
+                el.setAttribute('placeholder', translation);
+            }
+        });
+
+        const sortText = quoteSortBtn.querySelector('span');
+        if (sortText) {
+            sortText.textContent = isQuoteSortAscending ? TRANSLATIONS[CURRENT_LANG]['sort_asc'] : TRANSLATIONS[CURRENT_LANG]['sort_desc'];
+        }
+
+        if (selectedCountryCode) {
+            const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
+            if (selectedCountryObj) {
+                const flag = getFlagEmoji(selectedCountryCode);
+                const name = getCountryDisplayName(selectedCountryObj);
+                countryTriggerLabel.innerHTML = `${flag} ${name} (${selectedCountryCode})`;
+            }
+        } else {
+            countryTriggerLabel.textContent = TRANSLATIONS[CURRENT_LANG]['select_country_placeholder'];
+        }
+
+        const baseCurrencyLbl = currencyOptionsList.querySelector('li[data-value="CNY"] .currency-rate-lbl');
+        if (baseCurrencyLbl) {
+            baseCurrencyLbl.textContent = TRANSLATIONS[CURRENT_LANG]['currency_base'];
+        }
+    }
+
+    function getCountryDisplayName(c) {
+        if (CURRENT_LANG === 'en') {
+            return c.EName || c.CName;
+        }
+        return c.CName;
+    }
+
+    function sortCountries() {
+        countriesList.sort((a, b) => {
+            const tierA = getCountryTier(a.CountryCode);
+            const tierB = getCountryTier(b.CountryCode);
+            if (tierA !== tierB) {
+                return tierA - tierB;
+            }
+            const nameA = getCountryDisplayName(a);
+            const nameB = getCountryDisplayName(b);
+            return nameA.localeCompare(nameB, CURRENT_LANG === 'en' ? 'en' : 'zh');
+        });
+    }
+
     let quoteData = [];
     let rawQuoteItems = []; // Raw items cache for dynamic recalculation
     let isQuoteSortAscending = true; // Lowest price first by default
@@ -249,20 +444,48 @@ document.addEventListener('DOMContentLoaded', () => {
         return 3;
     };
 
-    countriesList.sort((a, b) => {
-        const tierA = getCountryTier(a.CountryCode);
-        const tierB = getCountryTier(b.CountryCode);
-        if (tierA !== tierB) {
-            return tierA - tierB;
+    sortCountries();
+    rebuildCountryNamesMap();
+    
+    // Set initial active pill and run translations
+    const langPills = document.querySelectorAll('.lang-pill');
+    langPills.forEach(p => {
+        if (p.getAttribute('data-lang') === CURRENT_LANG) {
+            p.classList.add('active');
+        } else {
+            p.classList.remove('active');
         }
-        return a.CName.localeCompare(b.CName, 'zh');
     });
 
-    // Populate mapping and render dropdown immediately
-    countriesList.forEach(c => {
-        const flag = getFlagEmoji(c.CountryCode);
-        countryNames[c.CountryCode] = `${flag} ${c.CName} (${c.CountryCode})`;
+    // Language pills click listeners
+    langPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const lang = pill.getAttribute('data-lang');
+            if (lang !== CURRENT_LANG) {
+                CURRENT_LANG = lang;
+                localStorage.setItem('gp_lang', CURRENT_LANG);
+                
+                langPills.forEach(p => {
+                    if (p.getAttribute('data-lang') === CURRENT_LANG) {
+                        p.classList.add('active');
+                    } else {
+                        p.classList.remove('active');
+                    }
+                });
+
+                sortCountries();
+                rebuildCountryNamesMap();
+                updateLanguageDOM();
+                renderCountryOptions(countriesList);
+                
+                if (rawQuoteItems && rawQuoteItems.length > 0) {
+                    calculateAndRenderQuoteData();
+                }
+            }
+        });
     });
+
+    updateLanguageDOM();
     
     // Defer render briefly to ensure DOM loaded
     setTimeout(() => {
@@ -393,7 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (list.length === 0) {
             const emptyLi = document.createElement('li');
             emptyLi.className = 'no-results';
-            emptyLi.textContent = '未找到匹配的国家';
+            emptyLi.textContent = CURRENT_LANG === 'en' ? 'No matching countries found' : '未找到匹配的国家';
             countryOptionsList.appendChild(emptyLi);
             return;
         }
@@ -401,7 +624,8 @@ document.addEventListener('DOMContentLoaded', () => {
         list.forEach(c => {
             const li = document.createElement('li');
             const flag = getFlagEmoji(c.CountryCode);
-            li.innerHTML = `${flag} ${c.CName} (${c.CountryCode})`;
+            const name = getCountryDisplayName(c);
+            li.innerHTML = `${flag} ${name} (${c.CountryCode})`;
             li.dataset.code = c.CountryCode;
             
             if (c.CountryCode === selectedCountryCode) {
@@ -410,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             li.addEventListener('click', (e) => {
                 e.stopPropagation();
-                selectCountry(c.CountryCode, flag, c.CName);
+                selectCountry(c.CountryCode, flag, name);
             });
 
             countryOptionsList.appendChild(li);
@@ -564,16 +788,16 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const errorTitle = document.getElementById('error-title');
                 const errorMessage = document.getElementById('error-message');
-                errorTitle.textContent = '测算运费失败';
-                errorMessage.textContent = data.Message || '云途接口未返回有效报价数据，请核对您的测算参数或目的地代码。';
+                errorTitle.textContent = CURRENT_LANG === 'en' ? 'Estimation Failed' : '测算运费失败';
+                errorMessage.textContent = data.Message || (CURRENT_LANG === 'en' ? 'YunExpress API did not return valid quotation data. Please check your parameters or destination code.' : '云途接口未返回有效报价数据，请核对您的测算参数或目的地代码。');
                 showState('error');
             }
         } catch (error) {
             console.error('Fetch error:', error);
             const errorTitle = document.getElementById('error-title');
             const errorMessage = document.getElementById('error-message');
-            errorTitle.textContent = '网络请求故障';
-            errorMessage.textContent = '无法连接至云途报价接口，请检查您的网络连接或稍后再试。';
+            errorTitle.textContent = CURRENT_LANG === 'en' ? 'Network Request Error' : '网络请求故障';
+            errorMessage.textContent = CURRENT_LANG === 'en' ? 'Unable to connect to the YunExpress pricing API. Please check your network connection or try again later.' : '无法连接至云途报价接口，请检查您的网络连接或稍后再试。';
             showState('error');
         }
     }
@@ -600,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cheapestSymbol = getCurrencySymbol();
             metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)} <span class="metric-converted-sub">≈ ${cheapestSymbol}${cheapestDisplay.toFixed(2)}</span>`;
         }
-        metricCheapestName.textContent = cheapest.CName || cheapest.Code;
+        metricCheapestName.textContent = CURRENT_LANG === 'en' ? (cheapest.EName || cheapest.CName || cheapest.Code) : (cheapest.CName || cheapest.Code);
 
         // 2. Fastest Channel (smallest min day in "X-Y" range)
         let fastest = quoteData[0];
@@ -614,11 +838,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        metricFastestVal.textContent = fastest.DeliveryDays ? `${fastest.DeliveryDays} 天` : '未提供';
-        metricFastestName.textContent = fastest.CName || fastest.Code;
+        metricFastestVal.textContent = fastest.DeliveryDays ? (CURRENT_LANG === 'en' ? `${fastest.DeliveryDays} Days` : `${fastest.DeliveryDays} 天`) : (CURRENT_LANG === 'en' ? 'N/A' : '未提供');
+        metricFastestName.textContent = CURRENT_LANG === 'en' ? (fastest.EName || fastest.CName || fastest.Code) : (fastest.CName || fastest.Code);
 
         // 3. Total Channels
-        metricTotalVal.textContent = `${quoteData.length} 个`;
+        metricTotalVal.textContent = CURRENT_LANG === 'en' ? `${quoteData.length}` : `${quoteData.length} 个`;
     }
 
     // Parse "3-8" or "7" delivery days string to extract minimum days
@@ -682,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quoteChannelsContainer.innerHTML = '';
         
         if (!quoteData || quoteData.length === 0) {
-            quoteChannelsContainer.innerHTML = '<div class="timeline-empty">暂无可用运输渠道报价</div>';
+            quoteChannelsContainer.innerHTML = `<div class="timeline-empty">${CURRENT_LANG === 'en' ? 'No shipping channels available' : '暂无可用运输渠道报价'}</div>`;
             return;
         }
 
@@ -716,10 +940,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // Helper to format individual breakdown sub-fees in the selected currency
             const formatBreakdownItem = (label, cnyVal, convertedVal) => {
                 if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
+                const labelMap = CURRENT_LANG === 'en' ? {
+                    '运费': 'Shipping',
+                    '挂号': 'Reg Fee',
+                    '燃油': 'Fuel Surcharge',
+                    '杂费': 'Sundry',
+                    '预付税': 'Tariff',
+                    '保价': 'Insurance',
+                    '签名': 'Signature',
+                    '打包费': 'Handling'
+                } : null;
+                const translatedLabel = (labelMap && labelMap[label]) ? labelMap[label] : label;
                 if (target === 'CNY') {
-                    return `${label}: ¥${parseFloat(cnyVal).toFixed(2)}`;
+                    return `${translatedLabel}: ¥${parseFloat(cnyVal).toFixed(2)}`;
                 }
-                return `${label}: ${targetSymbol}${convertedVal.toFixed(2)}`;
+                return `${translatedLabel}: ${targetSymbol}${convertedVal.toFixed(2)}`;
             };
 
             // Generate detailed billing tooltip / breakdown subtext
@@ -744,35 +979,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const excelTransitMap = transitTimesData[channel.Code];
             const excelTransit = getExcelTransit(excelTransitMap, countryCName);
+            
+            // Helper to translate transit days from Excel
+            const translateTransitDays = (transitStr) => {
+                if (!transitStr || CURRENT_LANG !== 'en') return transitStr;
+                return transitStr
+                    .replace(/个工作日/g, ' work days')
+                    .replace(/工作日/g, ' work days')
+                    .replace(/天/g, ' days');
+            };
+
+            const translateGoodsType = (gType) => {
+                if (CURRENT_LANG === 'en') {
+                    if (!gType) return 'General Goods';
+                    if (gType.includes('普')) return 'General Goods';
+                    if (gType.includes('电')) return 'Battery';
+                    if (gType.includes('特') || gType.includes('敏')) return 'Special Goods';
+                    return gType;
+                }
+                return gType || '普货';
+            };
 
             cardEl.innerHTML = `
                 <div class="channel-brand-icon-area">
                     <div class="channel-brand-icon-bg">
-                        <span>${getChannelIcon(channel.CName || channel.Code)}</span>
+                        <span>${getChannelIcon(channel.EName || channel.CName || channel.Code)}</span>
                     </div>
                 </div>
                 <div class="channel-info-area">
                     <div class="channel-title-row">
-                        <span class="channel-name">${channel.CName || '未知渠道'}</span>
+                        <span class="channel-name">${CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道')}</span>
                         <span class="channel-code">${channel.Code || '-'}</span>
-                        ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge">⏱️ API时效: ${channel.DeliveryDays} 天</span>` : ''}
-                        ${excelTransit ? `<span class="channel-days-badge transit-excel-badge">📄 报价表时效: ${excelTransit}</span>` : ''}
+                        ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge">⏱️ ${CURRENT_LANG === 'en' ? 'API Transit' : 'API时效'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>` : ''}
+                        ${excelTransit ? `<span class="channel-days-badge transit-excel-badge">📄 ${CURRENT_LANG === 'en' ? 'Table Transit' : '报价表时效'}: ${translateTransitDays(excelTransit)}</span>` : ''}
                     </div>
                     <div class="channel-ename">${channel.EName || ''}</div>
                     <div class="channel-meta-row">
                         <div class="channel-meta-item goods-type-badge ${getGoodsTypeClass(channel.GoodsType)}">
-                            <span>属性: <strong>${channel.GoodsType || '普货'}</strong></span>
+                            <span>${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
                         </div>
                         <div class="channel-meta-item">
-                            <span>计费重量: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
+                            <span>${CURRENT_LANG === 'en' ? 'Billable Wt' : '计费重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
                         </div>
                         ${pack > 0 ? `
                         <div class="channel-meta-item packaging-fee">
-                            <span>📦 打包费: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (≈ ${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
+                            <span>📦 ${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (≈ ${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
-                            <span>备注: <strong>${channel.Remark}</strong></span>
+                            <span>${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${channel.Remark}</strong></span>
                         </div>` : ''}
                     </div>
                 </div>
@@ -855,7 +1110,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const countryText = countryNames[country] || country;
         const goodsTypeText = quoteGoodsType.options[quoteGoodsType.selectedIndex].text;
         
-        quoteSummaryDetails.textContent = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText} ${postcode ? `| 邮编: ${postcode}` : ''}`;
+        if (CURRENT_LANG === 'en') {
+            quoteSummaryDetails.textContent = `Parameters: Destination: ${countryText} | Weight: ${parseFloat(weight).toFixed(3)} kg | Size: ${length}×${width}×${height} cm | Type: ${goodsTypeText}${postcode ? ` | ZIP: ${postcode}` : ''}`;
+        } else {
+            quoteSummaryDetails.textContent = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText}${postcode ? ` | 邮编: ${postcode}` : ''}`;
+        }
 
         updateMetrics();
         renderQuotationChannels();

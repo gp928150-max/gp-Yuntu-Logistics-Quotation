@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>graypoplar 智能物流测算系统 | 实时云途运价</title>
+    <title>graypoplar Dropshipping运费计算 | Dropshipping Shipping Cost Calculator | 智能物流测算系统</title>
+    <meta name="description" content="graypoplar 智能物流测算系统提供专业的 Dropshipping 运费计算 (Dropshipping Shipping Cost Calculator) 与云途 OMS 实时运价查询。支持全球多国快捷时效和最划算物流渠道智能对比筛选，助您优化跨境电商物流成本。">
+    <meta name="keywords" content="dropshipping运费计算, dropshipping shipping cost calculator, dropshipping运费, dropshipping物流, 云途运价查询, 跨境物流测算, graypoplar, 智能物流系统">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.20">
+    <link rel="stylesheet" href="style.css?v=1.5.21">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.20" defer></script>
+    <script src="app.js?v=1.5.21" defer></script>
 </head>
 <body>
     <!-- Top Status Bar -->
@@ -19,14 +21,14 @@
         <div class="status-bar-content">
             <div class="status-bar-left">
                 <span class="status-indicator-dot"></span>
-                <span class="status-bar-text" id="api-status-text">云途 OMS API 正常 (200 OK)</span>
+                <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.20 Enterprise</span>
+                <span class="status-bar-text version">V1.5.21 Enterprise</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text admin-trigger" id="admin-trigger">系统管理</span>
+                <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
             <div class="status-bar-right">
-                <span class="status-bar-rate-label">当前外汇折算价 (实时更新):</span>
+                <span class="status-bar-rate-label" data-translate="rate_label">当前外汇折算价 (实时更新):</span>
                 <span class="status-bar-rate-item">1 USD ≈ <span id="rate-ticker-usd">7.2500</span> CNY</span>
                 <span class="status-bar-rate-divider">|</span>
                 <span class="status-bar-rate-item">1 EUR ≈ <span id="rate-ticker-eur">7.8500</span> CNY</span>
@@ -45,11 +47,15 @@
                 </a>
                 <span class="badge">LOGISTICS HUB</span>
                 <div class="nav-links">
-                    <a href="https://www.graypoplar.com/" target="_blank" class="nav-link">官网首页</a>
-                    <a href="https://wa.me/85262508059" target="_blank" class="nav-link">客服咨询</a>
+                    <a href="https://www.graypoplar.com/" target="_blank" class="nav-link" data-translate="nav_home">官网首页</a>
+                    <a href="https://wa.me/85262508059" target="_blank" class="nav-link" data-translate="nav_support">客服咨询</a>
                 </div>
             </div>
             <div class="nav-right">
+                <div class="lang-toggle-pills" id="lang-toggle-pills">
+                    <button type="button" class="lang-pill active" data-lang="zh">中文</button>
+                    <button type="button" class="lang-pill" data-lang="en">EN</button>
+                </div>
                 <div class="custom-select-container currency-select-container" id="currency-select-container">
                     <button type="button" class="custom-select-trigger currency-select-trigger" id="currency-select-trigger">
                         <svg class="globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -66,7 +72,7 @@
                         <ul class="custom-select-options" id="currency-options-list">
                             <li data-value="CNY" class="selected">
                                 <span class="currency-name-lbl">CNY - 人民币 (¥)</span>
-                                <span class="currency-rate-lbl">基准币种</span>
+                                <span class="currency-rate-lbl" data-translate="currency_base">基准币种</span>
                             </li>
                             <li data-value="USD">
                                 <span class="currency-name-lbl">USD - 美元 ($)</span>
@@ -89,8 +95,8 @@
 
         <!-- Header -->
         <header class="app-header">
-            <h1 class="main-title">智能物流测算系统</h1>
-            <p class="main-subtitle">由 graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。</p>
+            <h1 class="main-title" data-translate="main_title">智能物流测算系统</h1>
+            <p class="main-subtitle" data-translate="main_subtitle">由 graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。</p>
         </header>
 
         <!-- Metrics Section (Dynamically updated) -->
@@ -103,7 +109,7 @@
                     </svg>
                 </div>
                 <div class="metric-info">
-                    <span class="metric-label">最划算渠道</span>
+                    <span class="metric-label" data-translate="metric_cheapest">最划算渠道</span>
                     <h3 class="metric-val" id="metric-cheapest-val">-</h3>
                     <span class="metric-desc" id="metric-cheapest-name">-</span>
                 </div>
@@ -115,7 +121,7 @@
                     </svg>
                 </div>
                 <div class="metric-info">
-                    <span class="metric-label">最快捷时效</span>
+                    <span class="metric-label" data-translate="metric_fastest">最快捷时效</span>
                     <h3 class="metric-val" id="metric-fastest-val">-</h3>
                     <span class="metric-desc" id="metric-fastest-name">-</span>
                 </div>
@@ -129,9 +135,9 @@
                     </svg>
                 </div>
                 <div class="metric-info">
-                    <span class="metric-label">服务商可用渠道</span>
+                    <span class="metric-label" data-translate="metric_total">服务商可用渠道</span>
                     <h3 class="metric-val" id="metric-total-val">-</h3>
-                    <span class="metric-desc">数据源：云途官方运价</span>
+                    <span class="metric-desc" data-translate="metric_total_desc">数据源：云途官方运价</span>
                 </div>
             </div>
         </div>
@@ -141,13 +147,13 @@
             <!-- Left Panel: Form Config -->
             <aside class="sidebar-panel">
                 <div class="panel-card">
-                    <h2 class="panel-title">包裹估算参数</h2>
+                    <h2 class="panel-title" data-translate="sidebar_title">包裹估算参数</h2>
                     <form id="quote-form" class="quote-form">
                         <div class="form-field">
-                            <label for="quote-country">目的国家 <span class="req">*</span></label>
+                            <label for="quote-country" data-translate="label_country">目的国家 <span class="req">*</span></label>
                             <div class="custom-select-container" id="country-select-container">
                                 <button type="button" class="custom-select-trigger" id="country-select-trigger">
-                                    <span class="trigger-label" id="country-trigger-label">选择目的国家...</span>
+                                    <span class="trigger-label" id="country-trigger-label" data-translate="select_country_placeholder">选择目的国家...</span>
                                     <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="6 9 12 15 18 9"></polyline>
                                     </svg>
@@ -158,43 +164,44 @@
                                             <circle cx="11" cy="11" r="8"></circle>
                                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                         </svg>
-                                        <input type="text" id="country-search-input" placeholder="输入国家名称或简码搜索..." autocomplete="off">
+                                        <input type="text" id="country-search-input" data-translate-placeholder="search_country_placeholder" placeholder="输入国家名称或简码搜索..." autocomplete="off">
                                     </div>
                                     <ul class="custom-select-options" id="country-options-list">
-                                        <li class="loading-option">正在加载国家列表...</li>
+                                        <li class="loading-option" data-translate="loading_countries">正在加载国家列表...</li>
                                     </ul>
                                 </div>
                                 <input type="hidden" id="quote-country" required>
                             </div>
                         </div>
                         <div class="form-field">
-                            <label for="quote-weight">包裹重量 (kg) <span class="req">*</span></label>
-                            <input type="number" id="quote-weight" step="0.001" min="0.001" placeholder="重量, 例如: 0.5" required>
+                            <label for="quote-weight" data-translate="label_weight">包裹重量 (kg) <span class="req">*</span></label>
+                            <input type="number" id="quote-weight" step="0.001" min="0.001" data-translate-placeholder="weight_placeholder" placeholder="重量, 例如: 0.5" required>
                         </div>
                         <div class="form-field">
-                            <label for="quote-goods-type">货物类型</label>
+                            <label for="quote-goods-type" data-translate="label_goods_type">货物类型</label>
                             <select id="quote-goods-type">
-                                <option value="0" selected>普货 (General Goods)</option>
-                                <option value="1">带电 (Contains Batteries)</option>
-                                <option value="2">特货 (Special Goods)</option>
+                                <option value="0" selected data-translate="goods_type_general">普货 (General Goods)</option>
+                                <option value="1" data-translate="goods_type_battery">带电 (Contains Batteries)</option>
+                                <option value="2" data-translate="goods_type_special">特货 (Special Goods)</option>
                             </select>
                         </div>
                         <div class="form-field">
-                            <label for="quote-postcode">邮区编码 (选填)</label>
-                            <input type="text" id="quote-postcode" placeholder="目的国邮编">
+                            <label for="quote-postcode" data-translate="label_postcode">邮区编码 (选填)</label>
+                            <input type="text" id="quote-postcode" data-translate-placeholder="postcode_placeholder" placeholder="目的国邮编">
                         </div>
                         <div class="form-field">
-                            <label>包裹尺寸 (cm, 选填)</label>
+                            <label data-translate="label_dimensions">包裹尺寸 (cm, 选填)</label>
                             <div class="dimensions-input-group">
-                                <input type="number" id="quote-length" min="1" placeholder="长" value="1">
+                                <input type="number" id="quote-length" min="1" data-translate-placeholder="dim_length" placeholder="长" value="1">
                                 <span class="times">&times;</span>
-                                <input type="number" id="quote-width" min="1" placeholder="宽" value="1">
+                                <input type="number" id="quote-width" min="1" data-translate-placeholder="dim_width" placeholder="宽" value="1">
                                 <span class="times">&times;</span>
-                                <input type="number" id="quote-height" min="1" placeholder="高" value="1">
+                                <input type="number" id="quote-height" min="1" data-translate-placeholder="dim_height" placeholder="高" value="1">
+                            </div>
                         </div>
 
                         <button type="submit" class="submit-btn full-width">
-                            <span>开始测算报价</span>
+                            <span data-translate="btn_calculate">开始测算报价</span>
                             <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -215,8 +222,8 @@
                             <line x1="6" y1="20" x2="6" y2="14"></line>
                         </svg>
                     </div>
-                    <h3>配置估算参数</h3>
-                    <p>请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，graypoplar 将实时通过云途接口计算运费详情与最优通道报价。</p>
+                    <h3 data-translate="welcome_title">配置估算参数</h3>
+                    <p data-translate="welcome_desc">请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，graypoplar 将实时通过云途接口计算运费详情与最优通道报价。</p>
                 </div>
 
                 <!-- Loading State -->
@@ -226,8 +233,8 @@
                         <div class="skeleton-card"></div>
                         <div class="skeleton-card"></div>
                     </div>
-                    <h3>正在调用实时云途报价接口...</h3>
-                    <p>请稍候，我们正在为您测算最佳的运输专线报价</p>
+                    <h3 data-translate="loading_title">正在调用实时云途报价接口...</h3>
+                    <p data-translate="loading_desc">请稍候，我们正在为您测算最佳的运输专线报价</p>
                 </div>
 
                 <!-- Error State -->
@@ -239,15 +246,15 @@
                             <line x1="12" y1="17" x2="12.01" y2="17"></line>
                         </svg>
                     </div>
-                    <h3 id="error-title">运费估算失败</h3>
-                    <p id="error-message">请核对您的输入参数是否正确，或稍后再试。</p>
+                    <h3 id="error-title" data-translate="error_title_default">运费估算失败</h3>
+                    <p id="error-message" data-translate="error_desc_default">请核对您的输入参数是否正确，或稍后再试。</p>
                 </div>
 
                 <!-- Results State -->
                 <div id="quote-results-state" class="state-panel">
                     <div class="results-header-actions">
                         <div class="results-meta-summary">
-                            <h3 class="panel-section-title">渠道估算报价清单</h3>
+                            <h3 class="panel-section-title" data-translate="results_title">渠道估算报价清单</h3>
                             <p id="quote-summary-details" class="quote-summary-details">测算详情: -</p>
                         </div>
                         <button id="quote-sort-btn" class="text-btn">
@@ -255,7 +262,7 @@
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <polyline points="19 12 12 19 5 12"></polyline>
                             </svg>
-                            <span>价格从低到高</span>
+                            <span data-translate="sort_asc">价格从低到高</span>
                         </button>
                     </div>
 
@@ -267,13 +274,13 @@
                                 <line x1="12" y1="16" x2="12" y2="12"></line>
                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                             </svg>
-                            <span class="alert-text">云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>graypoplar</strong> 客服团队核实。</span>
+                            <span class="alert-text" data-translate="alert_text">云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>graypoplar</strong> 客服团队核实。</span>
                         </div>
                         <a href="https://wa.me/85262508059" target="_blank" class="whatsapp-btn">
                             <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.62.962 3.21 1.6 5.321 1.6 5.487 0 9.953-4.467 9.957-9.96.002-2.66-1.033-5.162-2.909-7.039C17.142 1.88 14.65 .843 12.01.84c-5.49 0-9.957 4.467-9.96 9.961-.002 2.052.544 3.715 1.579 5.424L2.617 21.6l5.59-1.465zM17.842 14.7c-.318-.16-1.886-.93-2.185-1.04-.298-.11-.515-.16-.73.16-.217.318-.84 1.057-1.03 1.277-.189.22-.377.245-.695.085a8.761 8.761 0 0 1-2.58-1.594 9.65 9.65 0 0 1-1.785-2.223c-.19-.323-.02-.497.14-.657.143-.143.318-.372.477-.557.16-.186.213-.318.319-.53.106-.212.053-.397-.027-.557-.08-.16-.73-1.758-1.002-2.414-.265-.636-.53-.55-.73-.56-.19-.01-.407-.01-.624-.01-.217 0-.57.08-.868.407-.298.326-1.137 1.112-1.137 2.71 0 1.598 1.164 3.14 1.323 3.354.16.212 2.29 3.498 5.548 4.906.775.335 1.38.535 1.85.684.78.248 1.488.213 2.049.13.625-.093 1.886-.77 2.152-1.478.265-.707.265-1.313.186-1.44-.08-.124-.298-.2-.616-.36z"></path>
                             </svg>
-                            <span>WhatsApp 咨询</span>
+                            <span data-translate="whatsapp_btn">WhatsApp 咨询</span>
                         </a>
                     </div>
                     
@@ -286,7 +293,7 @@
 
         <!-- Footer -->
         <footer class="app-footer">
-            <p>&copy; 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。</p>
+            <p data-translate="footer_text">&copy; 2026 graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。</p>
         </footer>
     </div>
     <!-- Admin Management Modal -->
@@ -296,24 +303,24 @@
             
             <!-- Verification State -->
             <div id="admin-state-verify" class="admin-state-active">
-                <h3 class="admin-modal-title">管理员身份认证</h3>
-                <p class="admin-modal-subtitle">请输入系统管理密码进行安全认证</p>
+                <h3 class="admin-modal-title" data-translate="admin_auth_title">管理员身份认证</h3>
+                <p class="admin-modal-subtitle" data-translate="admin_auth_subtitle">请输入系统管理密码进行安全认证</p>
                 <div class="admin-input-group">
-                    <input type="password" id="admin-password-input" placeholder="输入管理密码..." autocomplete="off">
+                    <input type="password" id="admin-password-input" data-translate-placeholder="admin_password_placeholder" placeholder="输入管理密码..." autocomplete="off">
                 </div>
                 <div id="admin-verify-error" class="admin-error-text"></div>
                 <button type="button" class="submit-btn full-width" id="admin-verify-btn">
-                    <span>认证并登录</span>
+                    <span data-translate="admin_auth_btn">认证并登录</span>
                 </button>
             </div>
 
             <!-- Dashboard State -->
             <div id="admin-state-panel" class="admin-state-hidden">
-                <h3 class="admin-modal-title">系统参数管理</h3>
-                <p class="admin-modal-subtitle">配置实时测算系统的财务加成与打包费</p>
+                <h3 class="admin-modal-title" data-translate="admin_panel_title">系统参数管理</h3>
+                <p class="admin-modal-subtitle" data-translate="admin_panel_subtitle">配置实时测算系统的财务加成与打包费</p>
                 
                 <div class="admin-form-field">
-                    <label for="admin-profit-input">渠道利润加成 (%)</label>
+                    <label for="admin-profit-input" data-translate="admin_label_profit">渠道利润加成 (%)</label>
                     <div class="admin-input-with-suffix">
                         <input type="number" id="admin-profit-input" min="0" max="100" step="1" value="22">
                         <span class="suffix">%</span>
@@ -321,39 +328,39 @@
                 </div>
 
                 <div class="admin-form-field">
-                    <label for="admin-pack-input">包裹打包费 (RMB)</label>
+                    <label for="admin-pack-input" data-translate="admin_label_pack">包裹打包费 (RMB)</label>
                     <div class="admin-input-with-suffix">
                         <input type="number" id="admin-pack-input" min="0" step="0.5" value="2.0">
-                        <span class="suffix">元</span>
+                        <span class="suffix" data-translate="unit_rmb">元</span>
                     </div>
                 </div>
 
                 <div class="admin-form-field">
-                    <label for="admin-token-input">GitHub 访问令牌 (Token)</label>
+                    <label for="admin-token-input" data-translate="admin_label_token">GitHub 访问令牌 (Token)</label>
                     <div class="admin-input-with-suffix">
-                        <input type="password" id="admin-token-input" placeholder="输入 ghp_ 开头的 Token 进行云同步..." autocomplete="off">
+                        <input type="password" id="admin-token-input" data-translate-placeholder="admin_token_placeholder" placeholder="输入 ghp_ 开头的 Token 进行云同步..." autocomplete="off">
                     </div>
                 </div>
 
                 <div class="admin-form-field">
-                    <label for="admin-api-base-input">GitHub API 接口地址 (国内网络受阻时可填代理镜像)</label>
+                    <label for="admin-api-base-input" data-translate="admin_label_api_base">GitHub API 接口地址 (国内网络受阻时可填代理镜像)</label>
                     <div class="admin-input-with-suffix">
-                        <input type="text" id="admin-api-base-input" placeholder="默认 https://api.github.com" autocomplete="off" style="padding-right: 16px;">
+                        <input type="text" id="admin-api-base-input" data-translate-placeholder="admin_api_base_placeholder" placeholder="默认 https://api.github.com" autocomplete="off" style="padding-right: 16px;">
                     </div>
                 </div>
 
                 <div class="admin-form-field">
-                    <label for="admin-backend-url-input">Vercel 后端接口地址 (托管于 GitHub Pages 时必填)</label>
+                    <label for="admin-backend-url-input" data-translate="admin_label_backend_url">Vercel 后端接口地址 (托管于 GitHub Pages 时必填)</label>
                     <div class="admin-input-with-suffix">
-                        <input type="text" id="admin-backend-url-input" placeholder="例如 https://xxx.vercel.app" autocomplete="off" style="padding-right: 16px;">
+                        <input type="text" id="admin-backend-url-input" data-translate-placeholder="admin_backend_url_placeholder" placeholder="例如 https://xxx.vercel.app" autocomplete="off" style="padding-right: 16px;">
                     </div>
                 </div>
 
                 <div id="admin-save-status" class="admin-success-text"></div>
                 
                 <div class="admin-action-row">
-                    <button type="button" class="admin-btn-logout" id="admin-logout-btn">安全退出</button>
-                    <button type="button" class="submit-btn" id="admin-save-btn">保存配置</button>
+                    <button type="button" class="admin-btn-logout" id="admin-logout-btn" data-translate="admin_logout">安全退出</button>
+                    <button type="button" class="submit-btn" id="admin-save-btn" data-translate="admin_save">保存配置</button>
                 </div>
             </div>
         </div>

@@ -214,7 +214,39 @@ body {
     gap: 16px;
 }
 
+/* Segmented Control Language Switcher - Apple style */
+.lang-toggle-pills {
+    display: inline-flex;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 3px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    gap: 2px;
+}
 
+.lang-pill {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: var(--font-body);
+}
+
+.lang-pill:hover {
+    color: var(--text-primary);
+}
+
+.lang-pill.active {
+    background: #ffffff;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+}
 
 /* Custom Currency Dropdown Selector - Apple Glassmorphism styling */
 .currency-select-container {
@@ -1289,9 +1321,15 @@ body {
     }
     
     .nav-right {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr;
         align-items: center;
         gap: 12px;
+        width: 100%;
+    }
+    
+    .lang-toggle-pills {
+        flex-shrink: 0;
     }
     
     .currency-select-container {
