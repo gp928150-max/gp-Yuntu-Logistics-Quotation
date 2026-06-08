@@ -51,16 +51,14 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Top Status Bar (Frosted glass announcement ribbon) */
+/* Top Status Bar (Premium Charcoal Black control ribbon) */
 .top-status-bar {
     width: 100%;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    background: #1d1d1f; /* Premium Apple dark black */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 0.72rem; /* 11px */
     font-weight: 500;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.6); /* Soft white-gray secondary text */
     font-family: var(--font-body);
     z-index: 1001;
     position: relative;
@@ -82,14 +80,18 @@ body {
     white-space: nowrap;
 }
 
+.status-bar-text {
+    color: rgba(255, 255, 255, 0.85); /* Off-white for high readability */
+}
+
 .status-bar-divider {
-    color: rgba(0, 0, 0, 0.08);
+    color: rgba(255, 255, 255, 0.15);
     font-weight: 300;
     margin: 0 4px;
 }
 
 .status-bar-text.version {
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .status-indicator-dot {
@@ -102,22 +104,22 @@ body {
 }
 
 .status-bar-rate-label {
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.4);
     font-weight: 600;
     font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
     margin-right: 4px;
 }
 
 .status-bar-rate-item {
     font-family: var(--font-heading);
     font-weight: 600;
-    color: var(--text-primary);
+    color: #ffffff; /* Bright white for primary rates values */
 }
 
 .status-bar-rate-divider {
-    color: rgba(0, 0, 0, 0.06);
+    color: rgba(255, 255, 255, 0.12);
     user-select: none;
     margin: 0 4px;
 }
@@ -255,6 +257,18 @@ body {
     color: var(--text-secondary);
     transition: transform 0.25s ease;
     flex-shrink: 0;
+}
+
+.currency-select-trigger .globe-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.currency-select-trigger:hover .globe-icon {
+    color: var(--primary);
 }
 
 .currency-select-container.open .chevron-icon {

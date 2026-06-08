@@ -9,9 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.5.3">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.2" defer></script>
+    <script src="app.js?v=1.5.3" defer></script>
 </head>
 <body>
     <!-- Top Status Bar -->
@@ -21,7 +21,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.2 Enterprise</span>
+                <span class="status-bar-text version">V1.5.3 Enterprise</span>
             </div>
             <div class="status-bar-right">
                 <span class="status-bar-rate-label">当前外汇折算价 (实时更新):</span>
@@ -50,6 +50,11 @@
             <div class="nav-right">
                 <div class="custom-select-container currency-select-container" id="currency-select-container">
                     <button type="button" class="custom-select-trigger currency-select-trigger" id="currency-select-trigger">
+                        <svg class="globe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
                         <span class="trigger-label" id="currency-trigger-label">CNY (¥)</span>
                         <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
