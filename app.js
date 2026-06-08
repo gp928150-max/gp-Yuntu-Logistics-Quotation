@@ -848,7 +848,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showState('error');
         }
     }
-
     function updateMetrics() {
         if (!quoteData || quoteData.length === 0) return;
 
@@ -873,19 +872,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         metricCheapestName.textContent = CURRENT_LANG === 'en' ? (cheapest.EName || cheapest.CName || cheapest.Code) : (cheapest.CName || cheapest.Code);
 
-        // 2. Fastest Channel (smallest min day in "X-Y" range)
+        // Helper to translate transit days from Excel
+        const translateTransitDays = (transitStr) => {
+            if (!transitStr || CURRENT_LANG !== 'en') return transitStr;
+            return transitStr
+                .replace(/个工作日/g, ' work days')
+                .replace(/工作日/g, ' work days')
+                .replace(/天/g, ' days');
+        };
+
+        const selectedCountryObj = countriesList.find(c => c.CountryCode === selectedCountryCode);
+        const countryCName = selectedCountryObj ? selectedCountryObj.CName : '';
+
+        // Prioritize Excel quotation transit data over live API transit days
+        const getEffectiveTransitString = (item) => {
+            const excelTransitMap = transitTimesData[item.Code];
+            const excelTransit = getExcelTransit(excelTransitMap, countryCName);
+            return excelTransit || item.DeliveryDays;
+        };
+
+        // 2. Fastest Channel (smallest min day in prioritized transit range)
         let fastest = quoteData[0];
-        let fastestMinDays = getMinDays(fastest.DeliveryDays);
+        let fastestTransitStr = getEffectiveTransitString(fastest);
+        let fastestMinDays = getMinDays(fastestTransitStr);
         
         quoteData.forEach(item => {
-            const minDays = getMinDays(item.DeliveryDays);
+            const transitStr = getEffectiveTransitString(item);
+            const minDays = getMinDays(transitStr);
             if (minDays < fastestMinDays) {
                 fastest = item;
                 fastestMinDays = minDays;
+                fastestTransitStr = transitStr;
             }
         });
         
-        metricFastestVal.textContent = fastest.DeliveryDays ? (CURRENT_LANG === 'en' ? `${fastest.DeliveryDays} Days` : `${fastest.DeliveryDays} 天`) : (CURRENT_LANG === 'en' ? 'N/A' : '未提供');
+        if (fastestTransitStr) {
+            let displayDays = translateTransitDays(fastestTransitStr);
+            // If it came from API, we format it with "Days" / "天" suffix
+            if (fastestTransitStr === fastest.DeliveryDays && !/工作日|天|days|work days/i.test(fastestTransitStr)) {
+                displayDays = CURRENT_LANG === 'en' ? `${fastestTransitStr} Days` : `${fastestTransitStr} 天`;
+            }
+            metricFastestVal.textContent = displayDays;
+        } else {
+            metricFastestVal.textContent = CURRENT_LANG === 'en' ? 'N/A' : '未提供';
+        }
         metricFastestName.textContent = CURRENT_LANG === 'en' ? (fastest.EName || fastest.CName || fastest.Code) : (fastest.CName || fastest.Code);
 
         // 3. Total Channels
