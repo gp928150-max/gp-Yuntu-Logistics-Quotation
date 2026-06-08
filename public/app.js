@@ -477,6 +477,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function performQuotationQuery() {
         showState('loading');
         
+        // Force reload the latest parameters from server config first
+        try {
+            await loadConfig();
+        } catch (e) {
+            console.warn('Failed to load fresh config before query:', e);
+        }
+        
         const country = quoteCountry.value;
         const weight = quoteWeight.value;
         const goodsType = quoteGoodsType.value;
@@ -900,6 +907,13 @@ document.addEventListener('DOMContentLoaded', () => {
             adminStatePanel.classList.remove('admin-state-hidden');
             adminStatePanel.classList.add('admin-state-active');
             
+            // Force fetch the latest config from server to ensure fresh state
+            try {
+                await loadConfig();
+            } catch (err) {
+                console.warn('Failed to load fresh config on admin login:', err);
+            }
+            
             // Sync values to inputs
             adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
             adminPackInput.value = SYSTEM_PACKAGING_FEE;
@@ -1032,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.17)`,
+                    message: `Update ${path} from admin panel (V1.5.18)`,
                     content: base64Content
                 };
                 if (sha) {
