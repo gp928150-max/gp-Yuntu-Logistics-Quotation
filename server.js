@@ -264,7 +264,8 @@ app.post('/api/github-sync', async (req, res) => {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/vnd.github.v3+json',
-                    'Cache-Control': 'no-cache'
+                    'Cache-Control': 'no-cache',
+                    'User-Agent': 'gp-Yuntu-Logistics-Quotation'
                 }
             });
 
@@ -278,7 +279,7 @@ app.post('/api/github-sync', async (req, res) => {
 
             // 2. Put updated config
             const putBody = {
-                message: `Update ${path} from admin panel via Vercel Proxy (V1.5.12)`,
+                message: `Update ${path} from admin panel via Vercel Proxy (V1.5.14)`,
                 content: base64Content
             };
             if (sha) {
@@ -290,7 +291,8 @@ app.post('/api/github-sync', async (req, res) => {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/vnd.github.v3+json'
+                    'Accept': 'application/vnd.github.v3+json',
+                    'User-Agent': 'gp-Yuntu-Logistics-Quotation'
                 },
                 body: JSON.stringify(putBody)
             });
