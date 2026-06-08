@@ -139,30 +139,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updatePrefilledInputs() {
+        if (adminProfitInput) {
+            adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
+        }
+        if (adminPackInput) {
+            adminPackInput.value = SYSTEM_PACKAGING_FEE;
+        }
+
+        if (rawQuoteItems && rawQuoteItems.length > 0) {
+            calculateAndRenderQuoteData();
+        }
+    }
+
     async function loadConfig() {
+        // 1. Try to load directly from GitHub API for real-time config (bypasses GitHub Pages build delay)
+        try {
+            const token = localStorage.getItem('gp_github_token');
+            const apiBase = (localStorage.getItem('gp_github_api_base') || 'https://api.github.com').trim().replace(/\/+$/, '');
+            const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
+            const url = `${apiBase}/repos/${repo}/contents/config.json?t=${Date.now()}`;
+            
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(url, { headers });
+            if (response.ok) {
+                const fileData = await response.json();
+                // Decode base64 content
+                const base64Content = fileData.content.replace(/\s/g, '');
+                // Decode base64 bytes safely supporting Chinese characters if any
+                const decodedStr = decodeURIComponent(atob(base64Content).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const data = JSON.parse(decodedStr);
+                
+                SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
+                SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
+                console.log('Successfully loaded config from GitHub API:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+                
+                updatePrefilledInputs();
+                return;
+            }
+        } catch (apiErr) {
+            console.warn('Failed to load config from GitHub API, falling back to local file:', apiErr);
+        }
+
+        // 2. Fallback: load relative config.json (standard static loading)
         try {
             const response = await fetch('config.json?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
                 SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
                 SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
-                console.log('Successfully loaded config from server:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+                console.log('Successfully loaded config from local fallback:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
                 
-                // Prefill admin panel form inputs
-                if (adminProfitInput) {
-                    adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
-                }
-                if (adminPackInput) {
-                    adminPackInput.value = SYSTEM_PACKAGING_FEE;
-                }
-
-                // If there are raw items, recalculate and render!
-                if (rawQuoteItems && rawQuoteItems.length > 0) {
-                    calculateAndRenderQuoteData();
-                }
+                updatePrefilledInputs();
             }
         } catch (e) {
-            console.warn('Failed to load config.json from server:', e);
+            console.warn('Failed to load local config.json fallback:', e);
         }
     }
 
@@ -1046,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.18)`,
+                    message: `Update ${path} from admin panel (V1.5.19)`,
                     content: base64Content
                 };
                 if (sha) {
