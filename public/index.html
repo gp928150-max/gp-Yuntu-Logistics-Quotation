@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.29">
+    <link rel="stylesheet" href="style.css?v=1.5.30">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.29" defer></script>
+    <script src="app.js?v=1.5.30" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -36,7 +36,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.29 Enterprise</span>
+                <span class="status-bar-text version">V1.5.30 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -199,6 +199,10 @@
                 <div class="panel-card">
                     <h2 class="panel-title" data-translate="sidebar_title">包裹估算参数</h2>
                     <form id="quote-form" class="quote-form">
+                        <div class="form-field">
+                            <label data-translate="label_origin">发货国家</label>
+                            <div class="form-field-static" data-translate="val_origin">中国 (China)</div>
+                        </div>
                         <div class="form-field">
                             <label for="quote-country" data-translate="label_country">目的国家 <span class="req">*</span></label>
                             <div class="custom-select-container" id="country-select-container">
