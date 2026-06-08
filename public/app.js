@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadConfig() {
         try {
-            const response = await fetch('config.json');
+            const response = await fetch('config.json?t=' + Date.now());
             if (response.ok) {
                 const data = await response.json();
                 SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
@@ -1032,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.16)`,
+                    message: `Update ${path} from admin panel (V1.5.17)`,
                     content: base64Content
                 };
                 if (sha) {
