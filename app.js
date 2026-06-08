@@ -790,10 +790,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Helper to calculate SHA-256 hash
+    async function sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
     // Verification handler
-    function performAdminVerification() {
+    async function performAdminVerification() {
         const pwd = adminPasswordInput.value;
-        if (pwd === '88') {
+        const hashedPwd = await sha256(pwd);
+        if (hashedPwd === '8b940be7fb78aaa6b6567dd7a3987996947460df1c668e698eb92ca77e425349') {
             adminVerifyError.textContent = '';
             adminStateVerify.classList.add('admin-state-hidden');
             adminStateVerify.classList.remove('admin-state-active');
