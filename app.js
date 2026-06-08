@@ -139,6 +139,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadConfig() {
+        try {
+            const response = await fetch('config.json');
+            if (response.ok) {
+                const data = await response.json();
+                SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
+                SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
+                console.log('Successfully loaded config from server:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+                
+                // Prefill admin panel form inputs
+                if (adminProfitInput) {
+                    adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
+                }
+                if (adminPackInput) {
+                    adminPackInput.value = SYSTEM_PACKAGING_FEE;
+                }
+
+                // If there are raw items, recalculate and render!
+                if (rawQuoteItems && rawQuoteItems.length > 0) {
+                    calculateAndRenderQuoteData();
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load config.json from server:', e);
+        }
+    }
+
     // Secure token credentials (embedded client-side for GitHub Pages deployment)
     const CLIENT_CODE = 'CN3949603';
     const API_SECRET = '3ihcklF2g/g1NdP1ZhzhXw==';
@@ -801,6 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const adminProfitInput = document.getElementById('admin-profit-input');
     const adminPackInput = document.getElementById('admin-pack-input');
+    const adminTokenInput = document.getElementById('admin-token-input');
     const adminSaveStatus = document.getElementById('admin-save-status');
     const adminSaveBtn = document.getElementById('admin-save-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
@@ -815,6 +843,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (adminPackInput) {
         adminPackInput.value = SYSTEM_PACKAGING_FEE;
+    }
+    if (adminTokenInput) {
+        adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
     }
 
     // Modal Events
@@ -864,6 +895,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sync values to inputs
             adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
             adminPackInput.value = SYSTEM_PACKAGING_FEE;
+            if (adminTokenInput) {
+                adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
+            }
             adminSaveStatus.textContent = '';
         } else {
             adminVerifyError.textContent = '密码错误，认证失败！';
@@ -872,6 +906,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.add('admin-shake');
                 setTimeout(() => card.classList.remove('admin-shake'), 300);
             }
+        }
+    }
+
+    async function saveConfigToGitHub(token, profit, pack) {
+        const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
+        const path = 'config.json';
+        const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+        
+        try {
+            adminSaveStatus.style.color = 'var(--text-secondary)';
+            adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
+
+            const getRes = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            let sha = '';
+            if (getRes.ok) {
+                const fileData = await getRes.json();
+                sha = fileData.sha;
+            } else if (getRes.status !== 404) {
+                throw new Error(`获取文件 SHA 失败: HTTP ${getRes.status}`);
+            }
+
+            const configObj = {
+                profit_margin: profit,
+                packaging_fee: pack
+            };
+            const configString = JSON.stringify(configObj, null, 2);
+            const base64Content = btoa(configString);
+
+            const putBody = {
+                message: `Update config.json from admin panel (V1.5.9)`,
+                content: base64Content
+            };
+            if (sha) {
+                putBody.sha = sha;
+            }
+
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify(putBody)
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(errData.message || `HTTP ${putRes.status}`);
+            }
+
+            adminSaveStatus.style.color = 'var(--success)';
+            adminSaveStatus.textContent = '配置已同步至云端！GitHub Pages 会在1分钟内自动刷新生效。';
+            
+            // Close modal softly
+            setTimeout(() => {
+                adminModal.classList.remove('open');
+            }, 2000);
+        } catch (error) {
+            console.error('Error saving config to GitHub:', error);
+            adminSaveStatus.style.color = 'var(--error)';
+            adminSaveStatus.textContent = `云同步失败: ${error.message} (配置已在本地生效)`;
         }
     }
 
@@ -908,18 +1012,36 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('gp_profit_margin', SYSTEM_PROFIT_MARGIN);
             localStorage.setItem('gp_packaging_fee', SYSTEM_PACKAGING_FEE);
             
-            adminSaveStatus.style.color = 'var(--success)';
-            adminSaveStatus.textContent = '配置保存成功，所有价格已完成即时重算！';
-            
             // Recalculate and redraw quotation list instantly
             if (rawQuoteItems && rawQuoteItems.length > 0) {
                 calculateAndRenderQuoteData();
             }
             
-            // Close modal softly
-            setTimeout(() => {
-                adminModal.classList.remove('open');
-            }, 1200);
+            // GitHub cloud sync
+            if (adminTokenInput) {
+                const tokenVal = adminTokenInput.value.trim();
+                if (tokenVal) {
+                    localStorage.setItem('gp_github_token', tokenVal);
+                    saveConfigToGitHub(tokenVal, SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+                } else {
+                    localStorage.removeItem('gp_github_token');
+                    adminSaveStatus.style.color = 'var(--success)';
+                    adminSaveStatus.textContent = '配置已在本地生效（未配置 GitHub Token，无法云同步）';
+                    
+                    // Close modal softly
+                    setTimeout(() => {
+                        adminModal.classList.remove('open');
+                    }, 1200);
+                }
+            } else {
+                adminSaveStatus.style.color = 'var(--success)';
+                adminSaveStatus.textContent = '配置保存成功，所有价格已完成即时重算！';
+                
+                // Close modal softly
+                setTimeout(() => {
+                    adminModal.classList.remove('open');
+                }, 1200);
+            }
         });
     }
 
@@ -938,4 +1060,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch live exchange rates dynamically
     fetchRealTimeExchangeRates();
     loadTransitTimes();
+    loadConfig();
 });
