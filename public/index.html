@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.30">
+    <link rel="stylesheet" href="style.css?v=1.5.31">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.30" defer></script>
+    <script src="app.js?v=1.5.31" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -36,7 +36,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.30 Enterprise</span>
+                <span class="status-bar-text version">V1.5.31 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -199,45 +199,49 @@
                 <div class="panel-card">
                     <h2 class="panel-title" data-translate="sidebar_title">包裹估算参数</h2>
                     <form id="quote-form" class="quote-form">
-                        <div class="form-field">
-                            <label data-translate="label_origin">发货国家</label>
-                            <div class="form-field-static" data-translate="val_origin">中国 (China)</div>
-                        </div>
-                        <div class="form-field">
-                            <label for="quote-country" data-translate="label_country">目的国家 <span class="req">*</span></label>
-                            <div class="custom-select-container" id="country-select-container">
-                                <button type="button" class="custom-select-trigger" id="country-select-trigger">
-                                    <span class="trigger-label" id="country-trigger-label" data-translate="select_country_placeholder">选择目的国家...</span>
-                                    <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                </button>
-                                <div class="custom-select-dropdown" id="country-select-dropdown">
-                                    <div class="dropdown-search-wrapper">
-                                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label data-translate="label_origin">发货国家</label>
+                                <div class="form-field-static" data-translate="val_origin">中国 (China)</div>
+                            </div>
+                            <div class="form-field">
+                                <label for="quote-country" data-translate="label_country">目的国家 <span class="req">*</span></label>
+                                <div class="custom-select-container" id="country-select-container">
+                                    <button type="button" class="custom-select-trigger" id="country-select-trigger">
+                                        <span class="trigger-label" id="country-trigger-label" data-translate="select_country_placeholder">选择目的国家...</span>
+                                        <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"></polyline>
                                         </svg>
-                                        <input type="text" id="country-search-input" data-translate-placeholder="search_country_placeholder" placeholder="输入国家名称或简码搜索..." autocomplete="off">
+                                    </button>
+                                    <div class="custom-select-dropdown" id="country-select-dropdown">
+                                        <div class="dropdown-search-wrapper">
+                                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                            </svg>
+                                            <input type="text" id="country-search-input" data-translate-placeholder="search_country_placeholder" placeholder="输入国家名称或简码搜索..." autocomplete="off">
+                                        </div>
+                                        <ul class="custom-select-options" id="country-options-list">
+                                            <li class="loading-option" data-translate="loading_countries">正在加载国家列表...</li>
+                                        </ul>
                                     </div>
-                                    <ul class="custom-select-options" id="country-options-list">
-                                        <li class="loading-option" data-translate="loading_countries">正在加载国家列表...</li>
-                                    </ul>
+                                    <input type="hidden" id="quote-country" required>
                                 </div>
-                                <input type="hidden" id="quote-country" required>
                             </div>
                         </div>
-                        <div class="form-field">
-                            <label for="quote-weight" data-translate="label_weight">包裹重量 (kg) <span class="req">*</span></label>
-                            <input type="number" id="quote-weight" step="0.001" min="0.001" data-translate-placeholder="weight_placeholder" placeholder="重量, 例如: 0.5" required>
-                        </div>
-                        <div class="form-field">
-                            <label for="quote-goods-type" data-translate="label_goods_type">货物类型</label>
-                            <select id="quote-goods-type">
-                                <option value="0" selected data-translate="goods_type_general">普货 (General Goods)</option>
-                                <option value="1" data-translate="goods_type_battery">带电 (Contains Batteries)</option>
-                                <option value="2" data-translate="goods_type_special">特货 (Special Goods)</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="quote-weight" data-translate="label_weight">包裹重量 (kg) <span class="req">*</span></label>
+                                <input type="number" id="quote-weight" step="0.001" min="0.001" data-translate-placeholder="weight_placeholder" placeholder="重量, 例如: 0.5" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="quote-goods-type" data-translate="label_goods_type">货物类型</label>
+                                <select id="quote-goods-type">
+                                    <option value="0" selected data-translate="goods_type_general">普货 (General Goods)</option>
+                                    <option value="1" data-translate="goods_type_battery">带电 (Contains Batteries)</option>
+                                    <option value="2" data-translate="goods_type_special">特货 (Special Goods)</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-field">
                             <label for="quote-postcode" data-translate="label_postcode">邮区编码 (选填)</label>
