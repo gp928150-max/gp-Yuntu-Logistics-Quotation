@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3000;
 // Enable CORS for all requests (useful if embedded from another domain like Webflow)
 app.use(cors());
 
+// Enable JSON body parsing for POST/PUT requests
+app.use(express.json());
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -229,6 +232,79 @@ app.get('/api/countries', async (req, res) => {
             message: '后端服务获取国家列表失败，请稍后再试',
             error: error.message
         });
+    }
+});
+// Proxy API Route for updating configuration (Bypasses GFW network blocks)
+app.post('/api/github-sync', async (req, res) => {
+    const { token, profit_margin, packaging_fee } = req.body;
+    if (!token) {
+        return res.status(400).json({ success: false, message: '令牌 (Token) 不能为空' });
+    }
+    if (profit_margin === undefined || packaging_fee === undefined) {
+        return res.status(400).json({ success: false, message: '利润率或打包费参数缺失' });
+    }
+
+    const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
+    const configObj = {
+        profit_margin: parseFloat(profit_margin),
+        packaging_fee: parseFloat(packaging_fee)
+    };
+    const configString = JSON.stringify(configObj, null, 2);
+    const base64Content = Buffer.from(configString).toString('base64');
+    const paths = ['public/config.json', 'config.json'];
+
+    try {
+        for (const path of paths) {
+            const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+            
+            // 1. Get SHA of existing file
+            let sha = '';
+            const getRes = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+
+            if (getRes.ok) {
+                const fileData = await getRes.json();
+                sha = fileData.sha;
+            } else if (getRes.status !== 404) {
+                const errText = await getRes.text();
+                throw new Error(`获取 ${path} 的 SHA 失败 (HTTP ${getRes.status}): ${errText}`);
+            }
+
+            // 2. Put updated config
+            const putBody = {
+                message: `Update ${path} from admin panel via Vercel Proxy (V1.5.12)`,
+                content: base64Content
+            };
+            if (sha) {
+                putBody.sha = sha;
+            }
+
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github.v3+json'
+                },
+                body: JSON.stringify(putBody)
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(`更新 ${path} 失败: ${errData.message || `HTTP ${putRes.status}`}`);
+            }
+        }
+
+        res.json({ success: true, message: '配置已同步至 GitHub 云端！' });
+    } catch (error) {
+        console.error('Error in github-sync proxy:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 

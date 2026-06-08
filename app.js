@@ -917,6 +917,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function saveConfigToGitHub(token, profit, pack) {
+        adminSaveStatus.style.color = 'var(--text-secondary)';
+        adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
+
+        try {
+            // First, try using our backend proxy (/api/github-sync)
+            const proxyUrl = '/api/github-sync';
+            const response = await fetch(proxyUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token,
+                    profit_margin: profit,
+                    packaging_fee: pack
+                })
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                if (resData.success) {
+                    adminSaveStatus.style.color = 'var(--success)';
+                    adminSaveStatus.textContent = '配置已同步至云端！部署系统会在1分钟内自动刷新生效。';
+                    
+                    // Close modal softly
+                    setTimeout(() => {
+                        adminModal.classList.remove('open');
+                    }, 2000);
+                    return;
+                } else {
+                    throw new Error(resData.message || '未知错误');
+                }
+            } else if (response.status === 404) {
+                // If backend proxy is not deployed (e.g. running on static server directly)
+                console.log('Backend proxy not found (404), falling back to client-side direct sync.');
+            } else {
+                const resData = await response.json().catch(() => ({}));
+                throw new Error(resData.message || `HTTP ${response.status}`);
+            }
+        } catch (proxyErr) {
+            console.warn('Backend proxy sync failed, falling back to direct client-side sync:', proxyErr);
+        }
+
+        // --- Client-side direct sync fallback (for local/static runs) ---
         const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
         let apiBase = (localStorage.getItem('gp_github_api_base') || 'https://api.github.com').trim();
         if (!apiBase) {
@@ -925,17 +969,12 @@ document.addEventListener('DOMContentLoaded', () => {
         apiBase = apiBase.replace(/\/+$/, '');
         
         try {
-            adminSaveStatus.style.color = 'var(--text-secondary)';
-            adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
-
             const configObj = {
                 profit_margin: profit,
                 packaging_fee: pack
             };
             const configString = JSON.stringify(configObj, null, 2);
             const base64Content = btoa(configString);
-
-            // Synchronize both root config and public config to prevent desync in deployments
             const paths = ['public/config.json', 'config.json'];
             
             for (const path of paths) {
@@ -968,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.11)`,
+                    message: `Update ${path} from admin panel (V1.5.12)`,
                     content: base64Content
                 };
                 if (sha) {
@@ -1006,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 adminModal.classList.remove('open');
             }, 2000);
         } catch (error) {
-            console.error('Error saving config to GitHub:', error);
+            console.error('Error saving config to GitHub directly:', error);
             adminSaveStatus.style.color = 'var(--error)';
             adminSaveStatus.textContent = `云同步失败: ${error.message} (配置已在本地生效)`;
         }
