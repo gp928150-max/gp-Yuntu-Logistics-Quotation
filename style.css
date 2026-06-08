@@ -183,8 +183,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 0;
-    margin-bottom: 48px;
+    padding: 20px 0;
+    margin-bottom: 36px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     position: relative;
     z-index: 15;
@@ -204,7 +204,7 @@ body {
 }
 
 .nav-logo .logo-img {
-    height: 56px; /* Clean profile inside navbar */
+    height: 112px; /* Double brand profile inside navbar */
     width: auto;
     object-fit: contain;
 }
@@ -1444,6 +1444,10 @@ body {
         align-items: stretch;
         padding: 16px 0;
         margin-bottom: 24px;
+    }
+    
+    .nav-logo .logo-img {
+        height: 64px;
     }
     
     .nav-left {
