@@ -11,7 +11,7 @@
     <!-- Style Sheet -->
     <link rel="stylesheet" href="style.css">
     <!-- App Logic -->
-    <script src="app.js?v=1.4.6" defer></script>
+    <script src="app.js?v=1.4.7" defer></script>
 </head>
 <body>
     <div class="app-container">
@@ -26,10 +26,28 @@
                     <a href="https://www.graypoplar.com/" target="_blank" class="nav-link">官网首页</a>
                     <a href="https://wa.me/85262508059" target="_blank" class="nav-link">客服咨询</a>
                     <span class="nav-separator">/</span>
-                    <span class="nav-version">V1.4.6 Enterprise</span>
+                    <span class="nav-version">V1.4.7 Enterprise</span>
                 </div>
             </div>
             <div class="nav-right">
+                <div class="nav-currency-wrapper">
+                    <span class="nav-currency-label">展示币种</span>
+                    <div class="select-pill-container">
+                        <select id="quote-currency" class="nav-currency-select">
+                            <option value="CNY" selected>CNY - ¥</option>
+                            <option value="USD">USD - $</option>
+                            <option value="EUR">EUR - €</option>
+                            <option value="HKD">HKD - HK$</option>
+                        </select>
+                    </div>
+                    <div class="currency-rates-tooltip" title="当前结算汇率:&#10;1 USD = 7.25 CNY&#10;1 EUR = 7.85 CNY&#10;1 HKD = 0.93 CNY">
+                        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </div>
+                </div>
                 <div class="api-status-badge">
                     <span class="status-pulse-dot"></span>
                     <span class="status-text">云途 API 连通正常 (200 OK)</span>
@@ -142,16 +160,6 @@
                                 <span class="times">&times;</span>
                                 <input type="number" id="quote-height" min="1" placeholder="高" value="1">
                             </div>
-                        </div>
-                        <div class="form-field">
-                            <label for="quote-currency">展示币种</label>
-                            <select id="quote-currency">
-                                <option value="CNY" selected>人民币 (CNY - ¥)</option>
-                                <option value="USD">美元 (USD - $)</option>
-                                <option value="EUR">欧元 (EUR - €)</option>
-                                <option value="HKD">港币 (HKD - HK$)</option>
-                            </select>
-                            <span class="field-hint">结算汇率: 1 USD = 7.25 CNY | 1 EUR = 7.85 CNY | 1 HKD = 0.93 CNY</span>
                         </div>
                         <button type="submit" class="submit-btn full-width">
                             <span>开始测算报价</span>

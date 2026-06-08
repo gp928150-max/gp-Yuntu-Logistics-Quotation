@@ -138,6 +138,84 @@ body {
 .nav-right {
     display: flex;
     align-items: center;
+    gap: 12px;
+}
+
+/* Nav Currency Selector Wrapper */
+.nav-currency-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.nav-currency-wrapper:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.nav-currency-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    user-select: none;
+}
+
+.select-pill-container {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.nav-currency-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: 11px;
+    padding: 2px 20px 2px 4px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    border: none;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: color 0.15s ease;
+}
+
+.nav-currency-select:hover {
+    color: var(--primary);
+}
+
+.nav-currency-select:focus {
+    color: var(--primary);
+}
+
+.currency-rates-tooltip {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text-muted);
+    cursor: help;
+    transition: color 0.2s ease;
+}
+
+.currency-rates-tooltip:hover {
+    color: var(--text-secondary);
+}
+
+.currency-rates-tooltip .info-icon {
+    width: 14px;
+    height: 14px;
+    color: inherit;
+    display: block;
 }
 
 /* API Status Indicator Badge */
@@ -278,6 +356,18 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.02em;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.metric-converted-val {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-left: 6px;
+    font-family: var(--font-body);
+    letter-spacing: 0;
 }
 
 .metric-desc {
@@ -831,6 +921,15 @@ body {
     letter-spacing: -0.02em;
 }
 
+.channel-total-badge .converted-price {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-left: 6px;
+    font-family: var(--font-body);
+    letter-spacing: 0;
+}
+
 .channel-price-breakdown {
     font-size: 0.75rem;
     color: var(--text-secondary);
@@ -1035,6 +1134,29 @@ body {
 @media (max-width: 768px) {
     .app-container {
         padding: 40px 16px;
+    }
+    
+    .app-nav {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        padding: 16px 0;
+        margin-bottom: 24px;
+    }
+    
+    .nav-left {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .nav-right {
+        justify-content: space-between;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .nav-currency-wrapper {
+        margin-right: 0;
     }
     
     .main-title {

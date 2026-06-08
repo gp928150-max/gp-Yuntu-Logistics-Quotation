@@ -410,9 +410,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        const cheapestDisplay = getDisplayPrice(cheapest.TotalFeeCNY);
-        const cheapestSymbol = getCurrencySymbol();
-        metricCheapestVal.textContent = `${cheapestSymbol}${cheapestDisplay.toFixed(2)}`;
+        const cheapestCNY = cheapest.TotalFeeCNY;
+        const target = getSelectedCurrency();
+        if (target === 'CNY') {
+            metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)}`;
+        } else {
+            const cheapestDisplay = getDisplayPrice(cheapestCNY);
+            const cheapestSymbol = getCurrencySymbol();
+            metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)} <span class="metric-converted-val">(${cheapestSymbol}${cheapestDisplay.toFixed(2)})</span>`;
+        }
         metricCheapestName.textContent = cheapest.CName || cheapest.Code;
 
         // 2. Fastest Channel (smallest min day in "X-Y" range)
@@ -473,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return isQuoteSortAscending ? feeA - feeB : feeB - feeA;
         });
 
+        const target = getSelectedCurrency();
         const targetSymbol = getCurrencySymbol();
 
         quoteData.forEach((channel) => {
@@ -489,16 +496,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const sig = getDisplayPrice(channel.SignatureFeeCNY);
             const pack = getDisplayPrice(channel.PackagingFeeCNY);
             
+            // Helper to format individual breakdown sub-fees in dual currency
+            const formatBreakdownItem = (label, cnyVal, convertedVal) => {
+                if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
+                const base = `¥${parseFloat(cnyVal).toFixed(2)}`;
+                if (target === 'CNY') {
+                    return `${label}:${base}`;
+                }
+                return `${label}:${base}(${targetSymbol}${convertedVal.toFixed(2)})`;
+            };
+
             // Generate detailed billing tooltip / breakdown subtext
             const breakdownParts = [];
-            if (sf > 0) breakdownParts.push(`运费:${targetSymbol}${sf.toFixed(2)}`);
-            if (rf > 0) breakdownParts.push(`挂号:${targetSymbol}${rf.toFixed(2)}`);
-            if (ff > 0) breakdownParts.push(`燃油:${targetSymbol}${ff.toFixed(2)}`);
-            if (sundry > 0) breakdownParts.push(`杂费:${targetSymbol}${sundry.toFixed(2)}`);
-            if (tariff > 0) breakdownParts.push(`预付税:${targetSymbol}${tariff.toFixed(2)}`);
-            if (insured > 0) breakdownParts.push(`保价:${targetSymbol}${insured.toFixed(2)}`);
-            if (sig > 0) breakdownParts.push(`签名:${targetSymbol}${sig.toFixed(2)}`);
-            if (pack > 0) breakdownParts.push(`打包费:${targetSymbol}${pack.toFixed(2)}`);
+            const sfItem = formatBreakdownItem('运费', channel.ShippingFeeCNY, sf);
+            if (sfItem) breakdownParts.push(sfItem);
+            const rfItem = formatBreakdownItem('挂号', channel.RegistrationFeeCNY, rf);
+            if (rfItem) breakdownParts.push(rfItem);
+            const ffItem = formatBreakdownItem('燃油', channel.FuelFeeCNY, ff);
+            if (ffItem) breakdownParts.push(ffItem);
+            const sundryItem = formatBreakdownItem('杂费', channel.SundryFeeCNY, sundry);
+            if (sundryItem) breakdownParts.push(sundryItem);
+            const tariffItem = formatBreakdownItem('预付税', channel.TariffPrepayFeeCNY, tariff);
+            if (tariffItem) breakdownParts.push(tariffItem);
+            const insuredItem = formatBreakdownItem('保价', channel.InsuredFeeCNY, insured);
+            if (insuredItem) breakdownParts.push(insuredItem);
+            const sigItem = formatBreakdownItem('签名', channel.SignatureFeeCNY, sig);
+            if (sigItem) breakdownParts.push(sigItem);
+            const packItem = formatBreakdownItem('打包费', channel.PackagingFeeCNY, pack);
+            if (packItem) breakdownParts.push(packItem);
             const breakdownText = breakdownParts.join(' + ');
 
             cardEl.innerHTML = `
@@ -523,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${pack > 0 ? `
                         <div class="channel-meta-item packaging-fee">
-                            <span>📦 打包费: <strong>${targetSymbol}${pack.toFixed(2)}</strong></span>
+                            <span>📦 打包费: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
@@ -533,8 +558,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="channel-price-area">
                     <div class="channel-total-badge">
-                        <span class="currency">${targetSymbol}</span>
-                        <span class="amount">${total.toFixed(2)}</span>
+                        <span class="amount">¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</span>
+                        ${target !== 'CNY' ? `<span class="converted-price">(${targetSymbol}${total.toFixed(2)})</span>` : ''}
                     </div>
                     <div class="channel-price-breakdown">${breakdownText}</div>
                 </div>
