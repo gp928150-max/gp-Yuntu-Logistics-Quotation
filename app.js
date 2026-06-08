@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             select_country_placeholder: "Select Destination Country...",
             search_country_placeholder: "Search by country name or code...",
             loading_countries: "Loading countries...",
-            label_weight: "Package Weight (kg)",
+            label_weight: "Weight (kg)",
             weight_placeholder: "Weight, e.g., 0.5",
             label_goods_type: "Goods Type",
             goods_type_general: "General Goods",

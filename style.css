@@ -629,6 +629,7 @@ body {
 .form-row {
     display: flex;
     gap: 12px;
+    align-items: flex-end;
 }
 
 .form-row .form-field.col-left {
@@ -1927,6 +1928,7 @@ body {
     .form-row {
         flex-direction: column;
         gap: 16px;
+        align-items: stretch;
     }
     .form-row .form-field.col-left,
     .form-row .form-field.col-right {
