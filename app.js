@@ -78,6 +78,62 @@ document.addEventListener('DOMContentLoaded', () => {
         return symbols[target] || '¥';
     }
 
+    function updateRatesUI() {
+        try {
+            // Update navbar ticker
+            const tickerUsd = document.getElementById('rate-ticker-usd');
+            const tickerEur = document.getElementById('rate-ticker-eur');
+            const tickerHkd = document.getElementById('rate-ticker-hkd');
+            if (tickerUsd) tickerUsd.textContent = EXCHANGE_RATES.USD.toFixed(2);
+            if (tickerEur) tickerEur.textContent = EXCHANGE_RATES.EUR.toFixed(2);
+            if (tickerHkd) tickerHkd.textContent = EXCHANGE_RATES.HKD.toFixed(2);
+
+            // Update custom dropdown labels
+            const dropUsd = document.getElementById('rate-dropdown-usd');
+            const dropEur = document.getElementById('rate-dropdown-eur');
+            const dropHkd = document.getElementById('rate-dropdown-hkd');
+            if (dropUsd) dropUsd.textContent = `汇率: ${EXCHANGE_RATES.USD.toFixed(2)}`;
+            if (dropEur) dropEur.textContent = `汇率: ${EXCHANGE_RATES.EUR.toFixed(2)}`;
+            if (dropHkd) dropHkd.textContent = `汇率: ${EXCHANGE_RATES.HKD.toFixed(2)}`;
+
+            // Update sidebar chips
+            const chipUsd = document.getElementById('rate-chip-usd');
+            const chipEur = document.getElementById('rate-chip-eur');
+            const chipHkd = document.getElementById('rate-chip-hkd');
+            if (chipUsd) chipUsd.textContent = EXCHANGE_RATES.USD.toFixed(2);
+            if (chipEur) chipEur.textContent = EXCHANGE_RATES.EUR.toFixed(2);
+            if (chipHkd) chipHkd.textContent = EXCHANGE_RATES.HKD.toFixed(2);
+        } catch (err) {
+            console.error('Error updating rates UI:', err);
+        }
+    }
+
+    async function fetchRealTimeExchangeRates() {
+        try {
+            const response = await fetch('https://open.er-api.com/v6/latest/CNY');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            if (data && data.rates) {
+                // The rates are relative to 1 CNY. E.g. 1 CNY = 0.138 USD.
+                // So 1 USD = 1 / 0.138 CNY.
+                const usdToCny = 1 / parseFloat(data.rates.USD);
+                const eurToCny = 1 / parseFloat(data.rates.EUR);
+                const hkdToCny = 1 / parseFloat(data.rates.HKD);
+                
+                if (usdToCny && eurToCny && hkdToCny) {
+                    EXCHANGE_RATES.USD = usdToCny;
+                    EXCHANGE_RATES.EUR = eurToCny;
+                    EXCHANGE_RATES.HKD = hkdToCny;
+                    
+                    updateRatesUI();
+                    console.log('Successfully updated real-time exchange rates:', EXCHANGE_RATES);
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load real-time exchange rates, utilizing static fallback values:', error);
+        }
+    }
+
     // Secure token credentials (embedded client-side for GitHub Pages deployment)
     const CLIENT_CODE = 'CN3949603';
     const API_SECRET = '3ihcklF2g/g1NdP1ZhzhXw==';
@@ -628,4 +684,6 @@ document.addEventListener('DOMContentLoaded', () => {
             quoteChannelsContainer.appendChild(cardEl);
         });
     }
+    // Fetch live exchange rates dynamically
+    fetchRealTimeExchangeRates();
 });
