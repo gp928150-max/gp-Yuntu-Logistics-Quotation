@@ -71,13 +71,41 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
 }
 
-.status-bar-left, .status-bar-right {
+.status-bar-left {
     display: flex;
     align-items: center;
     gap: 8px;
     white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    justify-content: flex-end;
+}
+
+.status-bar-rates-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.status-bar-rates-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 .status-bar-text {
@@ -1381,6 +1409,18 @@ body {
         width: auto;
         gap: 12px;
         flex-wrap: nowrap;
+    }
+    
+    .status-bar-right {
+        flex: none;
+    }
+    
+    .status-bar-rates-wrapper {
+        overflow: visible;
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     
     .main-title {
