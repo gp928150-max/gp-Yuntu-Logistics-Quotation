@@ -41,7 +41,12 @@
 }
 
 body {
-    background: radial-gradient(1200px at top, #ffffff 0%, #f5f5f7 100%); /* Studio lighting radial gradient */
+    background-color: #f5f5f7;
+    background-image: 
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 247, 0.45) 100%),
+        radial-gradient(rgba(0, 0, 0, 0.015) 1.2px, transparent 1.2px);
+    background-size: 100% 100%, 24px 24px;
+    background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-body);
     min-height: 100vh;
@@ -805,7 +810,7 @@ body {
 
 .empty-graphic {
     font-size: 3rem;
-    color: var(--text-secondary);
+    color: var(--primary);
     margin-bottom: 24px;
     display: inline-flex;
     align-items: center;
@@ -813,7 +818,15 @@ body {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: #f5f5f7;
+    background: rgba(0, 113, 227, 0.06);
+    border: 1px solid rgba(0, 113, 227, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 113, 227, 0.08);
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 .empty-graphic svg {
