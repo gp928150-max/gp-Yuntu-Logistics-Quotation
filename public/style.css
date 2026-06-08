@@ -24,8 +24,9 @@
     --error-bg: #fdf2f2;
     --error-border: rgba(255, 59, 48, 0.15);
 
-    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+    --font-heading: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
+    --font-number: 'JetBrains Mono', 'SF Mono', 'PingFang SC', "Microsoft YaHei UI", monospace;
     
     --glass-blur: blur(20px);
     --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
@@ -154,9 +155,10 @@ body {
 }
 
 .status-bar-rate-item {
-    font-family: var(--font-heading);
+    font-family: var(--font-number);
     font-weight: 600;
     color: #ffffff; /* Bright white for primary rates values */
+    font-variant-numeric: tabular-nums;
 }
 
 .status-bar-rate-divider {
@@ -558,25 +560,27 @@ body {
 }
 
 .metric-val {
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
+    font-family: var(--font-number);
+    font-size: 1.6rem;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.02em;
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .metric-converted-sub {
-    font-size: 0.92rem;
-    font-weight: 500;
+    font-size: 0.88rem;
+    font-weight: 600;
     color: var(--primary);
     margin-left: 8px;
-    font-family: var(--font-body);
+    font-family: var(--font-number);
     letter-spacing: -0.01em;
     display: inline-flex;
     align-items: baseline;
+    font-variant-numeric: tabular-nums;
 }
 
 .metric-desc {
@@ -1189,24 +1193,26 @@ body {
 }
 
 .channel-total-badge .amount {
-    font-size: 1.55rem;
+    font-size: 1.45rem;
     font-weight: 700;
-    font-family: var(--font-heading);
+    font-family: var(--font-number);
     letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .channel-converted-badge {
     display: inline-flex;
     align-items: center;
-    font-size: 0.88rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--primary);
-    font-family: var(--font-body);
+    font-family: var(--font-number);
     letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
 }
 
 .channel-price-breakdown {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--text-secondary);
     line-height: 1.4;
     letter-spacing: 0;
@@ -1214,6 +1220,8 @@ body {
     word-wrap: break-word;
     white-space: normal;
     text-align: right;
+    font-family: var(--font-number);
+    font-variant-numeric: tabular-nums;
 }
 
 /* Custom Searchable Country Select Dropdown - Apple Glassmorphism list */
