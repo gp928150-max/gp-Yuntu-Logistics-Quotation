@@ -920,6 +920,8 @@ document.addEventListener('DOMContentLoaded', () => {
         adminSaveStatus.style.color = 'var(--text-secondary)';
         adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
 
+        let useFallback = (window.location.protocol === 'file:' || window.location.hostname === '' || window.location.hostname.includes('github.io'));
+
         try {
             // First, try using our backend proxy (/api/github-sync)
             const proxyUrl = '/api/github-sync';
@@ -952,12 +954,18 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (response.status === 404) {
                 // If backend proxy is not deployed (e.g. running on static server directly)
                 console.log('Backend proxy not found (404), falling back to client-side direct sync.');
+                useFallback = true;
+                throw new Error('Backend proxy not found (404)');
             } else {
                 const resData = await response.json().catch(() => ({}));
                 throw new Error(resData.message || `HTTP ${response.status}`);
             }
         } catch (proxyErr) {
-            console.warn('Backend proxy sync failed, falling back to direct client-side sync:', proxyErr);
+            if (useFallback || (proxyErr instanceof TypeError && proxyErr.message.includes('Failed to fetch'))) {
+                console.warn('Backend proxy sync failed, falling back to direct client-side sync:', proxyErr);
+            } else {
+                throw new Error(`[后端同步服务错误] ${proxyErr.message}`);
+            }
         }
 
         // --- Client-side direct sync fallback (for local/static runs) ---
