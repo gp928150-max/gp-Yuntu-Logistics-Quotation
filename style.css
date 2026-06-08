@@ -95,17 +95,30 @@ body {
 .status-bar-rates-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    overflow-x: auto;
+    overflow: hidden;
     white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
     flex-shrink: 1;
     min-width: 0;
+    mask-image: linear-gradient(to right, transparent, white 20px, white calc(100% - 20px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, white 20px, white calc(100% - 20px), transparent);
 }
 
-.status-bar-rates-wrapper::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+.status-bar-rates-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: statusMarquee 30s linear infinite;
+    flex-shrink: 0;
+    padding-right: 8px;
+}
+
+.status-bar-rates-wrapper:hover .status-bar-rates-track {
+    animation-play-state: paused;
+}
+
+@keyframes statusMarquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
 }
 
 .status-bar-text {
@@ -1421,6 +1434,18 @@ body {
         display: flex;
         align-items: center;
         gap: 8px;
+        mask-image: none;
+        -webkit-mask-image: none;
+    }
+    
+    .status-bar-rates-track {
+        animation: none;
+        flex-shrink: 1;
+        padding-right: 0;
+    }
+    
+    .status-bar-rates-track:nth-child(2) {
+        display: none;
     }
     
     .main-title {

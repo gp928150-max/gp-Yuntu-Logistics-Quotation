@@ -309,19 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateRatesUI() {
         try {
-            // Update top status bar tickers (4 decimal places)
-            const tickerUsd = document.getElementById('rate-ticker-usd');
-            const tickerEur = document.getElementById('rate-ticker-eur');
-            const tickerGbp = document.getElementById('rate-ticker-gbp');
-            const tickerCad = document.getElementById('rate-ticker-cad');
-            const tickerAud = document.getElementById('rate-ticker-aud');
-            const tickerHkd = document.getElementById('rate-ticker-hkd');
-            if (tickerUsd) tickerUsd.textContent = EXCHANGE_RATES.USD.toFixed(4);
-            if (tickerEur) tickerEur.textContent = EXCHANGE_RATES.EUR.toFixed(4);
-            if (tickerGbp) tickerGbp.textContent = EXCHANGE_RATES.GBP.toFixed(4);
-            if (tickerCad) tickerCad.textContent = EXCHANGE_RATES.CAD.toFixed(4);
-            if (tickerAud) tickerAud.textContent = EXCHANGE_RATES.AUD.toFixed(4);
-            if (tickerHkd) tickerHkd.textContent = EXCHANGE_RATES.HKD.toFixed(4);
+            // Update top status bar tickers (4 decimal places, supports multiple instances in marquee)
+            const currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'HKD'];
+            currencies.forEach(cur => {
+                const elements = document.querySelectorAll(`.rate-ticker-${cur.toLowerCase()}`);
+                elements.forEach(el => {
+                    el.textContent = EXCHANGE_RATES[cur].toFixed(4);
+                });
+            });
 
             // Update custom dropdown labels (4 decimal places)
             const dropUsd = document.getElementById('rate-dropdown-usd');
