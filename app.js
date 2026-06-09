@@ -775,21 +775,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getBackendBaseUrl() {
+        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        // Default fallback for static hosting
+        if (!base && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
+            base = 'https://gp-yuntu-logistics-quotation.vercel.app';
+        }
+        if (base) {
+            if (!base.startsWith('http://') && !base.startsWith('https://')) {
+                base = 'https://' + base;
+            }
+            base = base.replace(/\/+$/, '');
+        }
+        return base;
+    }
+
     async function loadConfig() {
         // Load from Vercel API
         try {
-            let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
-            // Default fallback for static hosting
-            if (!backendUrl && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
-                backendUrl = 'https://gp-yuntu-logistics-quotation.vercel.app';
-            }
-            if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
-                backendUrl = 'https://' + backendUrl;
-            }
-            if (backendUrl) {
-                backendUrl = backendUrl.replace(/\/+$/, '');
-            }
-            
+            const backendUrl = getBackendBaseUrl();
             const targetUrl = backendUrl ? `${backendUrl}/api/config?t=${Date.now()}` : `/api/config?t=${Date.now()}`;
             const response = await fetch(targetUrl);
             if (response.ok) {
@@ -830,13 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textEl = document.getElementById('api-status-text');
         if (!dot || !textEl) return;
         
-        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
-        if (base) {
-            if (!base.startsWith('http://') && !base.startsWith('https://')) {
-                base = 'https://' + base;
-            }
-            base = base.replace(/\/+$/, '');
-        }
+        const base = getBackendBaseUrl();
         const checkUrl = base ? `${base}/api/countries` : `/api/countries`;
 
         try {
@@ -859,15 +857,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Stats Tracking
     function getStatsEndpoint(param) {
-        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
-        if (base) {
-            if (!base.startsWith('http://') && !base.startsWith('https://')) {
-                base = 'https://' + base;
-            }
-            base = base.replace(/\/+$/, '');
-            return `${base}/api/stats?${param}`;
-        }
-        return `/api/stats?${param}`;
+        const base = getBackendBaseUrl();
+        return base ? `${base}/api/stats?${param}` : `/api/stats?${param}`;
     }
 
     async function trackPageView() {
@@ -1297,13 +1288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             params.append('PostCode', postcode);
         }
 
-        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
-        if (base) {
-            if (!base.startsWith('http://') && !base.startsWith('https://')) {
-                base = 'https://' + base;
-            }
-            base = base.replace(/\/+$/, '');
-        }
+        const base = getBackendBaseUrl();
         const targetUrl = base ? `${base}/api/quotation?${params.toString()}` : `/api/quotation?${params.toString()}`;
 
         try {
@@ -1861,16 +1846,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
-        if (!base && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
-            base = 'https://gp-yuntu-logistics-quotation.vercel.app';
-        }
-        if (base) {
-            if (!base.startsWith('http://') && !base.startsWith('https://')) {
-                base = 'https://' + base;
-            }
-            base = base.replace(/\/+$/, '');
-        }
+        const base = getBackendBaseUrl();
         const authUrl = base ? `${base}/api/admin-auth` : `/api/admin-auth`;
 
         try {
@@ -1934,12 +1910,7 @@ document.addEventListener('DOMContentLoaded', () => {
         adminSaveStatus.textContent = '正在保存配置至云端...';
 
         try {
-            let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
-            if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
-                backendUrl = 'https://' + backendUrl;
-            }
-            backendUrl = backendUrl.replace(/\/+$/, '');
-
+            const backendUrl = getBackendBaseUrl();
             const saveUrl = backendUrl ? `${backendUrl}/api/config` : '/api/config';
             const response = await fetch(saveUrl, {
                 method: 'POST',
