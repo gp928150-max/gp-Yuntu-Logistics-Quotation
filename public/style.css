@@ -39,8 +39,8 @@
     width: 650px;
     height: 650px;
     filter: blur(140px);
-    opacity: 0.1;
-    z-index: -1;
+    opacity: 0.28;
+    z-index: 1;
     pointer-events: none;
     mix-blend-mode: multiply;
     animation: floatGlow 25s infinite alternate ease-in-out, morphGlow 18s infinite ease-in-out;
@@ -242,6 +242,8 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
+    z-index: 2;
 }
 
 /* Navigation Bar */
