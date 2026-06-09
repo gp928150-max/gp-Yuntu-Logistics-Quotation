@@ -1773,6 +1773,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminSaveStatus = document.getElementById('admin-save-status');
     const adminSaveBtn = document.getElementById('admin-save-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
+    const adminVerifyBackendInput = document.getElementById('admin-verify-backend-input');
 
     // Load initial values from localStorage (with fallbacks)
     let SYSTEM_PROFIT_MARGIN = parseFloat(localStorage.getItem('gp_profit_margin')) || 1.22;
@@ -1794,6 +1795,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (adminBackendUrlInput) {
         adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
+    }
+    if (adminVerifyBackendInput) {
+        adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || '';
     }
 
     // Modal Events
@@ -1833,6 +1837,20 @@ document.addEventListener('DOMContentLoaded', () => {
     async function performAdminVerification() {
         const pwd = adminPasswordInput.value;
         const hashedPwd = await sha256(pwd);
+        
+        if (adminVerifyBackendInput) {
+            let backendUrlVal = adminVerifyBackendInput.value.trim();
+            if (backendUrlVal) {
+                if (!backendUrlVal.startsWith('http://') && !backendUrlVal.startsWith('https://')) {
+                    backendUrlVal = 'https://' + backendUrlVal;
+                }
+                localStorage.setItem('gp_backend_url', backendUrlVal);
+                GLOBAL_BACKEND_URL = backendUrlVal;
+            } else {
+                localStorage.removeItem('gp_backend_url');
+                GLOBAL_BACKEND_URL = '';
+            }
+        }
         
         let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
         if (base) {
@@ -1994,6 +2012,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('gp_backend_url', backendUrlVal);
                 } else {
                     localStorage.removeItem('gp_backend_url');
+                }
+                if (adminVerifyBackendInput) {
+                    adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || '';
                 }
             }
             

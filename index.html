@@ -426,6 +426,10 @@
                 <div class="admin-input-group">
                     <input type="password" id="admin-password-input" data-translate-placeholder="admin_password_placeholder" placeholder="输入管理密码..." autocomplete="off">
                 </div>
+                <div class="admin-input-group" style="text-align: left;">
+                    <label for="admin-verify-backend-input" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500;">Vercel 后端接口地址 (托管于静态平台如 GitHub Pages 时必填)</label>
+                    <input type="text" id="admin-verify-backend-input" placeholder="例如 https://xxx.vercel.app" autocomplete="off">
+                </div>
                 <div id="admin-verify-error" class="admin-error-text"></div>
                 <button type="button" class="submit-btn full-width" id="admin-verify-btn">
                     <span data-translate="admin_auth_btn">认证并登录</span>
