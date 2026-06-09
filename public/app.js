@@ -1811,39 +1811,67 @@ document.addEventListener('DOMContentLoaded', () => {
     async function performAdminVerification() {
         const pwd = adminPasswordInput.value;
         const hashedPwd = await sha256(pwd);
-        if (hashedPwd === '8b940be7fb78aaa6b6567dd7a3987996947460df1c668e698eb92ca77e425349') {
-            adminVerifyError.textContent = '';
-            adminStateVerify.classList.add('admin-state-hidden');
-            adminStateVerify.classList.remove('admin-state-active');
-            adminStatePanel.classList.remove('admin-state-hidden');
-            adminStatePanel.classList.add('admin-state-active');
-            
-            // Force fetch the latest config from server to ensure fresh state
-            try {
-                await loadConfig();
-            } catch (err) {
-                console.warn('Failed to load fresh config on admin login:', err);
+        
+        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        if (base) {
+            if (!base.startsWith('http://') && !base.startsWith('https://')) {
+                base = 'https://' + base;
             }
-            
-            // Sync values to inputs
-            adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
-            adminPackInput.value = SYSTEM_PACKAGING_FEE;
-            if (adminTokenInput) {
-                adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
+            base = base.replace(/\/+$/, '');
+        }
+        const authUrl = base ? `${base}/api/admin-auth` : `/api/admin-auth`;
+
+        try {
+            const response = await fetch(authUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ hashedPwd })
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                adminVerifyError.textContent = '';
+                adminStateVerify.classList.add('admin-state-hidden');
+                adminStateVerify.classList.remove('admin-state-active');
+                adminStatePanel.classList.remove('admin-state-hidden');
+                adminStatePanel.classList.add('admin-state-active');
+                
+                // Force fetch the latest config from server to ensure fresh state
+                try {
+                    await loadConfig();
+                } catch (err) {
+                    console.warn('Failed to load fresh config on admin login:', err);
+                }
+                
+                // Sync values to inputs
+                adminProfitInput.value = Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100);
+                adminPackInput.value = SYSTEM_PACKAGING_FEE;
+                if (adminTokenInput) {
+                    adminTokenInput.value = localStorage.getItem('gp_github_token') || '';
+                }
+                if (adminApiBaseInput) {
+                    adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
+                }
+                if (adminBackendUrlInput) {
+                    adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
+                }
+                adminSaveStatus.textContent = '';
+            } else {
+                adminVerifyError.textContent = data.message || '密码错误，认证失败！';
+                const card = adminModal.querySelector('.admin-modal-card');
+                if (card) {
+                    card.classList.add('admin-shake');
+                    setTimeout(() => card.classList.remove('admin-shake'), 500);
+                }
             }
-            if (adminApiBaseInput) {
-                adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
-            }
-            if (adminBackendUrlInput) {
-                adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
-            }
-            adminSaveStatus.textContent = '';
-        } else {
-            adminVerifyError.textContent = '密码错误，认证失败！';
+        } catch (err) {
+            console.error('Admin verification request failed:', err);
+            adminVerifyError.textContent = '服务器连接故障，认证失败！';
             const card = adminModal.querySelector('.admin-modal-card');
             if (card) {
                 card.classList.add('admin-shake');
-                setTimeout(() => card.classList.remove('admin-shake'), 300);
+                setTimeout(() => card.classList.remove('admin-shake'), 500);
             }
         }
     }

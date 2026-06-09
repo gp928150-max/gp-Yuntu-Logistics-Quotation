@@ -14,12 +14,17 @@ app.use(express.json());
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Credentials configuration (Read from environment variables, fallback to current keys)
-const CLIENT_CODE = process.env.YUNTU_CLIENT_CODE || 'CN3949603';
-const API_SECRET = process.env.YUNTU_API_SECRET || '3ihcklF2g/g1NdP1ZhzhXw==';
+// Credentials configuration (Read from environment variables)
+const CLIENT_CODE = process.env.YUNTU_CLIENT_CODE;
+const API_SECRET = process.env.YUNTU_API_SECRET;
+
+// Warn if environment variables are not set (for local development or pending Vercel configuration)
+if (!CLIENT_CODE || !API_SECRET) {
+    console.warn('WARNING: YUNTU_CLIENT_CODE or YUNTU_API_SECRET environment variable is missing.');
+}
 
 // Generate Token
-const tokenSource = `${CLIENT_CODE}&${API_SECRET}`;
+const tokenSource = `${CLIENT_CODE || ''}&${API_SECRET || ''}`;
 const authToken = Buffer.from(tokenSource).toString('base64');
 
 // Proxy API Route
@@ -367,6 +372,18 @@ app.get('/api/stats', async (req, res) => {
             message: '获取或更新统计数据失败',
             error: error.message
         });
+    }
+});
+
+// Admin authentication endpoint
+app.post('/api/admin-auth', async (req, res) => {
+    const { hashedPwd } = req.body;
+    // Get hash from environment variable, fallback to original default hash if not set
+    const envHash = process.env.ADMIN_PASSWORD_HASH || '8b940be7fb78aaa6b6567dd7a3987996947460df1c668e698eb92ca77e425349';
+    if (hashedPwd === envHash) {
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false, message: '密码错误，认证失败！' });
     }
 });
 
