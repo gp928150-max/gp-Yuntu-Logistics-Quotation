@@ -2487,6 +2487,7 @@ body.dark-mode {
 body.dark-mode {
     background-color: var(--bg-main);
     color: var(--text-primary);
+    color-scheme: dark;
 }
 
 /* Theme button states in Dark Mode */
@@ -2511,9 +2512,13 @@ body.dark-mode .theme-toggle-btn .moon-icon {
 body.dark-mode .form-field input,
 body.dark-mode .form-field select,
 body.dark-mode .dimensions-input-group {
-    background: var(--card-bg);
+    background-color: var(--card-bg);
     border-color: rgba(255, 255, 255, 0.15);
     color: var(--text-primary);
+}
+
+body.dark-mode .form-field select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2398989d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
 body.dark-mode .form-field input:hover,
