@@ -279,7 +279,7 @@ app.post('/api/github-sync', async (req, res) => {
 
             // 2. Put updated config
             const putBody = {
-                message: `Update ${path} from admin panel via Vercel Proxy (V1.6.5)`,
+                message: `Update ${path} from admin panel via Vercel Proxy (V1.6.6)`,
                 content: base64Content
             };
             if (sha) {
