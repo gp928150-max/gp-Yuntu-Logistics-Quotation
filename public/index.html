@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.5.51">
+    <link rel="stylesheet" href="style.css?v=1.5.52">
     <!-- App Logic -->
-    <script src="app.js?v=1.5.51" defer></script>
+    <script src="app.js?v=1.5.52" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -29,6 +29,9 @@
     </script>
 </head>
 <body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
     <!-- Top Status Bar -->
     <div class="top-status-bar">
         <div class="status-bar-content">
@@ -36,7 +39,7 @@
                 <span class="status-indicator-dot"></span>
                 <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.5.51 Enterprise</span>
+                <span class="status-bar-text version">V1.5.52 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -286,10 +289,31 @@
 
                 <!-- Loading State -->
                 <div id="loading-state" class="state-panel">
-                    <div class="skeleton-wrapper">
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
-                        <div class="skeleton-card"></div>
+                     <div class="skeleton-wrapper">
+                        <div class="skeleton-card">
+                            <div class="skeleton-icon-block"></div>
+                            <div class="skeleton-text-group">
+                                <div class="skeleton-line line-long"></div>
+                                <div class="skeleton-line line-short"></div>
+                            </div>
+                            <div class="skeleton-price-block"></div>
+                        </div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-icon-block"></div>
+                            <div class="skeleton-text-group">
+                                <div class="skeleton-line line-long"></div>
+                                <div class="skeleton-line line-short"></div>
+                            </div>
+                            <div class="skeleton-price-block"></div>
+                        </div>
+                        <div class="skeleton-card">
+                            <div class="skeleton-icon-block"></div>
+                            <div class="skeleton-text-group">
+                                <div class="skeleton-line line-long"></div>
+                                <div class="skeleton-line line-short"></div>
+                            </div>
+                            <div class="skeleton-price-block"></div>
+                        </div>
                     </div>
                     <h3 data-translate="loading_title">正在调用实时云途报价接口...</h3>
                     <p data-translate="loading_desc">请稍候，我们正在为您测算最佳的运输专线报价</p>
