@@ -1394,17 +1394,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (iconClass === 'express') {
             return `
                 <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2s-5 3-5 8.5v4c0 2.5 2 4.5 5 6 3-1.5 5-3.5 5-6v-4C17 5.5 12 2 12 2z"></path>
-                    <path d="M9 15.5l-3.5 2.5v1.5L9 17.5"></path>
-                    <path d="M15 15l3.5 2.5v1.5L15 17.5"></path>
-                    <line x1="12" y1="14" x2="12" y2="17"></line>
+                    <path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5s1.26 2.5 5.5 2.5c2.31 0 4.24-1 5.5-2.5"></path>
+                    <path d="m12.5 7.5 3 3"></path>
+                    <path d="M9 12h.01"></path>
+                    <path d="M18 5.43A8.56 8.56 0 0 0 13.52 3a8.53 8.53 0 0 0-6 4.3c-2.22 4-2.88 8.65-2.88 8.65s4.65-.66 8.65-2.88a8.55 8.55 0 0 0 4.3-6.04 8.55 8.55 0 0 0-2.5-4.3z"></path>
+                    <path d="M18 5.43s.16-1.15.7-1.7c.68-.68 1.8-.75 2.5-.05.7.7.63 1.82-.05 2.5-.55.54-1.7.7-1.7.7"></path>
                 </svg>
             `;
         }
         if (iconClass === 'direct') {
             return `
                 <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22v-3m0-3V9m0-6.5A1.5 1.5 0 0 1 13.5 4v5.5L22 14v2l-10-3v5l3 2v1l-3-1-3 1v-1l3-2v-5L2 16v-2l8.5-4.5V4A1.5 1.5 0 0 1 12 2.5z"></path>
+                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.7-.2-1.5 0-2 0.5l-.4.4c-.4.4-.5 1-.2 1.5l5.2 3.6-3.8 3.8-2.6-.9c-.6-.2-1.3 0-1.7.4l-.4.4c-.4.4-.4 1.1 0 1.5l3.4 3.4c.4.4 1.1.4 1.5 0l.4-.4c.4-.4.6-1.1.4-1.7l-.9-2.6 3.8-3.8 3.6 5.2c.5.3 1.1.2 1.5-.2l.4-.4c.5-.5.7-1.3.5-2z"></path>
                 </svg>
             `;
         }
@@ -1919,7 +1920,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.7.0)`,
+                    message: `Update ${path} from admin panel (V1.7.1)`,
                     content: base64Content
                 };
                 if (sha) {
