@@ -1075,6 +1075,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         });
 
+        // Prioritize CountryCode matches in sorting (e.g. typing "at" puts Austria AT first)
+        filtered.sort((a, b) => {
+            const aCode = a.CountryCode.toLowerCase();
+            const bCode = b.CountryCode.toLowerCase();
+            
+            // 1. Exact match on CountryCode
+            const aExact = aCode === query;
+            const bExact = bCode === query;
+            if (aExact && !bExact) return -1;
+            if (!aExact && bExact) return 1;
+            
+            // 2. Starts with CountryCode
+            const aStarts = aCode.startsWith(query);
+            const bStarts = bCode.startsWith(query);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            
+            // 3. Contained in CountryCode
+            const aIndex = aCode.indexOf(query);
+            const bIndex = bCode.indexOf(query);
+            if (aIndex !== -1 && bIndex === -1) return -1;
+            if (aIndex === -1 && bIndex !== -1) return 1;
+            
+            // Fallback to original order (tier)
+            const tierA = getCountryTier(a.CountryCode);
+            const tierB = getCountryTier(b.CountryCode);
+            if (tierA !== tierB) return tierA - tierB;
+            
+            return getCountryDisplayName(a).localeCompare(getCountryDisplayName(b), 'zh');
+        });
+
         renderCountryOptions(filtered);
     });
 
@@ -1384,16 +1415,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function getChannelIcon(name) {
         const iconClass = getChannelIconClass(name);
         if (iconClass === 'mail') {
-            return `<img src="images/mail_3d.png" class="channel-brand-icon-img icon-mail" alt="Mail">`;
+            return `<i class="ri-mail-send-fill icon-mail"></i>`;
         }
         if (iconClass === 'express') {
-            return `<img src="images/rocket_3d.png" class="channel-brand-icon-img icon-express" alt="Express">`;
+            return `<i class="ri-rocket-2-fill icon-express"></i>`;
         }
         if (iconClass === 'direct') {
-            return `<img src="images/plane_3d.png" class="channel-brand-icon-img icon-direct" alt="Direct">`;
+            return `<i class="ri-plane-fill icon-direct"></i>`;
         }
         // Fallback: parcel
-        return `<img src="images/parcel_3d.png" class="channel-brand-icon-img icon-parcel" alt="Parcel">`;
+        return `<i class="ri-box-3-fill icon-parcel"></i>`;
     }
 
     function getExcelTransit(excelMap, cname) {
@@ -1897,7 +1928,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.7.3)`,
+                    message: `Update ${path} from admin panel (V1.7.4)`,
                     content: base64Content
                 };
                 if (sha) {

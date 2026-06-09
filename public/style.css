@@ -1273,76 +1273,89 @@ body {
 }
 
 .channel-brand-icon-bg {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: #ffffff;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #f5f5f7;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03), inset 0 1px 0 #ffffff;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.channel-brand-icon-bg img.channel-brand-icon-img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation: iconFloat 4s ease-in-out infinite;
+.channel-brand-icon-bg i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Pause floating animation on hover so hover transform rule takes over */
-.quote-channel-card:hover .channel-brand-icon-bg img.channel-brand-icon-img {
-    animation-play-state: paused;
+.channel-brand-icon-bg.brand-icon-mail {
+    background: rgba(9, 109, 217, 0.07);
+    border-color: rgba(9, 109, 217, 0.12);
+}
+.channel-brand-icon-bg.brand-icon-mail i {
+    color: #096dd9;
 }
 
-/* Floating animation keyframes */
-@keyframes iconFloat {
-    0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-2px) rotate(1deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
+.channel-brand-icon-bg.brand-icon-express {
+    background: rgba(255, 149, 0, 0.07);
+    border-color: rgba(255, 149, 0, 0.12);
+}
+.channel-brand-icon-bg.brand-icon-express i {
+    color: #ff9500;
 }
 
+.channel-brand-icon-bg.brand-icon-direct {
+    background: rgba(0, 113, 227, 0.07);
+    border-color: rgba(0, 113, 227, 0.12);
+}
+.channel-brand-icon-bg.brand-icon-direct i {
+    color: #0071e3;
+}
+
+.channel-brand-icon-bg.brand-icon-parcel {
+    background: rgba(134, 134, 139, 0.07);
+    border-color: rgba(134, 134, 139, 0.12);
+}
+.channel-brand-icon-bg.brand-icon-parcel i {
+    color: #86868b;
+}
+
+/* Hover effects */
 .quote-channel-card:hover .channel-brand-icon-bg {
-    transform: scale(1.05);
-    border-color: rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail {
-    box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12), 0 2px 4px rgba(0, 113, 227, 0.04);
+    background: rgba(9, 109, 217, 0.13);
+    border-color: rgba(9, 109, 217, 0.22);
+    box-shadow: 0 6px 16px rgba(9, 109, 217, 0.15);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express {
-    box-shadow: 0 8px 20px rgba(255, 149, 0, 0.15), 0 2px 4px rgba(255, 149, 0, 0.04);
+    background: rgba(255, 149, 0, 0.13);
+    border-color: rgba(255, 149, 0, 0.22);
+    box-shadow: 0 6px 16px rgba(255, 149, 0, 0.18);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct {
-    box-shadow: 0 8px 20px rgba(9, 109, 217, 0.12), 0 2px 4px rgba(9, 109, 217, 0.04);
+    background: rgba(0, 113, 227, 0.13);
+    border-color: rgba(0, 113, 227, 0.22);
+    box-shadow: 0 6px 16px rgba(0, 113, 227, 0.15);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel {
-    box-shadow: 0 8px 20px rgba(134, 134, 139, 0.1), 0 2px 4px rgba(134, 134, 139, 0.04);
+    background: rgba(134, 134, 139, 0.13);
+    border-color: rgba(134, 134, 139, 0.22);
+    box-shadow: 0 6px 16px rgba(134, 134, 139, 0.12);
 }
 
-/* Custom premium 3D micro-animations on hover */
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express img.channel-brand-icon-img {
-    transform: translate(4px, -4px) scale(1.15) rotate(5deg);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct img.channel-brand-icon-img {
-    transform: translate(5px, -3px) scale(1.18) rotate(-3deg);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail img.channel-brand-icon-img {
-    transform: translateY(-4px) scale(1.15) rotate(-8deg);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel img.channel-brand-icon-img {
-    transform: translateY(-3px) scale(1.12) rotate(4deg);
+.quote-channel-card:hover .channel-brand-icon-bg i {
+    transform: scale(1.1);
 }
 
 .channel-info-area {
@@ -2656,26 +2669,56 @@ body.dark-mode .sort-select-wrapper:hover {
 
 /* Brand icon background inside card in Dark Mode */
 body.dark-mode .channel-brand-icon-bg {
-    background: #ffffff;
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+}
+
+body.dark-mode .channel-brand-icon-bg.brand-icon-mail {
+    background: rgba(9, 109, 217, 0.12);
+    border-color: rgba(9, 109, 217, 0.22);
+}
+body.dark-mode .channel-brand-icon-bg.brand-icon-express {
+    background: rgba(255, 149, 0, 0.12);
+    border-color: rgba(255, 149, 0, 0.22);
+}
+body.dark-mode .channel-brand-icon-bg.brand-icon-direct {
+    background: rgba(0, 113, 227, 0.12);
+    border-color: rgba(0, 113, 227, 0.22);
+}
+body.dark-mode .channel-brand-icon-bg.brand-icon-parcel {
+    background: rgba(134, 134, 139, 0.12);
+    border-color: rgba(134, 134, 139, 0.22);
 }
 
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(0, 113, 227, 0.35), 0 0 0 1px rgba(0, 113, 227, 0.2);
+    background: rgba(9, 109, 217, 0.22);
+    border-color: rgba(9, 109, 217, 0.35);
+    box-shadow: 0 8px 24px rgba(9, 109, 217, 0.25);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(255, 149, 0, 0.4), 0 0 0 1px rgba(255, 149, 0, 0.25);
+    background: rgba(255, 149, 0, 0.22);
+    border-color: rgba(255, 149, 0, 0.35);
+    box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(9, 109, 217, 0.35), 0 0 0 1px rgba(9, 109, 217, 0.2);
+    background: rgba(0, 113, 227, 0.22);
+    border-color: rgba(0, 113, 227, 0.35);
+    box-shadow: 0 8px 24px rgba(0, 113, 227, 0.25);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(134, 134, 139, 0.25), 0 0 0 1px rgba(134, 134, 139, 0.2);
+    background: rgba(134, 134, 139, 0.22);
+    border-color: rgba(134, 134, 139, 0.35);
+    box-shadow: 0 8px 24px rgba(134, 134, 139, 0.2);
+}
+
+/* General Goods badge in dark mode to fix text/background contrast */
+body.dark-mode .channel-meta-item.goods-type-badge.type-general {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e5e5ea !important;
+}
+body.dark-mode .channel-meta-item.goods-type-badge.type-general strong {
+    color: #ffffff !important;
 }
 
 /* Invert dark text/parts of logo in Dark Mode */
