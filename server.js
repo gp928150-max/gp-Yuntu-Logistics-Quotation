@@ -377,6 +377,29 @@ app.get('/api/stats', async (req, res) => {
 
 // GET configuration endpoint
 app.get('/api/config', async (req, res) => {
+    let config = {
+        profit_margin: 1.13,
+        packaging_fee: 2.0,
+        backend_url: ''
+    };
+
+    // 1. Try loading from Vercel KV first
+    try {
+        const kvConfigStr = await executeKVCommand(['GET', 'gp_config']);
+        if (kvConfigStr) {
+            const kvConfig = typeof kvConfigStr === 'string' ? JSON.parse(kvConfigStr) : kvConfigStr;
+            if (kvConfig && typeof kvConfig === 'object') {
+                if (kvConfig.profit_margin !== undefined) config.profit_margin = parseFloat(kvConfig.profit_margin);
+                if (kvConfig.packaging_fee !== undefined) config.packaging_fee = parseFloat(kvConfig.packaging_fee);
+                if (kvConfig.backend_url !== undefined) config.backend_url = String(kvConfig.backend_url);
+                return res.json(config);
+            }
+        }
+    } catch (kvErr) {
+        console.error('Failed to fetch config from Vercel KV:', kvErr);
+    }
+
+    // 2. Fallback: local config.json or environment variables
     let localConfig = {};
     try {
         const fs = require('fs');
@@ -387,18 +410,69 @@ app.get('/api/config', async (req, res) => {
     } catch (err) {
         console.error('Failed to read config.json:', err);
     }
-    
-    // Check environment variables first, fallback to config.json, then to default values
-    const profit_margin = process.env.PROFIT_MARGIN ? parseFloat(process.env.PROFIT_MARGIN) : (localConfig.profit_margin || 1.13);
-    const packaging_fee = process.env.PACKAGING_FEE ? parseFloat(process.env.PACKAGING_FEE) : (localConfig.packaging_fee || 2.0);
-    const backend_url = process.env.BACKEND_URL || localConfig.backend_url || '';
 
-    res.json({
-        profit_margin,
-        packaging_fee,
-        backend_url
-    });
+    config.profit_margin = process.env.PROFIT_MARGIN ? parseFloat(process.env.PROFIT_MARGIN) : (localConfig.profit_margin !== undefined ? localConfig.profit_margin : 1.13);
+    config.packaging_fee = process.env.PACKAGING_FEE ? parseFloat(process.env.PACKAGING_FEE) : (localConfig.packaging_fee !== undefined ? localConfig.packaging_fee : 2.0);
+    config.backend_url = process.env.BACKEND_URL || localConfig.backend_url || '';
+
+    res.json(config);
 });
+
+// POST configuration endpoint (Updates both Vercel KV and local root config.json if possible)
+app.post('/api/config', async (req, res) => {
+    const { hashedPwd, profit_margin, packaging_fee, backend_url } = req.body;
+    
+    // Verify authentication
+    const envHash = process.env.ADMIN_PASSWORD_HASH || '8b940be7fb78aaa6b6567dd7a3987996947460df1c668e698eb92ca77e425349';
+    if (hashedPwd !== envHash) {
+        return res.status(401).json({ success: false, message: '密码错误，认证失败！' });
+    }
+
+    if (profit_margin === undefined || packaging_fee === undefined) {
+        return res.status(400).json({ success: false, message: '利润率或打包费参数缺失' });
+    }
+
+    const configObj = {
+        profit_margin: parseFloat(profit_margin),
+        packaging_fee: parseFloat(packaging_fee),
+        backend_url: backend_url !== undefined ? String(backend_url).trim() : ''
+    };
+
+    let kvSaved = false;
+    try {
+        const result = await executeKVCommand(['SET', 'gp_config', JSON.stringify(configObj)]);
+        if (result) {
+            kvSaved = true;
+        }
+    } catch (kvErr) {
+        console.error('Failed to save config to Vercel KV:', kvErr);
+    }
+
+    let fileSaved = false;
+    try {
+        const fs = require('fs');
+        const configPath = path.join(__dirname, 'config.json');
+        fs.writeFileSync(configPath, JSON.stringify(configObj, null, 2), 'utf8');
+        fileSaved = true;
+    } catch (fsErr) {
+        console.warn('Failed to save config to local file config.json:', fsErr);
+    }
+
+    if (kvSaved || fileSaved) {
+        res.json({
+            success: true,
+            message: '配置已成功保存！',
+            kvSaved,
+            fileSaved
+        });
+    } else {
+        res.status(500).json({
+            success: false,
+            message: '保存配置失败（无法写入 KV 数据库或本地文件）'
+        });
+    }
+});
+
 
 // Admin authentication endpoint
 app.post('/api/admin-auth', async (req, res) => {

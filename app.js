@@ -776,44 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadConfig() {
-        // 1. Try to load directly from GitHub API for real-time config (bypasses GitHub Pages build delay)
-        try {
-            const token = localStorage.getItem('gp_github_token');
-            const apiBase = (localStorage.getItem('gp_github_api_base') || 'https://api.github.com').trim().replace(/\/+$/, '');
-            const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
-            const url = `${apiBase}/repos/${repo}/contents/config.json?t=${Date.now()}`;
-            
-            const headers = {
-                'Accept': 'application/vnd.github.v3+json'
-            };
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
-            const response = await fetch(url, { headers });
-            if (response.ok) {
-                const fileData = await response.json();
-                // Decode base64 content
-                const base64Content = fileData.content.replace(/\s/g, '');
-                // Decode base64 bytes safely supporting Chinese characters if any
-                const decodedStr = decodeURIComponent(atob(base64Content).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                const data = JSON.parse(decodedStr);
-                
-                SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
-                SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
-                GLOBAL_BACKEND_URL = data.backend_url || '';
-                console.log('Successfully loaded config from GitHub API:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
-                
-                updatePrefilledInputs();
-                return;
-            }
-        } catch (apiErr) {
-            console.warn('Failed to load config from GitHub API, falling back to local file:', apiErr);
-        }
-
-        // 2. Fallback: load config from Vercel API
+        // Load from Vercel API
         try {
             let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
             if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
@@ -825,16 +788,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(targetUrl);
             if (response.ok) {
                 const data = await response.json();
-                SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
+                SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.13;
                 SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
                 GLOBAL_BACKEND_URL = data.backend_url || '';
                 console.log('Successfully loaded config from Vercel API:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
                 
+                // Cache locally
+                localStorage.setItem('gp_profit_margin', SYSTEM_PROFIT_MARGIN);
+                localStorage.setItem('gp_packaging_fee', SYSTEM_PACKAGING_FEE);
+                if (GLOBAL_BACKEND_URL) {
+                    localStorage.setItem('gp_backend_url', GLOBAL_BACKEND_URL);
+                }
+                
                 updatePrefilledInputs();
+                return;
             }
         } catch (e) {
-            console.warn('Failed to load config from Vercel API fallback:', e);
+            console.warn('Failed to load config from Vercel API:', e);
         }
+
+        // Fallback: load from localStorage cached parameters
+        const cachedMargin = localStorage.getItem('gp_profit_margin');
+        const cachedFee = localStorage.getItem('gp_packaging_fee');
+        if (cachedMargin !== null) {
+            SYSTEM_PROFIT_MARGIN = parseFloat(cachedMargin);
+        }
+        if (cachedFee !== null) {
+            SYSTEM_PACKAGING_FEE = parseFloat(cachedFee);
+        }
+        updatePrefilledInputs();
     }
 
     async function checkApiStatus() {
@@ -1795,6 +1777,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load initial values from localStorage (with fallbacks)
     let SYSTEM_PROFIT_MARGIN = parseFloat(localStorage.getItem('gp_profit_margin')) || 1.22;
     let SYSTEM_PACKAGING_FEE = localStorage.getItem('gp_packaging_fee') !== null && !isNaN(parseFloat(localStorage.getItem('gp_packaging_fee'))) ? parseFloat(localStorage.getItem('gp_packaging_fee')) : 2.0;
+    let currentAdminHash = '';
 
     // Set initial input states
     if (adminProfitInput) {
@@ -1870,6 +1853,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (response.ok && data.success) {
+                currentAdminHash = hashedPwd;
                 adminVerifyError.textContent = '';
                 adminStateVerify.classList.add('admin-state-hidden');
                 adminStateVerify.classList.remove('admin-state-active');
@@ -1915,28 +1899,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function saveConfigToGitHub(token, profit, pack) {
+    async function saveConfigToServer(hashedPwd, profit, pack) {
         adminSaveStatus.style.color = 'var(--text-secondary)';
-        adminSaveStatus.textContent = '正在进行 GitHub 云端同步...';
-
-        let useFallback = (window.location.protocol === 'file:' || window.location.hostname === '' || window.location.hostname.includes('github.io'));
+        adminSaveStatus.textContent = '正在保存配置至云端...';
 
         try {
-            // First, try using our backend proxy (/api/github-sync)
             let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
             if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
                 backendUrl = 'https://' + backendUrl;
             }
             backendUrl = backendUrl.replace(/\/+$/, '');
 
-            const proxyUrl = backendUrl ? `${backendUrl}/api/github-sync` : '/api/github-sync';
-            const response = await fetch(proxyUrl, {
+            const saveUrl = backendUrl ? `${backendUrl}/api/config` : '/api/config';
+            const response = await fetch(saveUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    token,
+                    hashedPwd,
                     profit_margin: profit,
                     packaging_fee: pack,
                     backend_url: backendUrl
@@ -1947,132 +1928,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resData = await response.json();
                 if (resData.success) {
                     adminSaveStatus.style.color = 'var(--success)';
-                    adminSaveStatus.textContent = '配置已同步至云端！部署系统会在1分钟内自动刷新生效。';
+                    adminSaveStatus.textContent = '配置已保存至云端数据库！价格计算已实时重算。';
                     
                     // Close modal softly
                     setTimeout(() => {
                         adminModal.classList.remove('open');
-                    }, 2000);
+                    }, 1500);
                     return;
                 } else {
                     throw new Error(resData.message || '未知错误');
                 }
-            } else if (response.status === 404) {
-                // If backend proxy is not deployed (e.g. running on static server directly)
-                console.log('Backend proxy not found (404), falling back to client-side direct sync.');
-                useFallback = true;
-                throw new Error('Backend proxy not found (404)');
             } else {
                 const resData = await response.json().catch(() => ({}));
                 throw new Error(resData.message || `HTTP ${response.status}`);
             }
-        } catch (proxyErr) {
-            if (useFallback || (proxyErr instanceof TypeError && proxyErr.message.includes('Failed to fetch'))) {
-                console.warn('Backend proxy sync failed, falling back to direct client-side sync:', proxyErr);
-            } else {
-                throw new Error(`[后端同步服务错误] ${proxyErr.message}`);
-            }
-        }
-
-        // --- Client-side direct sync fallback (for local/static runs) ---
-        const repo = 'gp928150-max/gp-Yuntu-Logistics-Quotation';
-        let apiBase = (localStorage.getItem('gp_github_api_base') || 'https://api.github.com').trim();
-        if (!apiBase) {
-            apiBase = 'https://api.github.com';
-        }
-        apiBase = apiBase.replace(/\/+$/, '');
-        
-        try {
-            const backendUrlVal = (localStorage.getItem('gp_backend_url') || '').trim();
-            const configObj = {
-                profit_margin: profit,
-                packaging_fee: pack,
-                backend_url: backendUrlVal
-            };
-            const configString = JSON.stringify(configObj, null, 2);
-            const base64Content = btoa(configString);
-            const paths = ['config.json'];
-            
-            for (const path of paths) {
-                const url = `${apiBase}/repos/${repo}/contents/${path}`;
-                
-                // 1. Get SHA of existing file (if any)
-                let sha = '';
-                try {
-                    const getRes = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-
-                    if (getRes.ok) {
-                        const fileData = await getRes.json();
-                        sha = fileData.sha;
-                    } else if (getRes.status !== 404) {
-                        throw new Error(`获取 ${path} 的 SHA 失败: HTTP ${getRes.status}`);
-                    }
-                } catch (fetchErr) {
-                    if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
-                        const isGithubPages = window.location.hostname.includes('github.io');
-                        if (isGithubPages) {
-                            throw new Error(`连接 GitHub 接口失败。由于您部署在 GitHub Pages 静态托管上，国内访问受阻，请确保您在下方配置了 Vercel 后端服务地址来进行安全中转。`);
-                        } else {
-                            throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
-                        }
-                    }
-                    throw fetchErr;
-                }
-
-                // 2. Put updated config
-                const putBody = {
-                    message: `Update ${path} from admin panel (V1.7.4)`,
-                    content: base64Content
-                };
-                if (sha) {
-                    putBody.sha = sha;
-                }
-
-                try {
-                    const putRes = await fetch(url, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify(putBody)
-                    });
-
-                    if (!putRes.ok) {
-                        const errData = await putRes.json();
-                        throw new Error(`更新 ${path} 失败: ${errData.message || `HTTP ${putRes.status}`}`);
-                    }
-                } catch (fetchErr) {
-                    if (fetchErr instanceof TypeError && fetchErr.message.includes('Failed to fetch')) {
-                        const isGithubPages = window.location.hostname.includes('github.io');
-                        if (isGithubPages) {
-                            throw new Error(`连接 GitHub 接口失败。由于您部署在 GitHub Pages 静态托管上，国内访问受阻，请确保您在下方配置了 Vercel 后端服务地址来进行安全中转。`);
-                        } else {
-                            throw new Error(`连接 GitHub 接口失败。如国内网络受阻，建议启用 VPN 代理，或在下方配置可用的 GitHub API 镜像/代理。`);
-                        }
-                    }
-                    throw fetchErr;
-                }
-            }
-
-            adminSaveStatus.style.color = 'var(--success)';
-            adminSaveStatus.textContent = '配置已同步至云端！部署系统会在1分钟内自动刷新生效。';
-            
-            // Close modal softly
-            setTimeout(() => {
-                adminModal.classList.remove('open');
-            }, 2000);
         } catch (error) {
-            console.error('Error saving config to GitHub directly:', error);
+            console.error('Error saving config:', error);
             adminSaveStatus.style.color = 'var(--error)';
-            adminSaveStatus.textContent = `云同步失败: ${error.message} (配置已在本地生效)`;
+            adminSaveStatus.textContent = `云端保存失败: ${error.message} (配置已在本地生效)`;
         }
     }
 
@@ -2114,46 +1987,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateAndRenderQuoteData();
             }
             
-            // GitHub cloud sync
-            if (adminTokenInput) {
-                const tokenVal = adminTokenInput.value.trim();
-                
-                // Save custom API base proxy if configured
-                if (adminApiBaseInput) {
-                    const apiBaseVal = adminApiBaseInput.value.trim();
-                    if (apiBaseVal) {
-                        localStorage.setItem('gp_github_api_base', apiBaseVal);
-                    } else {
-                        localStorage.removeItem('gp_github_api_base');
-                    }
-                }
-
-                // Save custom backend API proxy if configured
-                if (adminBackendUrlInput) {
-                    const backendUrlVal = adminBackendUrlInput.value.trim();
-                    if (backendUrlVal) {
-                        localStorage.setItem('gp_backend_url', backendUrlVal);
-                    } else {
-                        localStorage.removeItem('gp_backend_url');
-                    }
-                }
-                
-                if (tokenVal) {
-                    localStorage.setItem('gp_github_token', tokenVal);
-                    saveConfigToGitHub(tokenVal, SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+            // Save custom backend API proxy if configured
+            if (adminBackendUrlInput) {
+                const backendUrlVal = adminBackendUrlInput.value.trim();
+                if (backendUrlVal) {
+                    localStorage.setItem('gp_backend_url', backendUrlVal);
                 } else {
-                    localStorage.removeItem('gp_github_token');
-                    adminSaveStatus.style.color = 'var(--success)';
-                    adminSaveStatus.textContent = '配置已在本地生效（未配置 GitHub Token，无法云同步）';
-                    
-                    // Close modal softly
-                    setTimeout(() => {
-                        adminModal.classList.remove('open');
-                    }, 1200);
+                    localStorage.removeItem('gp_backend_url');
                 }
+            }
+            
+            if (currentAdminHash) {
+                saveConfigToServer(currentAdminHash, SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
             } else {
                 adminSaveStatus.style.color = 'var(--success)';
-                adminSaveStatus.textContent = '配置保存成功，所有价格已完成即时重算！';
+                adminSaveStatus.textContent = '配置已在本地生效（认证已过期，无法云同步）';
                 
                 // Close modal softly
                 setTimeout(() => {
@@ -2166,6 +2014,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout logic
     if (adminLogoutBtn) {
         adminLogoutBtn.addEventListener('click', () => {
+            currentAdminHash = '';
             adminStatePanel.classList.add('admin-state-hidden');
             adminStatePanel.classList.remove('admin-state-active');
             adminStateVerify.classList.remove('admin-state-hidden');
