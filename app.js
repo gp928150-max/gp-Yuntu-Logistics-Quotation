@@ -873,11 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Secure token credentials (embedded client-side for GitHub Pages deployment)
-    const CLIENT_CODE = 'CN3949603';
-    const API_SECRET = '3ihcklF2g/g1NdP1ZhzhXw==';
-    const tokenSource = `${CLIENT_CODE}&${API_SECRET}`;
-    const authToken = btoa(tokenSource); // Base64 in browser JS
+    // Credentials have been migrated to the secure backend proxy (Vercel)
 
     // Convert 2-letter country code to Unicode Flag Emoji
     function getFlagEmoji(countryCode) {
@@ -1236,15 +1232,20 @@ document.addEventListener('DOMContentLoaded', () => {
             params.append('PostCode', postcode);
         }
 
-        const targetUrl = `http://oms.api.yunexpress.com/api/Freight/GetPriceTrial?${params.toString()}`;
-        const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        if (base) {
+            if (!base.startsWith('http://') && !base.startsWith('https://')) {
+                base = 'https://' + base;
+            }
+            base = base.replace(/\/+$/, '');
+        }
+        const targetUrl = base ? `${base}/api/quotation?${params.toString()}` : `/api/quotation?${params.toString()}`;
 
         try {
-            const response = await fetch(proxyUrl, {
+            const response = await fetch(targetUrl, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Basic ${authToken}`
+                    'Accept': 'application/json'
                 }
             });
             const data = await response.json();
@@ -1918,7 +1919,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.6.6)`,
+                    message: `Update ${path} from admin panel (V1.6.8)`,
                     content: base64Content
                 };
                 if (sha) {

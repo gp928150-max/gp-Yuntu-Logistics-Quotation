@@ -14,9 +14,9 @@ app.use(express.json());
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Credentials configuration
-const CLIENT_CODE = 'CN3949603';
-const API_SECRET = '3ihcklF2g/g1NdP1ZhzhXw==';
+// Credentials configuration (Read from environment variables, fallback to current keys)
+const CLIENT_CODE = process.env.YUNTU_CLIENT_CODE || 'CN3949603';
+const API_SECRET = process.env.YUNTU_API_SECRET || '3ihcklF2g/g1NdP1ZhzhXw==';
 
 // Generate Token
 const tokenSource = `${CLIENT_CODE}&${API_SECRET}`;
@@ -137,36 +137,6 @@ app.get('/api/quotation', async (req, res) => {
         }
 
         const data = await response.json();
-
-        if (data.Code === '0000' && data.Items) {
-            data.Items = data.Items.map(item => {
-                const originalTotal = parseFloat(item.TotalFee) || 0;
-                
-                // Add 13% profit to individual fields
-                item.ShippingFee = (parseFloat(item.ShippingFee) || 0) * 1.13;
-                item.RegistrationFee = (parseFloat(item.RegistrationFee) || 0) * 1.13;
-                item.FuelFee = (parseFloat(item.FuelFee) || 0) * 1.13;
-                item.SundryFee = (parseFloat(item.SundryFee) || 0) * 1.13;
-                
-                if (item.TariffPrepayFee !== null && item.TariffPrepayFee !== undefined) {
-                    item.TariffPrepayFee = (parseFloat(item.TariffPrepayFee) || 0) * 1.13;
-                }
-                if (item.InsuredFee !== null && item.InsuredFee !== undefined) {
-                    item.InsuredFee = (parseFloat(item.InsuredFee) || 0) * 1.13;
-                }
-                if (item.SignatureFee !== null && item.SignatureFee !== undefined) {
-                    item.SignatureFee = (parseFloat(item.SignatureFee) || 0) * 1.13;
-                }
-                
-                // Add packaging fee (2 RMB)
-                item.PackagingFee = 2;
-                
-                // Total is marked up by 1.13 + 2 packaging fee
-                item.TotalFee = (originalTotal * 1.13) + 2;
-                
-                return item;
-            });
-        }
         res.json(data);
     } catch (error) {
         console.error('Error fetching price trial from YunExpress:', error);
@@ -282,7 +252,7 @@ app.post('/api/github-sync', async (req, res) => {
 
             // 2. Put updated config
             const putBody = {
-                message: `Update ${path} from admin panel via Vercel Proxy (V1.6.6)`,
+                message: `Update ${path} from admin panel via Vercel Proxy (V1.6.8)`,
                 content: base64Content
             };
             if (sha) {
