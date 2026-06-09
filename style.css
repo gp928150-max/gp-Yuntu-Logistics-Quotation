@@ -1747,6 +1747,13 @@ body {
         display: contents;
     }
     
+    .theme-toggle-btn {
+        grid-column: 2 / 3;
+        grid-row: 1;
+        justify-self: end;
+        margin-right: 156px;
+    }
+    
     .nav-logo {
         grid-column: 1 / 2;
         justify-self: start;
@@ -2721,6 +2728,15 @@ body.dark-mode .submit-btn {
 
 body.dark-mode .submit-btn:hover {
     background: #e5e5ea !important;
+}
+
+/* --- V1.6.3 Mobile Navigation and Card Borders in Dark Mode --- */
+body.dark-mode .app-nav .nav-links {
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .channel-price-area {
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 
