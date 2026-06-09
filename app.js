@@ -778,9 +778,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getBackendBaseUrl() {
-        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
-        // Default fallback for static hosting
-        // We check if the current environment is local (localhost, 127.0.0.1, private subnet IPs 192.168.x.x, 10.x.x.x, 172.16.x.x-172.31.x.x, or *.local)
+        if (GLOBAL_BACKEND_URL) {
+            return GLOBAL_BACKEND_URL;
+        }
         const hostname = window.location.hostname;
         const isLocal = hostname === 'localhost' || 
                         hostname === '127.0.0.1' || 
@@ -790,16 +790,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         /^10\./.test(hostname) ||
                         /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname);
         
-        if (!base && (hostname.includes('github.io') || window.location.protocol === 'file:' || (!hostname.includes('vercel.app') && !isLocal))) {
-            base = 'https://gp-yuntu-logistics-quotation.vercel.app';
+        if (hostname.includes('vercel.app') || isLocal) {
+            return '';
         }
-        if (base) {
-            if (!base.startsWith('http://') && !base.startsWith('https://')) {
-                base = 'https://' + base;
-            }
-            base = base.replace(/\/+$/, '');
-        }
-        return base;
+        return 'https://gp-yuntu-logistics-quotation.vercel.app';
     }
 
     async function loadConfig() {
@@ -818,9 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Cache locally
                 localStorage.setItem('gp_profit_margin', SYSTEM_PROFIT_MARGIN);
                 localStorage.setItem('gp_packaging_fee', SYSTEM_PACKAGING_FEE);
-                if (GLOBAL_BACKEND_URL) {
-                    localStorage.setItem('gp_backend_url', GLOBAL_BACKEND_URL);
-                }
+
                 
                 updatePrefilledInputs();
                 return;
@@ -1795,11 +1787,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminPackInput = document.getElementById('admin-pack-input');
     const adminTokenInput = document.getElementById('admin-token-input');
     const adminApiBaseInput = document.getElementById('admin-api-base-input');
-    const adminBackendUrlInput = document.getElementById('admin-backend-url-input');
     const adminSaveStatus = document.getElementById('admin-save-status');
     const adminSaveBtn = document.getElementById('admin-save-btn');
     const adminLogoutBtn = document.getElementById('admin-logout-btn');
-    const adminVerifyBackendInput = document.getElementById('admin-verify-backend-input');
 
     // Load initial values from localStorage (with fallbacks)
     let SYSTEM_PROFIT_MARGIN = parseFloat(localStorage.getItem('gp_profit_margin')) || 1.22;
@@ -1820,22 +1810,6 @@ document.addEventListener('DOMContentLoaded', () => {
         adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
     }
     const hostname = window.location.hostname;
-    const isLocal = hostname === 'localhost' || 
-                    hostname === '127.0.0.1' || 
-                    hostname.endsWith('.local') ||
-                    /^127\./.test(hostname) ||
-                    /^192\.168\./.test(hostname) ||
-                    /^10\./.test(hostname) ||
-                    /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname);
-    const isStaticPlatform = hostname.includes('github.io') || window.location.protocol === 'file:' || (!hostname.includes('vercel.app') && !isLocal);
-    const defaultBackend = isStaticPlatform ? 'https://gp-yuntu-logistics-quotation.vercel.app' : '';
-
-    if (adminBackendUrlInput) {
-        adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || defaultBackend;
-    }
-    if (adminVerifyBackendInput) {
-        adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || defaultBackend;
-    }
 
     function logoutAdmin() {
         currentAdminHash = '';
@@ -1896,19 +1870,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pwd = adminPasswordInput.value;
         const hashedPwd = await sha256(pwd);
         
-        if (adminVerifyBackendInput) {
-            let backendUrlVal = adminVerifyBackendInput.value.trim();
-            if (backendUrlVal) {
-                if (!backendUrlVal.startsWith('http://') && !backendUrlVal.startsWith('https://')) {
-                    backendUrlVal = 'https://' + backendUrlVal;
-                }
-                localStorage.setItem('gp_backend_url', backendUrlVal);
-                GLOBAL_BACKEND_URL = backendUrlVal;
-            } else {
-                localStorage.removeItem('gp_backend_url');
-                GLOBAL_BACKEND_URL = '';
-            }
-        }
+
         
         const base = getBackendBaseUrl();
         const authUrl = base ? `${base}/api/admin-auth` : `/api/admin-auth`;
@@ -1946,9 +1908,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (adminApiBaseInput) {
                     adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
                 }
-                if (adminBackendUrlInput) {
-                    adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
-                }
+
                 adminSaveStatus.textContent = '';
             } else {
                 adminVerifyError.textContent = data.message || '密码错误，认证失败！';
@@ -2024,18 +1984,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const adminAdvancedBtn = document.getElementById('admin-advanced-btn');
-    const adminVerifyBackendGroup = document.getElementById('admin-verify-backend-group');
-    if (adminAdvancedBtn && adminVerifyBackendGroup) {
-        adminAdvancedBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (adminVerifyBackendGroup.style.display === 'none') {
-                adminVerifyBackendGroup.style.display = 'block';
-            } else {
-                adminVerifyBackendGroup.style.display = 'none';
-            }
-        });
-    }
+
 
     // Save parameters logic
     if (adminSaveBtn) {
@@ -2066,18 +2015,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 calculateAndRenderQuoteData();
             }
             
-            // Save custom backend API proxy if configured
-            if (adminBackendUrlInput) {
-                const backendUrlVal = adminBackendUrlInput.value.trim();
-                if (backendUrlVal) {
-                    localStorage.setItem('gp_backend_url', backendUrlVal);
-                } else {
-                    localStorage.removeItem('gp_backend_url');
-                }
-                if (adminVerifyBackendInput) {
-                    adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || '';
-                }
-            }
+
             
             if (currentAdminHash) {
                 saveConfigToServer(currentAdminHash, SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
