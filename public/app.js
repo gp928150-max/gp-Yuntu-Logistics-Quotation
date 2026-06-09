@@ -1794,19 +1794,39 @@ document.addEventListener('DOMContentLoaded', () => {
         adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || defaultBackend;
     }
 
+    function logoutAdmin() {
+        currentAdminHash = '';
+        if (adminStatePanel) {
+            adminStatePanel.classList.add('admin-state-hidden');
+            adminStatePanel.classList.remove('admin-state-active');
+        }
+        if (adminStateVerify) {
+            adminStateVerify.classList.remove('admin-state-hidden');
+            adminStateVerify.classList.add('admin-state-active');
+        }
+        if (adminPasswordInput) {
+            adminPasswordInput.value = '';
+        }
+        if (adminVerifyError) {
+            adminVerifyError.textContent = '';
+        }
+    }
+
     // Modal Events
     if (adminTrigger) {
         adminTrigger.addEventListener('click', () => {
+            logoutAdmin();
             adminModal.classList.add('open');
-            adminVerifyError.textContent = '';
-            adminPasswordInput.value = '';
-            adminPasswordInput.focus();
+            if (adminPasswordInput) {
+                adminPasswordInput.focus();
+            }
         });
     }
 
     if (adminModalClose) {
         adminModalClose.addEventListener('click', () => {
             adminModal.classList.remove('open');
+            logoutAdmin();
         });
     }
 
@@ -1814,6 +1834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         adminModal.addEventListener('click', (e) => {
             if (e.target === adminModal) {
                 adminModal.classList.remove('open');
+                logoutAdmin();
             }
         });
     }
@@ -1931,9 +1952,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     adminSaveStatus.style.color = 'var(--success)';
                     adminSaveStatus.textContent = '配置已保存至云端数据库！价格计算已实时重算。';
                     
-                    // Close modal softly
+                    // Close modal softly and logout
                     setTimeout(() => {
                         adminModal.classList.remove('open');
+                        logoutAdmin();
                     }, 1500);
                     return;
                 } else {
@@ -2018,13 +2040,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Logout logic
     if (adminLogoutBtn) {
         adminLogoutBtn.addEventListener('click', () => {
-            currentAdminHash = '';
-            adminStatePanel.classList.add('admin-state-hidden');
-            adminStatePanel.classList.remove('admin-state-active');
-            adminStateVerify.classList.remove('admin-state-hidden');
-            adminStateVerify.classList.add('admin-state-active');
-            adminPasswordInput.value = '';
-            adminPasswordInput.focus();
+            logoutAdmin();
+            if (adminPasswordInput) {
+                adminPasswordInput.focus();
+            }
         });
     }
 
