@@ -217,6 +217,11 @@ body {
     animation: statusPulse 1.8s infinite;
 }
 
+.status-indicator-dot.error-state {
+    background: #ff453a !important;
+    box-shadow: 0 0 8px rgba(255, 69, 58, 0.6) !important;
+}
+
 .status-bar-rate-label {
     color: rgba(255, 255, 255, 0.4);
     font-weight: 600;

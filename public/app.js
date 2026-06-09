@@ -837,6 +837,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function checkApiStatus() {
+        const dot = document.querySelector('.status-indicator-dot');
+        const textEl = document.getElementById('api-status-text');
+        if (!dot || !textEl) return;
+        
+        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        if (base) {
+            if (!base.startsWith('http://') && !base.startsWith('https://')) {
+                base = 'https://' + base;
+            }
+            base = base.replace(/\/+$/, '');
+        }
+        const checkUrl = base ? `${base}/api/countries` : `/api/countries`;
+
+        try {
+            const response = await fetch(checkUrl);
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.Code === '0000') {
+                    dot.classList.remove('error-state');
+                    textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Normal (200 OK)' : '云途 OMS API 正常 (200 OK)';
+                    return;
+                }
+            }
+            dot.classList.add('error-state');
+            textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Error (500 Error)' : '云途 OMS API 异常 (连接失败)';
+        } catch (e) {
+            dot.classList.add('error-state');
+            textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Offline' : '云途 OMS API 异常 (连接故障)';
+        }
+    }
+
     // Stats Tracking
     function getStatsEndpoint(param) {
         let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
@@ -2169,5 +2201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTransitTimes();
     loadConfig().then(() => {
         trackPageView();
+        checkApiStatus();
     });
 });
