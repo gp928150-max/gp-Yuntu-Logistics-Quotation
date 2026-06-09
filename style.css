@@ -36,42 +36,61 @@
 /* Ambient Mesh Glows */
 .ambient-glow {
     position: fixed;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
+    width: 650px;
+    height: 650px;
     filter: blur(140px);
-    opacity: 0.08;
+    opacity: 0.1;
     z-index: -1;
     pointer-events: none;
     mix-blend-mode: multiply;
-    animation: floatGlow 20s infinite alternate ease-in-out;
+    animation: floatGlow 25s infinite alternate ease-in-out, morphGlow 18s infinite ease-in-out;
 }
 .glow-1 {
-    top: -200px;
-    left: -100px;
-    background: radial-gradient(circle, rgba(0, 113, 227, 0.45) 0%, transparent 80%);
+    top: -250px;
+    left: -150px;
+    background: radial-gradient(circle, rgba(66, 133, 244, 0.45) 0%, transparent 80%);
 }
 .glow-2 {
-    bottom: -150px;
-    right: -100px;
-    background: radial-gradient(circle, rgba(52, 199, 89, 0.35) 0%, transparent 80%);
+    bottom: -200px;
+    right: -150px;
+    background: radial-gradient(circle, rgba(219, 68, 85, 0.35) 0%, transparent 80%);
     animation-delay: -5s;
 }
 .glow-3 {
     top: 35%;
     left: 45%;
-    background: radial-gradient(circle, rgba(255, 149, 0, 0.25) 0%, transparent 80%);
+    background: radial-gradient(circle, rgba(244, 180, 0, 0.22) 0%, transparent 80%);
     animation-delay: -10s;
+}
+.glow-4 {
+    top: 15%;
+    right: 15%;
+    background: radial-gradient(circle, rgba(15, 157, 88, 0.25) 0%, transparent 80%);
+    animation-delay: -15s;
 }
 @keyframes floatGlow {
     0% {
         transform: translate(0, 0) scale(1);
     }
     50% {
-        transform: translate(60px, 80px) scale(1.15);
+        transform: translate(80px, 100px) scale(1.2);
     }
     100% {
-        transform: translate(-30px, -50px) scale(0.9);
+        transform: translate(-40px, -60px) scale(0.85);
+    }
+}
+@keyframes morphGlow {
+    0% {
+        border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
+    }
+    34% {
+        border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
+    }
+    67% {
+        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+    }
+    100% {
+        border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
     }
 }
 
