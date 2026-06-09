@@ -27,6 +27,23 @@ if (!CLIENT_CODE || !API_SECRET) {
 const tokenSource = `${CLIENT_CODE || ''}&${API_SECRET || ''}`;
 const authToken = Buffer.from(tokenSource).toString('base64');
 
+// Fetch helper with timeout using AbortController
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
+    }
+}
+
 // Proxy API Route
 app.get('/api/track', async (req, res) => {
     const orderNumber = req.query.order;
@@ -40,7 +57,7 @@ app.get('/api/track', async (req, res) => {
     const apiUrl = `http://oms.api.yunexpress.com/api/Tracking/GetTrackAllInfo?OrderNumber=${encodeURIComponent(orderNumber)}`;
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithTimeout(apiUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -56,9 +73,15 @@ app.get('/api/track', async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error('Error fetching from YunExpress:', error);
-        res.status(500).json({
+        let status = 500;
+        let msg = '后端服务查询失败，请稍后再试';
+        if (error.name === 'AbortError') {
+            status = 504;
+            msg = '请求云途服务超时，后端未能与云途服务器建立连接，请稍后再试';
+        }
+        res.status(status).json({
             success: false,
-            message: '后端服务查询失败，请稍后再试',
+            message: msg,
             error: error.message
         });
     }
@@ -77,7 +100,7 @@ app.get('/api/shipping-fee', async (req, res) => {
     const apiUrl = `http://oms.api.yunexpress.com/api/Freight/GetShippingFeeDetail?wayBillNumber=${encodeURIComponent(waybillNumber)}`;
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithTimeout(apiUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -93,9 +116,15 @@ app.get('/api/shipping-fee', async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error('Error fetching shipping fee from YunExpress:', error);
-        res.status(500).json({
+        let status = 500;
+        let msg = '后端服务查询运费失败，请稍后再试';
+        if (error.name === 'AbortError') {
+            status = 504;
+            msg = '请求云途服务超时，后端未能与云途服务器建立连接，请稍后再试';
+        }
+        res.status(status).json({
             success: false,
-            message: '后端服务查询运费失败，请稍后再试',
+            message: msg,
             error: error.message
         });
     }
@@ -129,7 +158,7 @@ app.get('/api/quotation', async (req, res) => {
     const apiUrl = `http://oms.api.yunexpress.com/api/Freight/GetPriceTrial?${params.toString()}`;
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithTimeout(apiUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -145,9 +174,15 @@ app.get('/api/quotation', async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error('Error fetching price trial from YunExpress:', error);
-        res.status(500).json({
+        let status = 500;
+        let msg = '后端服务估算运费失败，请稍后再试';
+        if (error.name === 'AbortError') {
+            status = 504;
+            msg = '请求云途服务超时，后端未能与云途服务器建立连接，请稍后再试';
+        }
+        res.status(status).json({
             success: false,
-            message: '后端服务估算运费失败，请稍后再试',
+            message: msg,
             error: error.message
         });
     }
@@ -158,7 +193,7 @@ app.get('/api/countries', async (req, res) => {
     const apiUrl = 'http://oms.api.yunexpress.com/api/Common/GetCountry';
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithTimeout(apiUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -202,13 +237,20 @@ app.get('/api/countries', async (req, res) => {
         }
     } catch (error) {
         console.error('Error fetching countries:', error);
-        res.status(500).json({
+        let status = 500;
+        let msg = '后端服务获取国家列表失败，请稍后再试';
+        if (error.name === 'AbortError') {
+            status = 504;
+            msg = '请求云途服务超时，后端未能与云途服务器建立连接，请稍后再试';
+        }
+        res.status(status).json({
             success: false,
-            message: '后端服务获取国家列表失败，请稍后再试',
+            message: msg,
             error: error.message
         });
     }
 });
+
 // Proxy API Route for updating configuration (Bypasses GFW network blocks)
 app.post('/api/github-sync', async (req, res) => {
     const { token, profit_margin, packaging_fee, backend_url } = req.body;
@@ -237,7 +279,7 @@ app.post('/api/github-sync', async (req, res) => {
             
             // 1. Get SHA of existing file
             let sha = '';
-            const getRes = await fetch(url, {
+            const getRes = await fetchWithTimeout(url, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -264,7 +306,7 @@ app.post('/api/github-sync', async (req, res) => {
                 putBody.sha = sha;
             }
 
-            const putRes = await fetch(url, {
+            const putRes = await fetchWithTimeout(url, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -284,7 +326,11 @@ app.post('/api/github-sync', async (req, res) => {
         res.json({ success: true, message: '配置已同步至 GitHub 云端！' });
     } catch (error) {
         console.error('Error in github-sync proxy:', error);
-        res.status(500).json({ success: false, message: error.message });
+        let msg = error.message;
+        if (error.name === 'AbortError') {
+            msg = '同步配置至 GitHub 超时，请检查您的网络连接或稍后再试。';
+        }
+        res.status(500).json({ success: false, message: msg });
     }
 });
 
@@ -314,14 +360,14 @@ async function executeKVCommand(commandArray) {
     }
 
     try {
-        const response = await fetch(url, {
+        const response = await fetchWithTimeout(url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(commandArray)
-        });
+        }, 5000);
 
         if (!response.ok) {
             throw new Error(`KV API error: ${response.status} ${await response.text()}`);

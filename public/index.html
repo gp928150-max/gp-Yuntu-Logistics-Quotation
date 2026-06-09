@@ -426,9 +426,12 @@
                 <div class="admin-input-group">
                     <input type="password" id="admin-password-input" data-translate-placeholder="admin_password_placeholder" placeholder="输入管理密码..." autocomplete="off">
                 </div>
-                <div class="admin-input-group" style="text-align: left; display: none;">
-                    <label for="admin-verify-backend-input" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500;">Vercel 后端接口地址 (托管于静态平台如 GitHub Pages 时必填)</label>
-                    <input type="text" id="admin-verify-backend-input" placeholder="例如 https://xxx.vercel.app" autocomplete="off">
+                <div class="admin-advanced-toggle" style="text-align: right; margin-bottom: 12px; margin-top: -4px;">
+                    <a href="#" id="admin-advanced-btn" style="font-size: 0.75rem; color: var(--accent-color); text-decoration: none; font-weight: 500;" data-translate="admin_advanced_settings">高级设置</a>
+                </div>
+                <div class="admin-input-group" id="admin-verify-backend-group" style="text-align: left; display: none;">
+                    <label for="admin-verify-backend-input" data-translate="admin_label_backend_url" style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500;">Vercel 后端接口地址 (托管于静态平台如 GitHub Pages 时必填)</label>
+                    <input type="text" id="admin-verify-backend-input" data-translate-placeholder="admin_backend_url_placeholder" placeholder="例如 https://xxx.vercel.app" autocomplete="off">
                 </div>
                 <div id="admin-verify-error" class="admin-error-text"></div>
                 <button type="button" class="submit-btn full-width" id="admin-verify-btn">
@@ -471,7 +474,7 @@
                     </div>
                 </div>
 
-                <div class="admin-form-field" style="display: none;">
+                <div class="admin-form-field">
                     <label for="admin-backend-url-input" data-translate="admin_label_backend_url">Vercel 后端接口地址 (托管于 GitHub Pages 时必填)</label>
                     <div class="admin-input-with-suffix">
                         <input type="text" id="admin-backend-url-input" data-translate-placeholder="admin_backend_url_placeholder" placeholder="例如 https://xxx.vercel.app" autocomplete="off" style="padding-right: 16px;">

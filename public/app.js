@@ -481,7 +481,8 @@ document.addEventListener('DOMContentLoaded', () => {
             admin_label_backend_url: "Vercel 后端接口地址 (托管于 GitHub Pages 时必填)",
             admin_backend_url_placeholder: "例如 https://xxx.vercel.app",
             admin_logout: "安全退出",
-            admin_save: "保存配置"
+            admin_save: "保存配置",
+            admin_advanced_settings: "高级设置"
         },
         en: {
             nav_home: "Official Website",
@@ -552,7 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
             admin_label_backend_url: "Vercel Backend Address (Required if hosted on GitHub Pages)",
             admin_backend_url_placeholder: "e.g., https://xxx.vercel.app",
             admin_logout: "Log Out",
-            admin_save: "Save Config"
+            admin_save: "Save Config",
+            admin_advanced_settings: "Advanced Settings"
         }
     };
 
@@ -778,7 +780,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function getBackendBaseUrl() {
         let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
         // Default fallback for static hosting
-        if (!base && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
+        // We check if the current environment is local (localhost, 127.0.0.1, private subnet IPs 192.168.x.x, 10.x.x.x, 172.16.x.x-172.31.x.x, or *.local)
+        const hostname = window.location.hostname;
+        const isLocal = hostname === 'localhost' || 
+                        hostname === '127.0.0.1' || 
+                        hostname.endsWith('.local') ||
+                        /^127\./.test(hostname) ||
+                        /^192\.168\./.test(hostname) ||
+                        /^10\./.test(hostname) ||
+                        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname);
+        
+        if (!base && (hostname.includes('github.io') || window.location.protocol === 'file:' || (!hostname.includes('vercel.app') && !isLocal))) {
             base = 'https://gp-yuntu-logistics-quotation.vercel.app';
         }
         if (base) {
@@ -1298,9 +1310,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Accept': 'application/json'
                 }
             });
-            const data = await response.json();
+
+            let data = null;
+            let parseError = false;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    parseError = true;
+                }
+            } else {
+                parseError = true;
+            }
             
-            if (response.ok && data.Code === '0000' && data.Items) {
+            if (response.ok && data && data.Code === '0000' && data.Items) {
                 rawQuoteItems = data.Items; // Store raw API items
                 calculateAndRenderQuoteData(); // Dynamic calculation and render
                 showState('results');
@@ -1309,7 +1333,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const errorTitle = document.getElementById('error-title');
                 const errorMessage = document.getElementById('error-message');
                 errorTitle.textContent = CURRENT_LANG === 'en' ? 'Estimation Failed' : '测算运费失败';
-                errorMessage.textContent = data.Message || (CURRENT_LANG === 'en' ? 'YunExpress API did not return valid quotation data. Please check your parameters or destination code.' : '云途接口未返回有效报价数据，请核对您的测算参数或目的地代码。');
+                
+                if (!response.ok) {
+                    if (parseError) {
+                        errorMessage.textContent = CURRENT_LANG === 'en' 
+                            ? `Server returned an error (HTTP ${response.status}). The service might be deploying or temporarily unavailable.`
+                            : `服务器返回错误 (HTTP ${response.status})。后端服务可能正在部署或暂时不可用，请稍后再试。`;
+                    } else {
+                        errorMessage.textContent = (data && data.Message) || (data && data.message) || `HTTP Error ${response.status}`;
+                    }
+                } else {
+                    errorMessage.textContent = (data && data.Message) || (data && data.message) || (CURRENT_LANG === 'en' ? 'YunExpress API did not return valid quotation data. Please check your parameters or destination code.' : '云途接口未返回有效报价数据，请核对您的测算参数或目的地代码。');
+                }
                 showState('error');
             }
         } catch (error) {
@@ -1317,7 +1352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const errorTitle = document.getElementById('error-title');
             const errorMessage = document.getElementById('error-message');
             errorTitle.textContent = CURRENT_LANG === 'en' ? 'Network Request Error' : '网络请求故障';
-            errorMessage.textContent = CURRENT_LANG === 'en' ? 'Unable to connect to the YunExpress pricing API. Please check your network connection or try again later.' : '无法连接至云途报价接口，请检查您的网络连接或稍后再试。';
+            errorMessage.textContent = (CURRENT_LANG === 'en' ? 'Unable to connect to the YunExpress pricing API.' : '无法连接至云途报价接口。') + ` (${error.name || 'Error'}: ${error.message || error})`;
             showState('error');
         }
     }
@@ -1956,7 +1991,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminApiBaseInput) {
         adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
     }
-    const isStaticPlatform = window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
+    const hostname = window.location.hostname;
+    const isLocal = hostname === 'localhost' || 
+                    hostname === '127.0.0.1' || 
+                    hostname.endsWith('.local') ||
+                    /^127\./.test(hostname) ||
+                    /^192\.168\./.test(hostname) ||
+                    /^10\./.test(hostname) ||
+                    /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname);
+    const isStaticPlatform = hostname.includes('github.io') || window.location.protocol === 'file:' || (!hostname.includes('vercel.app') && !isLocal);
     const defaultBackend = isStaticPlatform ? 'https://gp-yuntu-logistics-quotation.vercel.app' : '';
 
     if (adminBackendUrlInput) {
@@ -2150,6 +2193,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminPasswordInput) {
         adminPasswordInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') performAdminVerification();
+        });
+    }
+
+    const adminAdvancedBtn = document.getElementById('admin-advanced-btn');
+    const adminVerifyBackendGroup = document.getElementById('admin-verify-backend-group');
+    if (adminAdvancedBtn && adminVerifyBackendGroup) {
+        adminAdvancedBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (adminVerifyBackendGroup.style.display === 'none') {
+                adminVerifyBackendGroup.style.display = 'block';
+            } else {
+                adminVerifyBackendGroup.style.display = 'none';
+            }
         });
     }
 
