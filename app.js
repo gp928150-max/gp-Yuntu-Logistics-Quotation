@@ -14,31 +14,49 @@ function initAntigravityBackground() {
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    // Google-themed vibrant colors
+    // Google-themed vibrant colors + neutral grey for depth
     const colors = [
         '#4285F4',   // Google Blue
         '#EA4335',   // Google Red
         '#FBBC05',   // Google Yellow
         '#34A853',   // Google Green
-        '#A855F7'    // Google Purple
+        '#A855F7',   // Google Purple
+        '#86868b'    // SaaS Neutral Grey
     ];
 
     const particles = [];
-    // Increase density for rich visual representation (wind tunnel style)
-    const maxParticles = Math.min(300, Math.floor((width * height) / 5000));
+    // Higher density of tiny particles for a premium Google wind-tunnel aesthetic
+    const maxParticles = Math.min(500, Math.floor((width * height) / 3000));
 
-    // Mouse position tracking
+    // Mouse tracking and physics parameters
     let mouseX = undefined;
     let mouseY = undefined;
+    let lastMouseX = undefined;
+    let lastMouseY = undefined;
+    let mouseVx = 0;
+    let mouseVy = 0;
+    let targetMouseVx = 0;
+    let targetMouseVy = 0;
 
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
+        if (lastMouseX !== undefined && lastMouseY !== undefined) {
+            // Calculate frame-to-frame delta velocity
+            targetMouseVx = (e.clientX - lastMouseX) * 0.22;
+            targetMouseVy = (e.clientY - lastMouseY) * 0.22;
+        }
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
     });
 
     window.addEventListener('mouseleave', () => {
         mouseX = undefined;
         mouseY = undefined;
+        targetMouseVx = 0;
+        targetMouseVy = 0;
+        lastMouseX = undefined;
+        lastMouseY = undefined;
     });
 
     class Particle {
@@ -48,63 +66,73 @@ function initAntigravityBackground() {
 
         reset(isInitial = false) {
             if (isInitial) {
-                // Uniform random initial distribution
+                // Uniform random initial distribution across the entire screen
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
             } else {
-                // Flow source: Spawn predominantly on bottom and left edges
-                if (Math.random() < 0.6) {
-                    this.x = Math.random() * width;
-                    this.y = height + 30;
-                } else {
+                // Spawn predominantly on bottom and left edges to maintain up-right flow
+                if (Math.random() < 0.5) {
                     this.x = -30;
-                    this.y = Math.random() * height;
+                    this.y = Math.random() * (height * 0.9);
+                } else {
+                    this.x = Math.random() * (width * 0.7);
+                    this.y = height + 30;
                 }
             }
 
             this.lastX = this.x;
             this.lastY = this.y;
 
-            // Dimensions: combination of dots and capsules
-            this.thickness = 1.5 + Math.random() * 2.0; // 1.5px to 3.5px
-            this.length = this.thickness + Math.random() * 16; // 1.5px to 19.5px
+            // Pseudo-3D Depth Factor: 0.35 (far away) to 1.0 (close to camera)
+            this.z = 0.35 + Math.random() * 0.65;
+
+            // Dimensions: extremely tiny for a refined look
+            this.thickness = 0.9 + Math.random() * 1.4; // 0.9px to 2.3px
+            this.length = this.thickness + Math.random() * 11; // 0.9px to 13.3px
             this.color = colors[Math.floor(Math.random() * colors.length)];
             
-            // Aerodynamic wind velocity vectors (floating up and to the right)
-            this.baseVx = 0.8 + Math.random() * 1.2;  // 0.8 to 2.0 px/frame
-            this.baseVy = -1.0 - Math.random() * 1.5; // -1.0 to -2.5 px/frame
+            // Wind speed vectors (floating up and to the right)
+            this.baseVx = 0.9 + Math.random() * 1.1;  // 0.9 to 2.0 px/frame
+            this.baseVy = -1.1 - Math.random() * 1.3; // -1.1 to -2.4 px/frame
             
             this.angle = Math.atan2(this.baseVy, this.baseVx) + Math.PI / 2;
-            this.alpha = 0.25 + Math.random() * 0.6; // Opacity range 0.25 - 0.85
-            this.phase = Math.random() * Math.PI * 2; // Unique offset for wave-motion
+            this.alpha = 0.2 + Math.random() * 0.55; // Opacity bounds
+            this.phase = Math.random() * Math.PI * 2; // Offset for wind oscillation
         }
 
         update() {
-            // Apply wind base velocity
-            let vx = this.baseVx;
-            let vy = this.baseVy;
+            // Apply 3D perspective scaling to velocity (distant particles move slower)
+            let vx = this.baseVx * this.z;
+            let vy = this.baseVy * this.z;
 
             // Apply horizontal wave oscillation for a wind-like organic flow
             this.x += vx;
-            this.y += vy + Math.sin(this.x * 0.005 + this.phase) * 0.25;
+            this.y += vy + Math.sin(this.x * 0.004 + this.phase) * (0.2 * this.z);
 
-            // Interactive mouse deflection (bending space around cursor)
+            // Interactive mouse deflection (fluid drag force field)
             if (mouseX !== undefined && mouseY !== undefined) {
                 const dx = this.x - mouseX;
                 const dy = this.y - mouseY;
                 const dist = Math.hypot(dx, dy);
-                if (dist < 180) {
-                    const force = (180 - dist) / 180; // 0 to 1 scaling force
+                const influenceRadius = 160 * this.z; // Depth-scaled interaction radius
+
+                if (dist < influenceRadius) {
+                    const force = (influenceRadius - dist) / influenceRadius; // 0 to 1
                     const angle = Math.atan2(dy, dx);
                     
-                    // Smoothly push particle outward
-                    this.x += Math.cos(angle) * force * 3.5;
-                    this.y += Math.sin(angle) * force * 3.5;
+                    // 1. Repulsion (push away)
+                    this.x += Math.cos(angle) * force * 3.2;
+                    this.y += Math.sin(angle) * force * 3.2;
+
+                    // 2. Fluid Drag (pull in direction of mouse motion)
+                    this.x += mouseVx * force * 1.4;
+                    this.y += mouseVy * force * 1.4;
                 }
             }
 
-            // Reset particle if it leaves bounds (with extra padding margin)
-            if (this.x > width + 40 || this.y < -40 || this.x < -40 || this.y > height + 40) {
+            // Reset particle if it leaves bounds (with depth-scaled padding)
+            const margin = 40 * this.z;
+            if (this.x > width + margin || this.y < -margin || this.x < -margin || this.y > height + margin) {
                 this.reset();
             }
         }
@@ -122,12 +150,17 @@ function initAntigravityBackground() {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(drawAngle);
-            ctx.globalAlpha = this.alpha;
+            ctx.globalAlpha = this.alpha * (0.3 + 0.7 * this.z); // Depth-scaled transparency
             ctx.fillStyle = this.color;
+            
+            // Draw depth-scaled capsule
+            const drawThickness = this.thickness * this.z;
+            const drawLength = this.length * this.z;
+
             ctx.beginPath();
-            ctx.arc(0, -this.length / 2, this.thickness / 2, Math.PI, 0);
-            ctx.lineTo(this.thickness / 2, this.length / 2);
-            ctx.arc(0, this.length / 2, this.thickness / 2, 0, Math.PI);
+            ctx.arc(0, -drawLength / 2, drawThickness / 2, Math.PI, 0);
+            ctx.lineTo(drawThickness / 2, drawLength / 2);
+            ctx.arc(0, drawLength / 2, drawThickness / 2, 0, Math.PI);
             ctx.closePath();
             ctx.fill();
             ctx.restore();
@@ -144,6 +177,14 @@ function initAntigravityBackground() {
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
+
+        // Smooth interpolate mouse velocity
+        mouseVx += (targetMouseVx - mouseVx) * 0.1;
+        mouseVy += (targetMouseVy - mouseVy) * 0.1;
+        
+        // Decelerate velocities when mouse stops
+        targetMouseVx *= 0.94;
+        targetMouseVy *= 0.94;
 
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
@@ -1661,7 +1702,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.57)`,
+                    message: `Update ${path} from admin panel (V1.5.58)`,
                     content: base64Content
                 };
                 if (sha) {
