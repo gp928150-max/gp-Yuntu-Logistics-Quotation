@@ -122,6 +122,17 @@ body {
     line-height: 1.47059;
     letter-spacing: -0.022em;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+/* Smooth transitions for theme switching */
+.panel-card,
+#welcome-state,
+#loading-state,
+.skeleton-card,
+.top-status-bar,
+.app-nav {
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.3s ease, box-shadow 0.4s ease;
 }
 
 /* Top Status Bar (Premium Charcoal Black control ribbon) */
@@ -2575,9 +2586,10 @@ body.dark-mode .skeleton-card {
 }
 
 body.dark-mode .skeleton-icon-block,
-body.dark-mode .skeleton-title-block,
+body.dark-mode .skeleton-line,
 body.dark-mode .skeleton-price-block {
     background: linear-gradient(90deg, #242426 25%, #2c2c2e 50%, #242426 75%);
+    background-size: 200% 100%;
 }
 
 /* Empty State / Welcome Panel in Dark Mode */
