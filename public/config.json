@@ -1,4 +1,5 @@
 {
   "profit_margin": 1.13,
-  "packaging_fee": 2
+  "packaging_fee": 2,
+  "backend_url": "https://gp-yuntu-logistics-quotation.vercel.app"
 }
