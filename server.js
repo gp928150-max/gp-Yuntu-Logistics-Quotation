@@ -291,8 +291,8 @@ let localStats = {
 
 // Helper function to interact with Vercel KV REST API
 async function executeKVCommand(commandArray) {
-    const url = process.env.KV_REST_API_URL;
-    const token = process.env.KV_REST_API_TOKEN;
+    const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
     if (!url || !token) {
         // Fallback to local in-memory store
