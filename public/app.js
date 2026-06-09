@@ -1384,39 +1384,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function getChannelIcon(name) {
         const iconClass = getChannelIconClass(name);
         if (iconClass === 'mail') {
-            return `
-                <svg class="channel-svg-icon icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-                    <path d="m22 7-8.97 5.7a1.9 1.9 0 0 1-2.06 0L2 7"></path>
-                </svg>
-            `;
+            return `<i class="ri-mail-send-fill icon-mail"></i>`;
         }
         if (iconClass === 'express') {
-            return `
-                <svg class="channel-svg-icon icon-express" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4.5 16.5c-1.5 1.26-2.5 3.19-2.5 5.5s1.26 2.5 5.5 2.5c2.31 0 4.24-1 5.5-2.5"></path>
-                    <path d="m12.5 7.5 3 3"></path>
-                    <path d="M9 12h.01"></path>
-                    <path d="M18 5.43A8.56 8.56 0 0 0 13.52 3a8.53 8.53 0 0 0-6 4.3c-2.22 4-2.88 8.65-2.88 8.65s4.65-.66 8.65-2.88a8.55 8.55 0 0 0 4.3-6.04 8.55 8.55 0 0 0-2.5-4.3z"></path>
-                    <path d="M18 5.43s.16-1.15.7-1.7c.68-.68 1.8-.75 2.5-.05.7.7.63 1.82-.05 2.5-.55.54-1.7.7-1.7.7"></path>
-                </svg>
-            `;
+            return `<i class="ri-rocket-2-fill icon-express"></i>`;
         }
         if (iconClass === 'direct') {
-            return `
-                <svg class="channel-svg-icon icon-direct" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.7-.2-1.5 0-2 0.5l-.4.4c-.4.4-.5 1-.2 1.5l5.2 3.6-3.8 3.8-2.6-.9c-.6-.2-1.3 0-1.7.4l-.4.4c-.4.4-.4 1.1 0 1.5l3.4 3.4c.4.4 1.1.4 1.5 0l.4-.4c.4-.4.6-1.1.4-1.7l-.9-2.6 3.8-3.8 3.6 5.2c.5.3 1.1.2 1.5-.2l.4-.4c.5-.5.7-1.3.5-2z"></path>
-                </svg>
-            `;
+            return `<i class="ri-plane-fill icon-direct"></i>`;
         }
         // Fallback: parcel
-        return `
-            <svg class="channel-svg-icon icon-parcel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-            </svg>
-        `;
+        return `<i class="ri-box-3-fill icon-parcel"></i>`;
     }
 
     function getExcelTransit(excelMap, cname) {
@@ -1920,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.7.1)`,
+                    message: `Update ${path} from admin panel (V1.7.2)`,
                     content: base64Content
                 };
                 if (sha) {

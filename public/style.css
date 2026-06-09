@@ -1337,43 +1337,56 @@ body {
     box-shadow: 0 4px 12px rgba(134, 134, 139, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.channel-brand-icon-bg svg {
-    display: block;
+.channel-brand-icon-bg svg,
+.channel-brand-icon-bg i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
     height: 24px;
+    font-size: 24px;
+    line-height: 1;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.channel-brand-icon-bg svg.icon-mail {
+.channel-brand-icon-bg svg.icon-mail,
+.channel-brand-icon-bg i.icon-mail {
     color: #096dd9;
 }
 
-.channel-brand-icon-bg svg.icon-express {
+.channel-brand-icon-bg svg.icon-express,
+.channel-brand-icon-bg i.icon-express {
     color: #ff9500;
 }
 
-.channel-brand-icon-bg svg.icon-direct {
+.channel-brand-icon-bg svg.icon-direct,
+.channel-brand-icon-bg i.icon-direct {
     color: #0071e3;
 }
 
-.channel-brand-icon-bg svg.icon-parcel {
+.channel-brand-icon-bg svg.icon-parcel,
+.channel-brand-icon-bg i.icon-parcel {
     color: #86868b;
 }
 
 /* Custom premium micro-animations for each icon type */
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express svg {
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express svg,
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express i {
     transform: translate(3px, -3px) scale(1.15);
 }
 
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct svg {
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct svg,
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct i {
     transform: translate(3px, -3px) scale(1.15);
 }
 
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail svg {
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail svg,
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail i {
     transform: rotate(-8deg) scale(1.15);
 }
 
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel svg {
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel svg,
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel i {
     transform: translateY(-2px) scale(1.15);
 }
 
