@@ -1341,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const cheapestDisplay = getDisplayPrice(cheapestCNY);
             const cheapestSymbol = getCurrencySymbol();
-            metricCheapestVal.innerHTML = `¥${cheapestCNY.toFixed(2)} <span class="metric-converted-sub">≈ ${cheapestSymbol}${cheapestDisplay.toFixed(2)}</span>`;
+            metricCheapestVal.innerHTML = `${cheapestSymbol}${cheapestDisplay.toFixed(2)} <span class="metric-converted-sub">≈ ¥${cheapestCNY.toFixed(2)}</span>`;
         }
         metricCheapestName.textContent = CURRENT_LANG === 'en' ? (cheapest.EName || cheapest.CName || cheapest.Code) : (cheapest.CName || cheapest.Code);
 
@@ -1648,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${pack > 0 ? `
                         <div class="channel-meta-item packaging-fee">
-                            <span>📦 ${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}${target !== 'CNY' ? ` (≈ ${targetSymbol}${pack.toFixed(2)})` : ''}</strong></span>
+                            <span>📦 ${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>${target === 'CNY' ? `¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}` : `${targetSymbol}${pack.toFixed(2)} (≈ ¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)})`}</strong></span>
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
@@ -1658,9 +1658,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="channel-price-area">
                     <div class="channel-total-badge">
-                        <span class="amount">¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</span>
+                        <span class="amount">${target === 'CNY' ? `¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}` : `${targetSymbol}${total.toFixed(2)}`}</span>
                     </div>
-                    ${target !== 'CNY' ? `<div class="channel-converted-badge">≈ ${targetSymbol}${total.toFixed(2)}</div>` : ''}
+                    ${target !== 'CNY' ? `<div class="channel-converted-badge">≈ ¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</div>` : ''}
                     <div class="channel-price-breakdown">${breakdownText}</div>
                 </div>
             `;
