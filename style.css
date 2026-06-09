@@ -628,6 +628,7 @@ body {
     gap: 24px;
     margin-bottom: 36px;
     animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+    width: 100%;
 }
 
 .metrics-grid.hidden {
@@ -765,6 +766,8 @@ body {
     display: flex;
     gap: 36px;
     align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Left Sidebar panel */
