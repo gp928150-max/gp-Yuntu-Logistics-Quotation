@@ -813,20 +813,27 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('Failed to load config from GitHub API, falling back to local file:', apiErr);
         }
 
-        // 2. Fallback: load relative config.json (standard static loading)
+        // 2. Fallback: load config from Vercel API
         try {
-            const response = await fetch('config.json?t=' + Date.now());
+            let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
+            if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
+                backendUrl = 'https://' + backendUrl;
+            }
+            backendUrl = backendUrl.replace(/\/+$/, '');
+            
+            const targetUrl = backendUrl ? `${backendUrl}/api/config?t=${Date.now()}` : `/api/config?t=${Date.now()}`;
+            const response = await fetch(targetUrl);
             if (response.ok) {
                 const data = await response.json();
                 SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
                 SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
                 GLOBAL_BACKEND_URL = data.backend_url || '';
-                console.log('Successfully loaded config from local fallback:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
+                console.log('Successfully loaded config from Vercel API:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
                 
                 updatePrefilledInputs();
             }
         } catch (e) {
-            console.warn('Failed to load local config.json fallback:', e);
+            console.warn('Failed to load config from Vercel API fallback:', e);
         }
     }
 
@@ -1952,7 +1959,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             const configString = JSON.stringify(configObj, null, 2);
             const base64Content = btoa(configString);
-            const paths = ['public/config.json', 'config.json'];
+            const paths = ['config.json'];
             
             for (const path of paths) {
                 const url = `${apiBase}/repos/${repo}/contents/${path}`;

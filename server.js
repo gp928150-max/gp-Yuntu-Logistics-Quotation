@@ -229,7 +229,7 @@ app.post('/api/github-sync', async (req, res) => {
     }
     const configString = JSON.stringify(configObj, null, 2);
     const base64Content = Buffer.from(configString).toString('base64');
-    const paths = ['public/config.json', 'config.json'];
+    const paths = ['config.json'];
 
     try {
         for (const path of paths) {
@@ -373,6 +373,31 @@ app.get('/api/stats', async (req, res) => {
             error: error.message
         });
     }
+});
+
+// GET configuration endpoint
+app.get('/api/config', async (req, res) => {
+    let localConfig = {};
+    try {
+        const fs = require('fs');
+        const configPath = path.join(__dirname, 'config.json');
+        if (fs.existsSync(configPath)) {
+            localConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        }
+    } catch (err) {
+        console.error('Failed to read config.json:', err);
+    }
+    
+    // Check environment variables first, fallback to config.json, then to default values
+    const profit_margin = process.env.PROFIT_MARGIN ? parseFloat(process.env.PROFIT_MARGIN) : (localConfig.profit_margin || 1.13);
+    const packaging_fee = process.env.PACKAGING_FEE ? parseFloat(process.env.PACKAGING_FEE) : (localConfig.packaging_fee || 2.0);
+    const backend_url = process.env.BACKEND_URL || localConfig.backend_url || '';
+
+    res.json({
+        profit_margin,
+        packaging_fee,
+        backend_url
+    });
 });
 
 // Admin authentication endpoint
