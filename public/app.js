@@ -344,25 +344,45 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme toggler (Light/Dark mode)
     const body = document.body;
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     
-    // Check local storage or system preference
+    function applyTheme(isDark) {
+        if (isDark) {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+    }
+    
+    // Apply theme on load (respect saved theme if any, else system preference)
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-        body.classList.add('dark-mode');
+    if (savedTheme === 'dark') {
+        applyTheme(true);
+    } else if (savedTheme === 'light') {
+        applyTheme(false);
     } else {
-        body.classList.remove('dark-mode');
+        applyTheme(systemPrefersDark.matches);
+    }
+    
+    // Listen to system environment theme changes in real-time
+    try {
+        systemPrefersDark.addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches);
+            }
+        });
+    } catch (err) {
+        systemPrefersDark.addListener((e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches);
+            }
+        });
     }
     
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
+            const isDark = body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
     }
     // Input Fields
