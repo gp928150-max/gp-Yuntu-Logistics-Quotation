@@ -25,7 +25,7 @@ function initAntigravityBackground() {
     ];
 
     const particles = [];
-    const maxParticles = Math.min(500, Math.floor((width * height) / 3000));
+    const maxParticles = Math.min(180, Math.floor((width * height) / 10000));
 
     // Stacking/Target center coordinates for smooth tracking
     let targetX = width / 2;
@@ -43,27 +43,192 @@ function initAntigravityBackground() {
         mouseY = undefined;
     });
 
+    // Helper: Convert hex color to rgb
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    // Helper: Draw 3D shape with rotation and flat-shading
+    function draw3DShape(ctx, cx, cy, size, z, shapeType, color, rx, ry, rz, alpha) {
+        if (shapeType === 'sphere') {
+            const rad = size * z;
+            const grad = ctx.createRadialGradient(cx - rad * 0.3, cy - rad * 0.3, rad * 0.1, cx, cy, rad);
+            const rgb = hexToRgb(color) || {r: 128, g: 128, b: 128};
+            grad.addColorStop(0, `rgba(${Math.min(255, rgb.r + 80)}, ${Math.min(255, rgb.g + 80)}, ${Math.min(255, rgb.b + 80)}, ${alpha})`);
+            grad.addColorStop(0.3, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`);
+            grad.addColorStop(1, `rgba(${Math.max(0, rgb.r - 80)}, ${Math.max(0, rgb.g - 80)}, ${Math.max(0, rgb.b - 80)}, ${alpha * 0.2})`);
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+            ctx.fill();
+            return;
+        }
+
+        let vertices = [];
+        let faces = [];
+
+        if (shapeType === 'cube') {
+            vertices = [
+                [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+                [-1, -1, 1],  [1, -1, 1],  [1, 1, 1],  [-1, 1, 1]
+            ];
+            faces = [
+                [0, 1, 2, 3], // back
+                [1, 5, 6, 2], // right
+                [5, 4, 7, 6], // front
+                [4, 0, 3, 7], // left
+                [3, 2, 6, 7], // top
+                [4, 5, 1, 0]  // bottom
+            ];
+        } else if (shapeType === 'tetrahedron') {
+            vertices = [
+                [1, 1, 1], [-1, -1, 1], [-1, 1, -1], [1, -1, -1]
+            ];
+            faces = [
+                [0, 1, 2], [0, 2, 3], [0, 3, 1], [1, 3, 2]
+            ];
+        } else if (shapeType === 'octahedron') {
+            vertices = [
+                [0, 0, 1.2], [1.2, 0, 0], [0, 1.2, 0], [-1.2, 0, 0], [0, -1.2, 0], [0, 0, -1.2]
+            ];
+            faces = [
+                [0, 1, 2], [0, 2, 3], [0, 3, 4], [0, 4, 1],
+                [5, 2, 1], [5, 3, 2], [5, 4, 3], [5, 1, 4]
+            ];
+        }
+
+        const cx_r = Math.cos(rx), sx_r = Math.sin(rx);
+        const cy_r = Math.cos(ry), sy_r = Math.sin(ry);
+        const cz_r = Math.cos(rz), sz_r = Math.sin(rz);
+
+        const rotatedVertices = vertices.map(v => {
+            let y1 = v[1] * cx_r - v[2] * sx_r;
+            let z1 = v[1] * sx_r + v[2] * cx_r;
+            let x2 = v[0] * cy_r + z1 * sy_r;
+            let z2 = -v[0] * sy_r + z1 * cy_r;
+            let x3 = x2 * cz_r - y1 * sz_r;
+            let y3 = x2 * sz_r + y1 * cz_r;
+            return [x3, y3, z2];
+        });
+
+        const faceData = faces.map((faceIndices, faceIdx) => {
+            let sumZ = 0;
+            faceIndices.forEach(idx => {
+                sumZ += rotatedVertices[idx][2];
+            });
+            return {
+                indices: faceIndices,
+                avgZ: sumZ / faceIndices.length,
+                idx: faceIdx
+            };
+        });
+
+        faceData.sort((a, b) => a.avgZ - b.avgZ);
+        const rgb = hexToRgb(color) || {r: 128, g: 128, b: 128};
+
+        faceData.forEach(face => {
+            const indices = face.indices;
+            const v0 = rotatedVertices[indices[0]];
+            const v1 = rotatedVertices[indices[1]];
+            const v2 = rotatedVertices[indices[2]];
+            
+            const ax = v1[0] - v0[0];
+            const ay = v1[1] - v0[1];
+            const az = v1[2] - v0[2];
+            const bx = v2[0] - v0[0];
+            const by = v2[1] - v0[1];
+            const bz = v2[2] - v0[2];
+            
+            let nx = ay * bz - az * by;
+            let ny = az * bx - ax * bz;
+            let nz = ax * by - ay * bx;
+            
+            const len = Math.hypot(nx, ny, nz);
+            if (len > 0) {
+                nx /= len;
+                ny /= len;
+                nz /= len;
+            }
+
+            const lx = 0.5, ly = -0.5, lz = 0.7;
+            const l_len = Math.hypot(lx, ly, lz);
+            const l_nx = lx / l_len;
+            const l_ny = ly / l_len;
+            const l_nz = lz / l_len;
+            
+            const dot = nx * l_nx + ny * l_ny + nz * l_nz;
+            const intensity = Math.max(0.15, Math.min(1.0, (dot + 1) / 2));
+
+            ctx.beginPath();
+            indices.forEach((idx, i) => {
+                const vx = cx + rotatedVertices[idx][0] * size * z;
+                const vy = cy + rotatedVertices[idx][1] * size * z;
+                if (i === 0) ctx.moveTo(vx, vy);
+                else ctx.lineTo(vx, vy);
+            });
+            ctx.closePath();
+
+            const r_shaded = Math.min(255, Math.max(0, Math.floor(rgb.r * (0.35 + 0.65 * intensity))));
+            const g_shaded = Math.min(255, Math.max(0, Math.floor(rgb.g * (0.35 + 0.65 * intensity))));
+            const b_shaded = Math.min(255, Math.max(0, Math.floor(rgb.b * (0.35 + 0.65 * intensity))));
+
+            ctx.fillStyle = `rgba(${r_shaded}, ${g_shaded}, ${b_shaded}, ${alpha * (0.3 + 0.7 * z)})`;
+            ctx.fill();
+
+            // Face outline
+            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha * 0.75 * z})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+        });
+    }
+
+    const shapes = ['cube', 'tetrahedron', 'octahedron', 'sphere'];
+
     class Particle {
         constructor() {
             this.z = 0.35 + Math.random() * 0.65; // Depth factor
             
             // Randomize position in a sphere around target center initially
             this.angle = Math.random() * Math.PI * 2;
-            this.orbitRadius = 40 + Math.random() * 200; // Orbit radius from center
-            this.angularSpeed = (0.003 + Math.random() * 0.008) * (Math.random() < 0.5 ? 1 : -1);
+            this.orbitRadius = 50 + Math.random() * 220; // Orbit radius from center
+            this.angularSpeed = (0.002 + Math.random() * 0.007) * (Math.random() < 0.5 ? 1 : -1);
             
-            // Start at the target center
-            this.x = targetX + Math.cos(this.angle) * this.orbitRadius;
-            this.y = targetY + Math.sin(this.angle) * this.orbitRadius;
+            // Orbital inclination parameters for 3D tilted orbit feel
+            this.inclinationScale = 0.15 + Math.random() * 0.35;
+            this.orbitAngle = Math.random() * Math.PI * 2;
+            this.cosInc = Math.cos(this.orbitAngle);
+            this.sinInc = Math.sin(this.orbitAngle);
+
+            this.shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            this.size = 5 + Math.random() * 8; // Shape size parameter
+            
+            // Start centered
+            const cosAngle = Math.cos(this.angle);
+            const sinAngle = Math.sin(this.angle);
+            const rx_orb = cosAngle * this.orbitRadius;
+            const ry_orb = sinAngle * this.orbitRadius * this.inclinationScale;
+            this.x = targetX + rx_orb * this.cosInc - ry_orb * this.sinInc;
+            this.y = targetY + rx_orb * this.sinInc + ry_orb * this.cosInc;
             this.lastX = this.x;
             this.lastY = this.y;
 
-            // Dimensions: extremely tiny for a refined look
-            this.thickness = 0.9 + Math.random() * 1.4; // 0.9px to 2.3px
-            this.length = this.thickness + Math.random() * 11; // 0.9px to 13.3px
             this.color = colors[Math.floor(Math.random() * colors.length)];
             
-            this.alpha = 0.2 + Math.random() * 0.55; // Opacity bounds
+            // 3D rotation parameters
+            this.rx = Math.random() * Math.PI * 2;
+            this.ry = Math.random() * Math.PI * 2;
+            this.rz = Math.random() * Math.PI * 2;
+            this.drx = (0.008 + Math.random() * 0.018) * (Math.random() < 0.5 ? 1 : -1);
+            this.dry = (0.008 + Math.random() * 0.018) * (Math.random() < 0.5 ? 1 : -1);
+            this.drz = (0.008 + Math.random() * 0.018) * (Math.random() < 0.5 ? 1 : -1);
+
+            this.alpha = 0.25 + Math.random() * 0.55; // Opacity bounds
             this.phase = Math.random() * Math.PI * 2; // Offset for breathing oscillation
         }
 
@@ -72,50 +237,49 @@ function initAntigravityBackground() {
             this.angle += this.angularSpeed * this.z; // Depth-scaled rotation speed
             
             // Radial breathing oscillation
-            const currentRadius = this.orbitRadius + Math.sin(this.phase + time * 1.5) * (15 * this.z);
+            const currentRadius = this.orbitRadius + Math.sin(this.phase + time * 1.5) * (18 * this.z);
             
-            // Calculate orbital target position
-            const targetPartX = targetX + Math.cos(this.angle) * currentRadius;
-            const targetPartY = targetY + Math.sin(this.angle) * currentRadius;
+            // Squashed ellipse on Y axis to create a 3D tilted orbit feel
+            const cosAngle = Math.cos(this.angle);
+            const sinAngle = Math.sin(this.angle);
+            
+            // Rotate the orbit in 2D space to give varied tilted planes
+            const rx_orb = cosAngle * currentRadius;
+            const ry_orb = sinAngle * currentRadius * this.inclinationScale;
+            
+            const targetPartX = targetX + rx_orb * this.cosInc - ry_orb * this.sinInc;
+            const targetPartY = targetY + rx_orb * this.sinInc + ry_orb * this.cosInc;
 
             // Smoothly ease the particle's actual position to its target
-            this.x += (targetPartX - this.x) * (0.06 * this.z);
-            this.y += (targetPartY - this.y) * (0.06 * this.z);
+            this.x += (targetPartX - this.x) * (0.05 * this.z);
+            this.y += (targetPartY - this.y) * (0.05 * this.z);
             
             // Add subtle random brownian floating noise
             this.x += Math.cos(this.phase + time) * 0.15;
             this.y += Math.sin(this.phase + time) * 0.15;
+
+            // Update 3D rotations
+            this.rx += this.drx;
+            this.ry += this.dry;
+            this.rz += this.drz;
         }
 
         draw() {
-            // Compute real movement heading for rotational alignment
-            const dx = this.x - this.lastX;
-            const dy = this.y - this.lastY;
-            let drawAngle = this.angle + Math.PI / 2; // Default tangent alignment
-            
-            if (Math.hypot(dx, dy) > 0.05) {
-                drawAngle = Math.atan2(dy, dx) + Math.PI / 2;
-            }
+            draw3DShape(
+                ctx, 
+                this.x, 
+                this.y, 
+                this.size, 
+                this.z, 
+                this.shapeType, 
+                this.color, 
+                this.rx, 
+                this.ry, 
+                this.rz, 
+                this.alpha
+            );
 
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(drawAngle);
-            ctx.globalAlpha = this.alpha * (0.3 + 0.7 * this.z); // Depth-scaled transparency
-            ctx.fillStyle = this.color;
-            
-            // Draw depth-scaled capsule
-            const drawThickness = this.thickness * this.z;
-            const drawLength = this.length * this.z;
-
-            ctx.beginPath();
-            ctx.arc(0, -drawLength / 2, drawThickness / 2, Math.PI, 0);
-            ctx.lineTo(drawThickness / 2, drawLength / 2);
-            ctx.arc(0, drawLength / 2, drawThickness / 2, 0, Math.PI);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-
-            // Track last position for heading calculations
+            // Track last position
             this.lastX = this.x;
             this.lastY = this.y;
         }
@@ -133,16 +297,16 @@ function initAntigravityBackground() {
 
         // Smoothly interpolate center of particles towards mouse or screen center
         if (mouseX !== undefined && mouseY !== undefined) {
-            targetX += (mouseX - targetX) * 0.06;
-            targetY += (mouseY - targetY) * 0.06;
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
         } else {
             // Float around screen center in a gentle Lissajous pattern when idle
             const screenCenterX = width / 2;
             const screenCenterY = height / 2;
-            const idleX = screenCenterX + Math.cos(time * 0.5) * 60;
-            const idleY = screenCenterY + Math.sin(time * 0.3) * 40;
-            targetX += (idleX - targetX) * 0.03;
-            targetY += (idleY - targetY) * 0.03;
+            const idleX = screenCenterX + Math.cos(time * 0.4) * 80;
+            const idleY = screenCenterY + Math.sin(time * 0.25) * 50;
+            targetX += (idleX - targetX) * 0.02;
+            targetY += (idleY - targetY) * 0.02;
         }
 
         for (let i = 0; i < particles.length; i++) {
@@ -168,6 +332,31 @@ function initAntigravityBackground() {
 document.addEventListener('DOMContentLoaded', () => {
     // Start Antigravity background particles
     initAntigravityBackground();
+
+    // Theme toggler (Light/Dark mode)
+    const body = document.body;
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    
+    // Check local storage or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+        body.classList.add('dark-mode');
+    } else {
+        body.classList.remove('dark-mode');
+    }
+    
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    }
     // Input Fields
     const quoteForm = document.getElementById('quote-form');
     const quoteCountry = document.getElementById('quote-country');
@@ -1661,7 +1850,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.59)`,
+                    message: `Update ${path} from admin panel (V1.6.0)`,
                     content: base64Content
                 };
                 if (sha) {

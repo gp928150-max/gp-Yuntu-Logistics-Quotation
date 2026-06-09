@@ -2346,3 +2346,288 @@ body {
     }
 }
 
+/* --- Premium Theme Toggle Button --- */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    transform: translateY(-0.5px);
+}
+
+.theme-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn .sun-icon {
+    display: none;
+}
+
+.theme-toggle-btn .moon-icon {
+    display: block;
+}
+
+/* --- Premium Apple-style Dark Mode overrides --- */
+body.dark-mode {
+    --bg-main: #0a0a0c;
+    --card-bg: #16161a;
+    --card-border: rgba(255, 255, 255, 0.08);
+    
+    --text-primary: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-muted: #48484a;
+    
+    --primary: #2997ff;
+    --primary-hover: #41a4ff;
+    --primary-light: rgba(41, 151, 255, 0.12);
+    
+    --success: #30d158;
+    --success-bg: rgba(48, 209, 88, 0.12);
+    --success-border: rgba(48, 209, 88, 0.22);
+    
+    --warning: #ff9f0a;
+    --warning-bg: rgba(255, 159, 10, 0.12);
+    --warning-border: rgba(255, 159, 10, 0.22);
+    
+    --error: #ff453a;
+    --error-bg: rgba(255, 69, 58, 0.12);
+    --error-border: rgba(255, 69, 58, 0.22);
+
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-dropdown: 0 30px 60px rgba(0, 0, 0, 0.7), 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Base Body Styles in Dark Mode */
+body.dark-mode {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+}
+
+/* Theme button states in Dark Mode */
+body.dark-mode .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .theme-toggle-btn .sun-icon {
+    display: block;
+}
+
+body.dark-mode .theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+/* Form inputs & select in Dark Mode */
+body.dark-mode .form-field input,
+body.dark-mode .form-field select,
+body.dark-mode .dimensions-input-group {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+body.dark-mode .form-field input:hover,
+body.dark-mode .form-field select:hover,
+body.dark-mode .dimensions-input-group:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .form-field-static {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+}
+
+/* Custom Select Dropdowns in Dark Mode */
+body.dark-mode .custom-select-trigger,
+body.dark-mode .currency-select-trigger {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+body.dark-mode .custom-select-trigger:hover,
+body.dark-mode .currency-select-trigger:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode .custom-select-dropdown,
+body.dark-mode .currency-select-dropdown {
+    background: rgba(22, 22, 26, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .dropdown-search-wrapper {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .custom-select-options li:hover,
+body.dark-mode .currency-select-dropdown ul li:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .custom-select-options li.selected,
+body.dark-mode .currency-select-dropdown ul li.selected {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Lang toggle pills in Dark Mode */
+body.dark-mode .lang-toggle-pills {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .lang-pill {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .lang-pill.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+body.dark-mode .lang-pill:hover {
+    color: var(--text-primary);
+}
+
+/* Skeleton loader in Dark Mode */
+body.dark-mode .skeleton-card {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .skeleton-icon-block,
+body.dark-mode .skeleton-title-block,
+body.dark-mode .skeleton-price-block {
+    background: linear-gradient(90deg, #242426 25%, #2c2c2e 50%, #242426 75%);
+}
+
+/* Empty State / Welcome Panel in Dark Mode */
+body.dark-mode .welcome-panel .empty-graphic {
+    background: rgba(41, 151, 255, 0.08);
+    border-color: rgba(41, 151, 255, 0.2);
+}
+
+body.dark-mode .welcome-panel h3 {
+    color: var(--text-primary);
+}
+
+/* Nav separator and links in Dark Mode */
+body.dark-mode .app-nav .nav-left .nav-links::before {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-mode .app-nav .nav-link {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .app-nav .nav-link:hover {
+    color: var(--text-primary);
+}
+
+/* Status summary details panel in Dark Mode */
+body.dark-mode .results-header-actions p {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+}
+
+/* Admin config inputs in Dark Mode */
+body.dark-mode .admin-input-group input,
+body.dark-mode .admin-input-with-suffix input {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+body.dark-mode .admin-input-with-suffix .suffix {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary);
+}
+
+/* Admin panel modal card in Dark Mode */
+body.dark-mode .admin-modal-card {
+    background: rgba(22, 22, 26, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .admin-modal {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Country search input wrapper in Dark Mode */
+body.dark-mode .country-search-wrapper {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .country-search-wrapper svg {
+    color: var(--text-secondary);
+}
+
+/* WhatsApp Link card in Dark Mode */
+body.dark-mode .alert-notice-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Metric Cards in Dark Mode */
+body.dark-mode .metric-card.cheapest {
+    border-color: rgba(48, 209, 88, 0.2);
+    background: linear-gradient(180deg, rgba(48, 209, 88, 0.04) 0%, var(--card-bg) 100%);
+}
+
+body.dark-mode .metric-card.fastest {
+    border-color: rgba(255, 159, 10, 0.2);
+    background: linear-gradient(180deg, rgba(255, 159, 10, 0.04) 0%, var(--card-bg) 100%);
+}
+
+body.dark-mode .metric-card.total-channels {
+    border-color: rgba(41, 151, 255, 0.2);
+    background: linear-gradient(180deg, rgba(41, 151, 255, 0.04) 0%, var(--card-bg) 100%);
+}
+
+/* Sort dropdown in Dark Mode */
+body.dark-mode .sort-select-wrapper {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .sort-select-wrapper:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Brand icon background inside card in Dark Mode */
+body.dark-mode .channel-brand-icon-bg {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Invert dark text/parts of logo in Dark Mode */
+body.dark-mode .nav-logo .logo-img {
+    filter: invert(1) brightness(1.5);
+}
+
+
+
