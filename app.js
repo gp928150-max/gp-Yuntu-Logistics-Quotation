@@ -556,6 +556,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    let urlLang = new URLSearchParams(window.location.search).get('lang');
+    if (urlLang) {
+        urlLang = urlLang.toLowerCase();
+        if (urlLang === 'zh' || urlLang === 'en') {
+            localStorage.setItem('gp_lang', urlLang);
+        }
+    }
     let CURRENT_LANG = localStorage.getItem('gp_lang');
     if (!CURRENT_LANG) {
         const browserLang = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
