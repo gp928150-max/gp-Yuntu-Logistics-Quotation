@@ -346,6 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     
+    // Clean up old localStorage override to prevent sticking
+    localStorage.removeItem('theme');
+    
     function applyTheme(isDark) {
         if (isDark) {
             body.classList.add('dark-mode');
@@ -354,35 +357,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Apply theme on load (respect saved theme if any, else system preference)
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
+    // Apply theme on load (respect session-specific override if set, else system preference)
+    const sessionTheme = sessionStorage.getItem('theme');
+    if (sessionTheme === 'dark') {
         applyTheme(true);
-    } else if (savedTheme === 'light') {
+    } else if (sessionTheme === 'light') {
         applyTheme(false);
     } else {
         applyTheme(systemPrefersDark.matches);
     }
     
     // Listen to system environment theme changes in real-time
+    // Switching OS settings will always override current page theme and reset session override
+    const handleSystemThemeChange = (e) => {
+        applyTheme(e.matches);
+        sessionStorage.removeItem('theme');
+    };
+    
     try {
-        systemPrefersDark.addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                applyTheme(e.matches);
-            }
-        });
+        systemPrefersDark.addEventListener('change', handleSystemThemeChange);
     } catch (err) {
-        systemPrefersDark.addListener((e) => {
-            if (!localStorage.getItem('theme')) {
-                applyTheme(e.matches);
-            }
-        });
+        systemPrefersDark.addListener(handleSystemThemeChange);
     }
     
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
             const isDark = body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
     }
     // Input Fields
