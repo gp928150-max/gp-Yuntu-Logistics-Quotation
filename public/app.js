@@ -1539,65 +1539,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-    function extractChannelRemarksAndRates(channelCode, transitTimesData) {
-        const excelTransitMap = transitTimesData[channelCode];
-        if (!excelTransitMap) return { remarks: [], rates: [] };
-        
-        const remarks = [];
-        const rates = [];
-        
-        const allKnownCountries = new Set();
-        countriesList.forEach(c => {
-            if (c.CName) allKnownCountries.add(c.CName.trim());
-            if (c.EName) allKnownCountries.add(c.EName.trim().toLowerCase());
-            if (c.CountryCode) allKnownCountries.add(c.CountryCode.trim().toLowerCase());
-        });
-        for (const code in aliases) {
-            aliases[code].forEach(alias => allKnownCountries.add(alias.trim()));
-        }
-        const extraCountries = [
-            '阿联酋', '俄罗斯联邦', '波斯尼亚和黑塞哥维那', '叙利亚', '中非共和国',
-            '圣马丁(荷属)', '圣马丁（荷属）', '科特迪瓦(象牙海岸)', '留尼汪',
-            '阿鲁巴', '荷兰加勒比区', '科特迪瓦', '圣文森特和格林纳丁斯', '美属萨摩亚',
-            '安提瓜和巴布达', '安圭拉', '泽西岛', '黑山', '南苏丹', '刚果共和国',
-            '刚果民主共和国', '法罗群岛', '基里巴斯', '圣基茨和尼维斯', '北马里亚纳群岛',
-            '瑙鲁', '法属波利尼西亚', '萨摩亚', '玻利维亚', '佛得角', '瓦利斯和富图纳',
-            '圣皮埃尔和密克隆', '委内瑞拉', '马绍尔群岛', '开曼群岛', '库克群岛',
-            '新喀里多尼亚', '英属维尔京群岛', '约旦', '越南', '巴勒斯坦', '巴拉圭',
-            '圣马力诺', '利比亚', '托克劳', '瓦努阿图', '瓜德罗普', '美属维尔京群岛',
-            '东帝汶', '哈萨克斯坦', '吉尔吉斯斯坦', '塔吉克斯坦', '土库曼斯坦',
-            '马约特', '毛里求斯', '尼加拉瓜', '塞舌尔', '斯威士兰', '图瓦卢',
-            '危地马拉', '直布罗陀', '澳门', '香港', '台湾'
-        ];
-        extraCountries.forEach(c => allKnownCountries.add(c));
-
-        for (const [key, val] of Object.entries(excelTransitMap)) {
-            const trimmedKey = key.trim();
-            const trimmedVal = val ? val.trim() : '';
-            
-            if (allKnownCountries.has(trimmedKey) || allKnownCountries.has(trimmedKey.toLowerCase())) {
-                continue;
-            }
-            
-            if (/^\d+-\d+\s*(工作日|天|days|work\s*days)/i.test(trimmedVal) || 
-                /^\d+\s*(工作日|天|days|work\s*days)/i.test(trimmedVal) ||
-                /受.*政策影响/i.test(trimmedVal) ||
-                /预计延误/i.test(trimmedVal)) {
-                continue;
-            }
-            
-            if (trimmedKey === '重量（KG）' || trimmedKey === '运费' || 
-                /W[≤<≥>]/i.test(trimmedKey) || /W\s*[\d\.]+/i.test(trimmedKey) ||
-                trimmedVal.startsWith('CNY') || trimmedVal.startsWith('USD')) {
-                rates.push({ key: trimmedKey, val: trimmedVal });
-            } else {
-                remarks.push({ key: trimmedKey, val: trimmedVal });
-            }
-        }
-        
-        return { remarks, rates };
-    }
-
     function renderQuotationChannels() {
         quoteChannelsContainer.innerHTML = '';
         
@@ -1635,12 +1576,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetSymbol = getCurrencySymbol();
 
         quoteData.forEach((channel) => {
-            const { remarks, rates } = extractChannelRemarksAndRates(channel.Code, transitTimesData);
-            const hasDetails = remarks.length > 0 || rates.length > 0;
-
-            const wrapperEl = document.createElement('div');
-            wrapperEl.className = 'quote-channel-wrapper';
-
             const cardEl = document.createElement('div');
             cardEl.className = 'quote-channel-card';
 
@@ -1762,111 +1697,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     ${target !== 'CNY' ? `<div class="channel-converted-badge">≈ ¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</div>` : ''}
                     <div class="channel-price-breakdown">${breakdownText}</div>
-                    ${hasDetails ? `
-                    <button class="channel-details-toggle-btn">
-                        <span>${CURRENT_LANG === 'en' ? 'Show Details' : '详细说明'}</span>
-                        <svg class="chevron-down-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px; height:12px; transition: transform 0.2s ease; margin-left: 4px;">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </button>
-                    ` : ''}
                 </div>
             `;
             
-            wrapperEl.appendChild(cardEl);
-
-            if (hasDetails) {
-                const drawerEl = document.createElement('div');
-                drawerEl.className = 'channel-details-drawer';
-                
-                let remarksHtml = '';
-                if (remarks.length > 0) {
-                    remarksHtml = `
-                        <div class="details-section">
-                            <h4 class="details-section-title">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px; height:15px; flex-shrink:0;">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                                ${CURRENT_LANG === 'en' ? 'Guidelines & Details' : '渠道操作指南及说明'}
-                            </h4>
-                            <div class="details-remarks-grid">
-                                ${remarks.map(r => `
-                                    <div class="details-remark-item">
-                                        <span class="remark-label">${r.key}</span>
-                                        <span class="remark-value">${r.val}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                let ratesHtml = '';
-                if (rates.length > 0) {
-                    ratesHtml = `
-                        <div class="details-section">
-                            <h4 class="details-section-title">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px; height:15px; flex-shrink:0;">
-                                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                                    <line x1="12" y1="4" x2="12" y2="20"></line>
-                                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                                </svg>
-                                ${CURRENT_LANG === 'en' ? 'Excel Surcharge Reference' : '报价表重量区间及参考费'}
-                            </h4>
-                            <div class="details-rates-table">
-                                <div class="rates-header">
-                                    <span>${CURRENT_LANG === 'en' ? 'Weight Range' : '重量区间'}</span>
-                                    <span>${CURRENT_LANG === 'en' ? 'Reference Fee' : '参考运费'}</span>
-                                </div>
-                                <div class="rates-body">
-                                    ${rates.map(r => `
-                                        <div class="rates-row">
-                                            <span>${r.key}</span>
-                                            <span>${r.val}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                drawerEl.innerHTML = remarksHtml + ratesHtml;
-                wrapperEl.appendChild(drawerEl);
-                
-                const toggleBtn = cardEl.querySelector('.channel-details-toggle-btn');
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        wrapperEl.classList.toggle('expanded');
-                        toggleBtn.classList.toggle('expanded');
-                        const isExpanded = wrapperEl.classList.contains('expanded');
-                        const span = toggleBtn.querySelector('span');
-                        const icon = toggleBtn.querySelector('svg');
-                        
-                        if (span) {
-                            span.textContent = isExpanded 
-                                ? (CURRENT_LANG === 'en' ? 'Hide Details' : '收起说明')
-                                : (CURRENT_LANG === 'en' ? 'Show Details' : '详细说明');
-                        }
-                        if (icon) {
-                            icon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-                        }
-                    });
-                }
-            }
-            
-            quoteChannelsContainer.appendChild(wrapperEl);
+            quoteChannelsContainer.appendChild(cardEl);
         });
     }
 
     // Dynamic calculation and rendering with custom admin parameters
     function calculateAndRenderQuoteData() {
         if (!rawQuoteItems || rawQuoteItems.length === 0) return;
-
-        console.log('Calculating quote data with SYSTEM_PROFIT_MARGIN =', SYSTEM_PROFIT_MARGIN, 'and SYSTEM_PACKAGING_FEE =', SYSTEM_PACKAGING_FEE);
 
         quoteData = rawQuoteItems.map(item => {
             const clonedItem = { ...item };
@@ -1930,22 +1770,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const countryText = countryNames[country] || country;
         const goodsTypeText = quoteGoodsType.options[quoteGoodsType.selectedIndex].text;
         
-        const markupText = `
-            <span style="display: block; margin-top: 6px; color: var(--primary); font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 4px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px; height:14px; flex-shrink:0;">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                ${CURRENT_LANG === 'en' 
-                    ? `Includes +${Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100)}% profit margin and ¥${SYSTEM_PACKAGING_FEE.toFixed(2)} handling fee`
-                    : `费用详情: 本报价已包含 +${Math.round((SYSTEM_PROFIT_MARGIN - 1) * 100)}% 利润率及 ¥${SYSTEM_PACKAGING_FEE.toFixed(2)} 打包费`}
-            </span>
-        `;
-
         if (CURRENT_LANG === 'en') {
-            quoteSummaryDetails.innerHTML = `Parameters: Destination: ${countryText} | Weight: ${parseFloat(weight).toFixed(3)} kg | Size: ${length}×${width}×${height} cm | Type: ${goodsTypeText}${postcode ? ` | ZIP: ${postcode}` : ''}${markupText}`;
+            quoteSummaryDetails.textContent = `Parameters: Destination: ${countryText} | Weight: ${parseFloat(weight).toFixed(3)} kg | Size: ${length}×${width}×${height} cm | Type: ${goodsTypeText}${postcode ? ` | ZIP: ${postcode}` : ''}`;
         } else {
-            quoteSummaryDetails.innerHTML = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText}${postcode ? ` | 邮编: ${postcode}` : ''}${markupText}`;
+            quoteSummaryDetails.textContent = `当前参数: 目的国: ${countryText} | 重量: ${parseFloat(weight).toFixed(3)} kg | 尺寸: ${length}×${width}×${height} cm | 类型: ${goodsTypeText}${postcode ? ` | 邮编: ${postcode}` : ''}`;
         }
 
         updateMetrics();
