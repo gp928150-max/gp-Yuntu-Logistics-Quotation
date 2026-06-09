@@ -779,10 +779,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Load from Vercel API
         try {
             let backendUrl = (localStorage.getItem('gp_backend_url') || '').trim();
+            // Default fallback for static hosting
+            if (!backendUrl && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
+                backendUrl = 'https://gp-yuntu-logistics-quotation.vercel.app';
+            }
             if (backendUrl && !backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
                 backendUrl = 'https://' + backendUrl;
             }
-            backendUrl = backendUrl.replace(/\/+$/, '');
+            if (backendUrl) {
+                backendUrl = backendUrl.replace(/\/+$/, '');
+            }
             
             const targetUrl = backendUrl ? `${backendUrl}/api/config?t=${Date.now()}` : `/api/config?t=${Date.now()}`;
             const response = await fetch(targetUrl);
@@ -1793,11 +1799,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminApiBaseInput) {
         adminApiBaseInput.value = localStorage.getItem('gp_github_api_base') || '';
     }
+    const isStaticPlatform = window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
+    const defaultBackend = isStaticPlatform ? 'https://gp-yuntu-logistics-quotation.vercel.app' : '';
+
     if (adminBackendUrlInput) {
-        adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || '';
+        adminBackendUrlInput.value = localStorage.getItem('gp_backend_url') || defaultBackend;
     }
     if (adminVerifyBackendInput) {
-        adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || '';
+        adminVerifyBackendInput.value = localStorage.getItem('gp_backend_url') || defaultBackend;
     }
 
     // Modal Events
@@ -1853,6 +1862,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        if (!base && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:' || (!window.location.hostname.includes('vercel.app') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'))) {
+            base = 'https://gp-yuntu-logistics-quotation.vercel.app';
+        }
         if (base) {
             if (!base.startsWith('http://') && !base.startsWith('https://')) {
                 base = 'https://' + base;
