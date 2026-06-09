@@ -33,6 +33,17 @@
     --shadow-dropdown: 0 30px 60px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.02);
 }
 
+/* Antigravity Particles Background Canvas */
+#antigravity-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
 /* Ambient Mesh Glows */
 .ambient-glow {
     position: fixed;
@@ -40,7 +51,7 @@
     height: 650px;
     filter: blur(140px);
     opacity: 0.45;
-    z-index: 1;
+    z-index: 0;
     pointer-events: none;
     animation: floatGlow 25s infinite alternate ease-in-out, morphGlow 18s infinite ease-in-out;
 }

@@ -1,4 +1,173 @@
+// Antigravity Particle Field Background (Copy of antigravity.google)
+function initAntigravityBackground() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'antigravity-canvas';
+    document.body.insertBefore(canvas, document.body.firstChild);
+
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    // Handle high DPI screens for sharp rendering
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Google-themed vibrant colors
+    const colors = [
+        '#4285F4',   // Google Blue
+        '#EA4335',   // Google Red
+        '#FBBC05',   // Google Yellow
+        '#34A853',   // Google Green
+        '#A855F7'    // Google Purple
+    ];
+
+    const particles = [];
+    // Increase density for rich visual representation (wind tunnel style)
+    const maxParticles = Math.min(300, Math.floor((width * height) / 5000));
+
+    // Mouse position tracking
+    let mouseX = undefined;
+    let mouseY = undefined;
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseleave', () => {
+        mouseX = undefined;
+        mouseY = undefined;
+    });
+
+    class Particle {
+        constructor() {
+            this.reset(true);
+        }
+
+        reset(isInitial = false) {
+            if (isInitial) {
+                // Uniform random initial distribution
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+            } else {
+                // Flow source: Spawn predominantly on bottom and left edges
+                if (Math.random() < 0.6) {
+                    this.x = Math.random() * width;
+                    this.y = height + 30;
+                } else {
+                    this.x = -30;
+                    this.y = Math.random() * height;
+                }
+            }
+
+            this.lastX = this.x;
+            this.lastY = this.y;
+
+            // Dimensions: combination of dots and capsules
+            this.thickness = 1.5 + Math.random() * 2.0; // 1.5px to 3.5px
+            this.length = this.thickness + Math.random() * 16; // 1.5px to 19.5px
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Aerodynamic wind velocity vectors (floating up and to the right)
+            this.baseVx = 0.8 + Math.random() * 1.2;  // 0.8 to 2.0 px/frame
+            this.baseVy = -1.0 - Math.random() * 1.5; // -1.0 to -2.5 px/frame
+            
+            this.angle = Math.atan2(this.baseVy, this.baseVx) + Math.PI / 2;
+            this.alpha = 0.25 + Math.random() * 0.6; // Opacity range 0.25 - 0.85
+            this.phase = Math.random() * Math.PI * 2; // Unique offset for wave-motion
+        }
+
+        update() {
+            // Apply wind base velocity
+            let vx = this.baseVx;
+            let vy = this.baseVy;
+
+            // Apply horizontal wave oscillation for a wind-like organic flow
+            this.x += vx;
+            this.y += vy + Math.sin(this.x * 0.005 + this.phase) * 0.25;
+
+            // Interactive mouse deflection (bending space around cursor)
+            if (mouseX !== undefined && mouseY !== undefined) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 180) {
+                    const force = (180 - dist) / 180; // 0 to 1 scaling force
+                    const angle = Math.atan2(dy, dx);
+                    
+                    // Smoothly push particle outward
+                    this.x += Math.cos(angle) * force * 3.5;
+                    this.y += Math.sin(angle) * force * 3.5;
+                }
+            }
+
+            // Reset particle if it leaves bounds (with extra padding margin)
+            if (this.x > width + 40 || this.y < -40 || this.x < -40 || this.y > height + 40) {
+                this.reset();
+            }
+        }
+
+        draw() {
+            // Compute real movement heading for rotational alignment
+            const dx = this.x - this.lastX;
+            const dy = this.y - this.lastY;
+            let drawAngle = this.angle;
+            
+            if (Math.hypot(dx, dy) > 0.1) {
+                drawAngle = Math.atan2(dy, dx) + Math.PI / 2;
+            }
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(drawAngle);
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(0, -this.length / 2, this.thickness / 2, Math.PI, 0);
+            ctx.lineTo(this.thickness / 2, this.length / 2);
+            ctx.arc(0, this.length / 2, this.thickness / 2, 0, Math.PI);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            // Track last position for heading calculations
+            this.lastX = this.x;
+            this.lastY = this.y;
+        }
+    }
+
+    for (let i = 0; i < maxParticles; i++) {
+        particles.push(new Particle());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.update();
+            p.draw();
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // Start Antigravity background particles
+    initAntigravityBackground();
     // Input Fields
     const quoteForm = document.getElementById('quote-form');
     const quoteCountry = document.getElementById('quote-country');
@@ -847,7 +1016,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showState('error');
         }
     }
-
     function updateMetrics() {
         if (!quoteData || quoteData.length === 0) return;
 
@@ -1493,7 +1661,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.55)`,
+                    message: `Update ${path} from admin panel (V1.5.57)`,
                     content: base64Content
                 };
                 if (sha) {
