@@ -339,6 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start Antigravity background particles
     // initAntigravityBackground();
 
+    let GLOBAL_BACKEND_URL = '';
+
     // Theme toggler (Light/Dark mode)
     const body = document.body;
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
@@ -459,6 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
             admin_trigger: "系统管理",
             rate_label: "当前外汇折算价 (实时更新):",
             currency_base: "基准币种",
+            stats_views: "系统访问量:",
+            stats_queries: "累计测算量:",
             
             // Admin
             admin_auth_title: "管理员身份认证",
@@ -528,6 +532,8 @@ document.addEventListener('DOMContentLoaded', () => {
             admin_trigger: "Admin settings",
             rate_label: "Live Exchange Rates:",
             currency_base: "Base Currency",
+            stats_views: "System Views:",
+            stats_queries: "Total Calculations:",
             
             // Admin
             admin_auth_title: "Administrator Authentication",
@@ -790,6 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
                 SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
+                GLOBAL_BACKEND_URL = data.backend_url || '';
                 console.log('Successfully loaded config from GitHub API:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
                 
                 updatePrefilledInputs();
@@ -806,12 +813,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 SYSTEM_PROFIT_MARGIN = parseFloat(data.profit_margin) || 1.22;
                 SYSTEM_PACKAGING_FEE = parseFloat(data.packaging_fee) !== undefined ? parseFloat(data.packaging_fee) : 2.0;
+                GLOBAL_BACKEND_URL = data.backend_url || '';
                 console.log('Successfully loaded config from local fallback:', SYSTEM_PROFIT_MARGIN, SYSTEM_PACKAGING_FEE);
                 
                 updatePrefilledInputs();
             }
         } catch (e) {
             console.warn('Failed to load local config.json fallback:', e);
+        }
+    }
+
+    // Stats Tracking
+    function getStatsEndpoint(param) {
+        let base = GLOBAL_BACKEND_URL || (localStorage.getItem('gp_backend_url') || '').trim();
+        if (base) {
+            if (!base.startsWith('http://') && !base.startsWith('https://')) {
+                base = 'https://' + base;
+            }
+            base = base.replace(/\/+$/, '');
+            return `${base}/api/stats?${param}`;
+        }
+        return `/api/stats?${param}`;
+    }
+
+    async function trackPageView() {
+        try {
+            const url = getStatsEndpoint('track=view');
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                updateStatsUI(data.views, data.queries);
+            }
+        } catch (err) {
+            console.warn('Failed to track page view:', err);
+        }
+    }
+
+    async function trackQuery() {
+        try {
+            const url = getStatsEndpoint('track=query');
+            const response = await fetch(url);
+            if (response.ok) {
+                const data = await response.json();
+                updateStatsUI(data.views, data.queries);
+            }
+        } catch (err) {
+            console.warn('Failed to track query:', err);
+        }
+    }
+
+    function updateStatsUI(views, queries) {
+        const viewsEl = document.getElementById('stats-views-val');
+        const queriesEl = document.getElementById('stats-queries-val');
+        if (viewsEl && views !== undefined) {
+            viewsEl.textContent = Number(views).toLocaleString();
+        }
+        if (queriesEl && queries !== undefined) {
+            queriesEl.textContent = Number(queries).toLocaleString();
         }
     }
 
@@ -1195,6 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 rawQuoteItems = data.Items; // Store raw API items
                 calculateAndRenderQuoteData(); // Dynamic calculation and render
                 showState('results');
+                trackQuery();
             } else {
                 const errorTitle = document.getElementById('error-title');
                 const errorMessage = document.getElementById('error-message');
@@ -1770,7 +1829,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     token,
                     profit_margin: profit,
-                    packaging_fee: pack
+                    packaging_fee: pack,
+                    backend_url: backendUrl
                 })
             });
 
@@ -1814,9 +1874,11 @@ document.addEventListener('DOMContentLoaded', () => {
         apiBase = apiBase.replace(/\/+$/, '');
         
         try {
+            const backendUrlVal = (localStorage.getItem('gp_backend_url') || '').trim();
             const configObj = {
                 profit_margin: profit,
-                packaging_fee: pack
+                packaging_fee: pack,
+                backend_url: backendUrlVal
             };
             const configString = JSON.stringify(configObj, null, 2);
             const base64Content = btoa(configString);
@@ -2028,5 +2090,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch live exchange rates dynamically
     fetchRealTimeExchangeRates();
     loadTransitTimes();
-    loadConfig();
+    loadConfig().then(() => {
+        trackPageView();
+    });
 });

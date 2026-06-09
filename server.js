@@ -236,7 +236,7 @@ app.get('/api/countries', async (req, res) => {
 });
 // Proxy API Route for updating configuration (Bypasses GFW network blocks)
 app.post('/api/github-sync', async (req, res) => {
-    const { token, profit_margin, packaging_fee } = req.body;
+    const { token, profit_margin, packaging_fee, backend_url } = req.body;
     if (!token) {
         return res.status(400).json({ success: false, message: '令牌 (Token) 不能为空' });
     }
@@ -249,6 +249,9 @@ app.post('/api/github-sync', async (req, res) => {
         profit_margin: parseFloat(profit_margin),
         packaging_fee: parseFloat(packaging_fee)
     };
+    if (backend_url !== undefined) {
+        configObj.backend_url = String(backend_url).trim();
+    }
     const configString = JSON.stringify(configObj, null, 2);
     const base64Content = Buffer.from(configString).toString('base64');
     const paths = ['public/config.json', 'config.json'];
@@ -307,6 +310,93 @@ app.post('/api/github-sync', async (req, res) => {
     } catch (error) {
         console.error('Error in github-sync proxy:', error);
         res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Local in-memory fallback for local development
+let localStats = {
+    views: 0,
+    queries: 0
+};
+
+// Helper function to interact with Vercel KV REST API
+async function executeKVCommand(commandArray) {
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+
+    if (!url || !token) {
+        // Fallback to local in-memory store
+        const cmd = commandArray[0].toUpperCase();
+        if (cmd === 'INCR') {
+            const key = commandArray[1];
+            if (key === 'gp_views') localStats.views++;
+            if (key === 'gp_queries') localStats.queries++;
+            return key === 'gp_views' ? localStats.views : localStats.queries;
+        } else if (cmd === 'MGET') {
+            return [String(localStats.views), String(localStats.queries)];
+        }
+        return null;
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(commandArray)
+        });
+
+        if (!response.ok) {
+            throw new Error(`KV API error: ${response.status} ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        return data.result;
+    } catch (err) {
+        console.error('Vercel KV execution error, falling back to local:', err);
+        const cmd = commandArray[0].toUpperCase();
+        if (cmd === 'INCR') {
+            const key = commandArray[1];
+            if (key === 'gp_views') localStats.views++;
+            if (key === 'gp_queries') localStats.queries++;
+            return key === 'gp_views' ? localStats.views : localStats.queries;
+        } else if (cmd === 'MGET') {
+            return [String(localStats.views), String(localStats.queries)];
+        }
+        return null;
+    }
+}
+
+// Endpoint to track and retrieve stats
+app.get('/api/stats', async (req, res) => {
+    const track = req.query.track;
+
+    try {
+        if (track === 'view') {
+            await executeKVCommand(['INCR', 'gp_views']);
+        } else if (track === 'query') {
+            await executeKVCommand(['INCR', 'gp_queries']);
+        }
+
+        // Retrieve both stats
+        const values = await executeKVCommand(['MGET', 'gp_views', 'gp_queries']);
+        const viewsVal = values && values[0] ? parseInt(values[0]) : 0;
+        const queriesVal = values && values[1] ? parseInt(values[1]) : 0;
+
+        res.json({
+            success: true,
+            views: viewsVal,
+            queries: queriesVal
+        });
+    } catch (error) {
+        console.error('Stats endpoint error:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取或更新统计数据失败',
+            error: error.message
+        });
     }
 });
 

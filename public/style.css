@@ -1716,6 +1716,31 @@ body {
     border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.footer-stats {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.footer-stats .stats-num {
+    font-family: var(--font-number);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.footer-stats .stats-divider {
+    color: rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .footer-stats .stats-divider {
+    color: rgba(255, 255, 255, 0.15);
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
