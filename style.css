@@ -46,6 +46,7 @@
 
 /* Ambient Mesh Glows */
 .ambient-glow {
+    display: none;
     position: fixed;
     width: 650px;
     height: 650px;
@@ -112,12 +113,7 @@
 }
 
 body {
-    background-color: #f5f5f7;
-    background-image: 
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 247, 0.45) 100%),
-        radial-gradient(rgba(0, 0, 0, 0.015) 1.2px, transparent 1.2px);
-    background-size: 100% 100%, 24px 24px;
-    background-attachment: fixed;
+    background-color: #ffffff;
     color: var(--text-primary);
     font-family: var(--font-body);
     min-height: 100vh;

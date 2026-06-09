@@ -25,125 +25,75 @@ function initAntigravityBackground() {
     ];
 
     const particles = [];
-    // Higher density of tiny particles for a premium Google wind-tunnel aesthetic
     const maxParticles = Math.min(500, Math.floor((width * height) / 3000));
 
-    // Mouse tracking and physics parameters
+    // Stacking/Target center coordinates for smooth tracking
+    let targetX = width / 2;
+    let targetY = height / 2;
     let mouseX = undefined;
     let mouseY = undefined;
-    let lastMouseX = undefined;
-    let lastMouseY = undefined;
-    let mouseVx = 0;
-    let mouseVy = 0;
-    let targetMouseVx = 0;
-    let targetMouseVy = 0;
 
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
-        if (lastMouseX !== undefined && lastMouseY !== undefined) {
-            // Calculate frame-to-frame delta velocity
-            targetMouseVx = (e.clientX - lastMouseX) * 0.22;
-            targetMouseVy = (e.clientY - lastMouseY) * 0.22;
-        }
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
     });
 
     window.addEventListener('mouseleave', () => {
         mouseX = undefined;
         mouseY = undefined;
-        targetMouseVx = 0;
-        targetMouseVy = 0;
-        lastMouseX = undefined;
-        lastMouseY = undefined;
     });
 
     class Particle {
         constructor() {
-            this.reset(true);
-        }
-
-        reset(isInitial = false) {
-            if (isInitial) {
-                // Uniform random initial distribution across the entire screen
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-            } else {
-                // Spawn predominantly on bottom and left edges to maintain up-right flow
-                if (Math.random() < 0.5) {
-                    this.x = -30;
-                    this.y = Math.random() * (height * 0.9);
-                } else {
-                    this.x = Math.random() * (width * 0.7);
-                    this.y = height + 30;
-                }
-            }
-
+            this.z = 0.35 + Math.random() * 0.65; // Depth factor
+            
+            // Randomize position in a sphere around target center initially
+            this.angle = Math.random() * Math.PI * 2;
+            this.orbitRadius = 40 + Math.random() * 200; // Orbit radius from center
+            this.angularSpeed = (0.003 + Math.random() * 0.008) * (Math.random() < 0.5 ? 1 : -1);
+            
+            // Start at the target center
+            this.x = targetX + Math.cos(this.angle) * this.orbitRadius;
+            this.y = targetY + Math.sin(this.angle) * this.orbitRadius;
             this.lastX = this.x;
             this.lastY = this.y;
-
-            // Pseudo-3D Depth Factor: 0.35 (far away) to 1.0 (close to camera)
-            this.z = 0.35 + Math.random() * 0.65;
 
             // Dimensions: extremely tiny for a refined look
             this.thickness = 0.9 + Math.random() * 1.4; // 0.9px to 2.3px
             this.length = this.thickness + Math.random() * 11; // 0.9px to 13.3px
             this.color = colors[Math.floor(Math.random() * colors.length)];
             
-            // Wind speed vectors (floating up and to the right)
-            this.baseVx = 0.9 + Math.random() * 1.1;  // 0.9 to 2.0 px/frame
-            this.baseVy = -1.1 - Math.random() * 1.3; // -1.1 to -2.4 px/frame
-            
-            this.angle = Math.atan2(this.baseVy, this.baseVx) + Math.PI / 2;
             this.alpha = 0.2 + Math.random() * 0.55; // Opacity bounds
-            this.phase = Math.random() * Math.PI * 2; // Offset for wind oscillation
+            this.phase = Math.random() * Math.PI * 2; // Offset for breathing oscillation
         }
 
-        update() {
-            // Apply 3D perspective scaling to velocity (distant particles move slower)
-            let vx = this.baseVx * this.z;
-            let vy = this.baseVy * this.z;
+        update(time) {
+            // Orbit calculation
+            this.angle += this.angularSpeed * this.z; // Depth-scaled rotation speed
+            
+            // Radial breathing oscillation
+            const currentRadius = this.orbitRadius + Math.sin(this.phase + time * 1.5) * (15 * this.z);
+            
+            // Calculate orbital target position
+            const targetPartX = targetX + Math.cos(this.angle) * currentRadius;
+            const targetPartY = targetY + Math.sin(this.angle) * currentRadius;
 
-            // Apply horizontal wave oscillation for a wind-like organic flow
-            this.x += vx;
-            this.y += vy + Math.sin(this.x * 0.004 + this.phase) * (0.2 * this.z);
-
-            // Interactive mouse deflection (fluid drag force field)
-            if (mouseX !== undefined && mouseY !== undefined) {
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const dist = Math.hypot(dx, dy);
-                const influenceRadius = 160 * this.z; // Depth-scaled interaction radius
-
-                if (dist < influenceRadius) {
-                    const force = (influenceRadius - dist) / influenceRadius; // 0 to 1
-                    const angle = Math.atan2(dy, dx);
-                    
-                    // 1. Repulsion (push away)
-                    this.x += Math.cos(angle) * force * 3.2;
-                    this.y += Math.sin(angle) * force * 3.2;
-
-                    // 2. Fluid Drag (pull in direction of mouse motion)
-                    this.x += mouseVx * force * 1.4;
-                    this.y += mouseVy * force * 1.4;
-                }
-            }
-
-            // Reset particle if it leaves bounds (with depth-scaled padding)
-            const margin = 40 * this.z;
-            if (this.x > width + margin || this.y < -margin || this.x < -margin || this.y > height + margin) {
-                this.reset();
-            }
+            // Smoothly ease the particle's actual position to its target
+            this.x += (targetPartX - this.x) * (0.06 * this.z);
+            this.y += (targetPartY - this.y) * (0.06 * this.z);
+            
+            // Add subtle random brownian floating noise
+            this.x += Math.cos(this.phase + time) * 0.15;
+            this.y += Math.sin(this.phase + time) * 0.15;
         }
 
         draw() {
             // Compute real movement heading for rotational alignment
             const dx = this.x - this.lastX;
             const dy = this.y - this.lastY;
-            let drawAngle = this.angle;
+            let drawAngle = this.angle + Math.PI / 2; // Default tangent alignment
             
-            if (Math.hypot(dx, dy) > 0.1) {
+            if (Math.hypot(dx, dy) > 0.05) {
                 drawAngle = Math.atan2(dy, dx) + Math.PI / 2;
             }
 
@@ -171,24 +121,33 @@ function initAntigravityBackground() {
         }
     }
 
+    // Initialize particles
     for (let i = 0; i < maxParticles; i++) {
         particles.push(new Particle());
     }
 
+    let time = 0;
     function animate() {
         ctx.clearRect(0, 0, width, height);
+        time += 0.01;
 
-        // Smooth interpolate mouse velocity
-        mouseVx += (targetMouseVx - mouseVx) * 0.1;
-        mouseVy += (targetMouseVy - mouseVy) * 0.1;
-        
-        // Decelerate velocities when mouse stops
-        targetMouseVx *= 0.94;
-        targetMouseVy *= 0.94;
+        // Smoothly interpolate center of particles towards mouse or screen center
+        if (mouseX !== undefined && mouseY !== undefined) {
+            targetX += (mouseX - targetX) * 0.06;
+            targetY += (mouseY - targetY) * 0.06;
+        } else {
+            // Float around screen center in a gentle Lissajous pattern when idle
+            const screenCenterX = width / 2;
+            const screenCenterY = height / 2;
+            const idleX = screenCenterX + Math.cos(time * 0.5) * 60;
+            const idleY = screenCenterY + Math.sin(time * 0.3) * 40;
+            targetX += (idleX - targetX) * 0.03;
+            targetY += (idleY - targetY) * 0.03;
+        }
 
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
-            p.update();
+            p.update(time);
             p.draw();
         }
 
@@ -1702,7 +1661,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.5.58)`,
+                    message: `Update ${path} from admin panel (V1.5.59)`,
                     content: base64Content
                 };
                 if (sha) {
