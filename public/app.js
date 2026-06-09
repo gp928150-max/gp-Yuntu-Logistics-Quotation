@@ -1856,7 +1856,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.6.4)`,
+                    message: `Update ${path} from admin panel (V1.6.5)`,
                     content: base64Content
                 };
                 if (sha) {
