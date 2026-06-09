@@ -215,6 +215,8 @@ function initAntigravityBackground() {
             const ry_orb = sinAngle * this.orbitRadius * this.inclinationScale;
             this.x = targetX + rx_orb * this.cosInc - ry_orb * this.sinInc;
             this.y = targetY + rx_orb * this.sinInc + ry_orb * this.cosInc;
+            this.vx = 0;
+            this.vy = 0;
             this.lastX = this.x;
             this.lastY = this.y;
 
@@ -250,9 +252,13 @@ function initAntigravityBackground() {
             const targetPartX = targetX + rx_orb * this.cosInc - ry_orb * this.sinInc;
             const targetPartY = targetY + rx_orb * this.sinInc + ry_orb * this.cosInc;
 
-            // Smoothly ease the particle's actual position to its target
-            this.x += (targetPartX - this.x) * (0.05 * this.z);
-            this.y += (targetPartY - this.y) * (0.05 * this.z);
+            // Inertial physics (Spring-mass-damping model for a looser follow feel)
+            const ax = (targetPartX - this.x) * (0.0025 * this.z);
+            const ay = (targetPartY - this.y) * (0.0025 * this.z);
+            this.vx = (this.vx + ax) * 0.94;
+            this.vy = (this.vy + ay) * 0.94;
+            this.x += this.vx;
+            this.y += this.vy;
             
             // Add subtle random brownian floating noise
             this.x += Math.cos(this.phase + time) * 0.15;
@@ -297,8 +303,8 @@ function initAntigravityBackground() {
 
         // Smoothly interpolate center of particles towards mouse or screen center
         if (mouseX !== undefined && mouseY !== undefined) {
-            targetX += (mouseX - targetX) * 0.05;
-            targetY += (mouseY - targetY) * 0.05;
+            targetX += (mouseX - targetX) * 0.025;
+            targetY += (mouseY - targetY) * 0.025;
         } else {
             // Float around screen center in a gentle Lissajous pattern when idle
             const screenCenterX = width / 2;
@@ -1850,7 +1856,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.6.0)`,
+                    message: `Update ${path} from admin panel (V1.6.1)`,
                     content: base64Content
                 };
                 if (sha) {

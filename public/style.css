@@ -2629,3 +2629,87 @@ body.dark-mode .nav-logo .logo-img {
     filter: invert(1) brightness(1.5);
 }
 
+/* --- V1.6.1 Dark Mode Readability and Selector Fixes --- */
+
+/* Main title text gradient in dark mode */
+body.dark-mode .main-title {
+    background: linear-gradient(135deg, #ffffff 0%, #a1a1a6 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+/* Channel code badge in dark mode */
+body.dark-mode .channel-code {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Estimated days badge text in dark mode */
+body.dark-mode .channel-days-badge {
+    color: #ff9f0a !important;
+}
+
+/* Transit API badge in dark mode */
+body.dark-mode .transit-api-badge {
+    background: rgba(41, 151, 255, 0.15) !important;
+    color: #2997ff !important;
+}
+
+/* Transit Excel badge in dark mode */
+body.dark-mode .transit-excel-badge {
+    background: rgba(48, 209, 88, 0.15) !important;
+    color: #30d158 !important;
+}
+
+/* Packaging sub-fee tags in dark mode */
+body.dark-mode .channel-meta-item.packaging-fee {
+    background: var(--success-bg) !important;
+    color: #30d158 !important;
+}
+body.dark-mode .channel-meta-item.packaging-fee strong {
+    color: #30d158 !important;
+}
+
+/* Channel remarks tag in dark mode */
+body.dark-mode .channel-meta-item.channel-remark-tag {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Metrics circular icon backdrops in dark mode */
+body.dark-mode .cheapest .metric-icon {
+    background: rgba(48, 209, 88, 0.15) !important;
+    color: #30d158 !important;
+}
+body.dark-mode .fastest .metric-icon {
+    background: rgba(255, 159, 10, 0.15) !important;
+    color: #ff9f0a !important;
+}
+body.dark-mode .total-channels .metric-icon {
+    background: rgba(41, 151, 255, 0.15) !important;
+    color: #2997ff !important;
+}
+
+/* Info alert notice bottom card in dark mode */
+body.dark-mode .info-alert-bar {
+    background: rgba(255, 159, 10, 0.08) !important;
+    border-color: rgba(255, 159, 10, 0.15) !important;
+    box-shadow: none !important;
+}
+body.dark-mode .alert-content,
+body.dark-mode .info-icon,
+body.dark-mode .alert-text strong {
+    color: #ff9f0a !important;
+}
+
+/* Welcome empty status state panel in dark mode */
+body.dark-mode #welcome-state .empty-graphic {
+    background: rgba(41, 151, 255, 0.08) !important;
+    border-color: rgba(41, 151, 255, 0.2) !important;
+}
+
+/* Results section divider lines in dark mode */
+body.dark-mode .results-header-actions {
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
