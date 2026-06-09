@@ -843,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(checkUrl);
             if (response.ok) {
                 const data = await response.json();
-                if (data && data.Code === '0000') {
+                if (data && (data.success || data.Code === '0000')) {
                     dot.classList.remove('error-state');
                     textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Normal (200 OK)' : '云途 OMS API 正常 (200 OK)';
                     return;
