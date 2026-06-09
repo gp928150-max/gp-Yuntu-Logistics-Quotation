@@ -377,6 +377,7 @@ app.get('/api/stats', async (req, res) => {
 
 // GET configuration endpoint
 app.get('/api/config', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     let config = {
         profit_margin: 1.13,
         packaging_fee: 2.0,
