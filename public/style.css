@@ -2713,3 +2713,13 @@ body.dark-mode .results-header-actions {
     border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* --- V1.6.2 Dark Mode Submit Button Contrast --- */
+body.dark-mode .submit-btn {
+    background: #ffffff !important;
+    color: #0a0a0c !important;
+}
+
+body.dark-mode .submit-btn:hover {
+    background: #e5e5ea !important;
+}
+

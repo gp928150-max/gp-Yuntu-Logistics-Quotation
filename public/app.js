@@ -337,7 +337,7 @@ function initAntigravityBackground() {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Start Antigravity background particles
-    initAntigravityBackground();
+    // initAntigravityBackground();
 
     // Theme toggler (Light/Dark mode)
     const body = document.body;
@@ -1856,7 +1856,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.6.1)`,
+                    message: `Update ${path} from admin panel (V1.6.2)`,
                     content: base64Content
                 };
                 if (sha) {
