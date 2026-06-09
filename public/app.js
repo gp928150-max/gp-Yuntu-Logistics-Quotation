@@ -1384,16 +1384,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function getChannelIcon(name) {
         const iconClass = getChannelIconClass(name);
         if (iconClass === 'mail') {
-            return `<i class="ri-mail-send-fill icon-mail"></i>`;
+            return `<img src="images/mail_3d.png" class="channel-brand-icon-img icon-mail" alt="Mail">`;
         }
         if (iconClass === 'express') {
-            return `<i class="ri-rocket-2-fill icon-express"></i>`;
+            return `<img src="images/rocket_3d.png" class="channel-brand-icon-img icon-express" alt="Express">`;
         }
         if (iconClass === 'direct') {
-            return `<i class="ri-plane-fill icon-direct"></i>`;
+            return `<img src="images/plane_3d.png" class="channel-brand-icon-img icon-direct" alt="Direct">`;
         }
         // Fallback: parcel
-        return `<i class="ri-box-3-fill icon-parcel"></i>`;
+        return `<img src="images/parcel_3d.png" class="channel-brand-icon-img icon-parcel" alt="Parcel">`;
     }
 
     function getExcelTransit(excelMap, cname) {
@@ -1897,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 2. Put updated config
                 const putBody = {
-                    message: `Update ${path} from admin panel (V1.7.2)`,
+                    message: `Update ${path} from admin panel (V1.7.3)`,
                     content: base64Content
                 };
                 if (sha) {

@@ -1273,121 +1273,76 @@ body {
 }
 
 .channel-brand-icon-bg {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: #f5f5f7;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03), inset 0 1px 0 #ffffff;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.channel-brand-icon-bg img.channel-brand-icon-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: iconFloat 4s ease-in-out infinite;
+}
+
+/* Pause floating animation on hover so hover transform rule takes over */
+.quote-channel-card:hover .channel-brand-icon-bg img.channel-brand-icon-img {
+    animation-play-state: paused;
+}
+
+/* Floating animation keyframes */
+@keyframes iconFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-2px) rotate(1deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg {
     transform: scale(1.05);
-}
-
-.channel-brand-icon-bg.brand-icon-mail {
-    background: linear-gradient(135deg, rgba(9, 109, 217, 0.08) 0%, rgba(9, 109, 217, 0.02) 100%);
-    border-color: rgba(9, 109, 217, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.channel-brand-icon-bg.brand-icon-express {
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.08) 0%, rgba(255, 149, 0, 0.02) 100%);
-    border-color: rgba(255, 149, 0, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.channel-brand-icon-bg.brand-icon-direct {
-    background: linear-gradient(135deg, rgba(0, 113, 227, 0.08) 0%, rgba(0, 113, 227, 0.02) 100%);
-    border-color: rgba(0, 113, 227, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.channel-brand-icon-bg.brand-icon-parcel {
-    background: linear-gradient(135deg, rgba(134, 134, 139, 0.08) 0%, rgba(134, 134, 139, 0.02) 100%);
-    border-color: rgba(134, 134, 139, 0.15);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail {
-    background: linear-gradient(135deg, rgba(9, 109, 217, 0.14) 0%, rgba(9, 109, 217, 0.06) 100%);
-    border-color: rgba(9, 109, 217, 0.25);
-    box-shadow: 0 4px 12px rgba(9, 109, 217, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(0, 113, 227, 0.12), 0 2px 4px rgba(0, 113, 227, 0.04);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express {
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.14) 0%, rgba(255, 149, 0, 0.06) 100%);
-    border-color: rgba(255, 149, 0, 0.25);
-    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(255, 149, 0, 0.15), 0 2px 4px rgba(255, 149, 0, 0.04);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct {
-    background: linear-gradient(135deg, rgba(0, 113, 227, 0.14) 0%, rgba(0, 113, 227, 0.06) 100%);
-    border-color: rgba(0, 113, 227, 0.25);
-    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(9, 109, 217, 0.12), 0 2px 4px rgba(9, 109, 217, 0.04);
 }
 
 .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel {
-    background: linear-gradient(135deg, rgba(134, 134, 139, 0.14) 0%, rgba(134, 134, 139, 0.06) 100%);
-    border-color: rgba(134, 134, 139, 0.25);
-    box-shadow: 0 4px 12px rgba(134, 134, 139, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 20px rgba(134, 134, 139, 0.1), 0 2px 4px rgba(134, 134, 139, 0.04);
 }
 
-.channel-brand-icon-bg svg,
-.channel-brand-icon-bg i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
-    line-height: 1;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* Custom premium 3D micro-animations on hover */
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express img.channel-brand-icon-img {
+    transform: translate(4px, -4px) scale(1.15) rotate(5deg);
 }
 
-.channel-brand-icon-bg svg.icon-mail,
-.channel-brand-icon-bg i.icon-mail {
-    color: #096dd9;
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct img.channel-brand-icon-img {
+    transform: translate(5px, -3px) scale(1.18) rotate(-3deg);
 }
 
-.channel-brand-icon-bg svg.icon-express,
-.channel-brand-icon-bg i.icon-express {
-    color: #ff9500;
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail img.channel-brand-icon-img {
+    transform: translateY(-4px) scale(1.15) rotate(-8deg);
 }
 
-.channel-brand-icon-bg svg.icon-direct,
-.channel-brand-icon-bg i.icon-direct {
-    color: #0071e3;
-}
-
-.channel-brand-icon-bg svg.icon-parcel,
-.channel-brand-icon-bg i.icon-parcel {
-    color: #86868b;
-}
-
-/* Custom premium micro-animations for each icon type */
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express svg,
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express i {
-    transform: translate(3px, -3px) scale(1.15);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct svg,
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct i {
-    transform: translate(3px, -3px) scale(1.15);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail svg,
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail i {
-    transform: rotate(-8deg) scale(1.15);
-}
-
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel svg,
-.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel i {
-    transform: translateY(-2px) scale(1.15);
+.quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel img.channel-brand-icon-img {
+    transform: translateY(-3px) scale(1.12) rotate(4deg);
 }
 
 .channel-info-area {
@@ -2701,48 +2656,26 @@ body.dark-mode .sort-select-wrapper:hover {
 
 /* Brand icon background inside card in Dark Mode */
 body.dark-mode .channel-brand-icon-bg {
-    background: transparent;
-}
-body.dark-mode .channel-brand-icon-bg.brand-icon-mail {
-    background: linear-gradient(135deg, rgba(9, 109, 217, 0.15) 0%, rgba(9, 109, 217, 0.05) 100%);
-    border-color: rgba(9, 109, 217, 0.25);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-body.dark-mode .channel-brand-icon-bg.brand-icon-express {
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.15) 0%, rgba(255, 149, 0, 0.05) 100%);
-    border-color: rgba(255, 149, 0, 0.25);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-body.dark-mode .channel-brand-icon-bg.brand-icon-direct {
-    background: linear-gradient(135deg, rgba(0, 113, 227, 0.15) 0%, rgba(0, 113, 227, 0.05) 100%);
-    border-color: rgba(0, 113, 227, 0.25);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-body.dark-mode .channel-brand-icon-bg.brand-icon-parcel {
-    background: linear-gradient(135deg, rgba(134, 134, 139, 0.15) 0%, rgba(134, 134, 139, 0.05) 100%);
-    border-color: rgba(134, 134, 139, 0.25);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-mail {
-    background: linear-gradient(135deg, rgba(9, 109, 217, 0.25) 0%, rgba(9, 109, 217, 0.1) 100%);
-    border-color: rgba(9, 109, 217, 0.4);
-    box-shadow: 0 4px 20px rgba(9, 109, 217, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 113, 227, 0.35), 0 0 0 1px rgba(0, 113, 227, 0.2);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-express {
-    background: linear-gradient(135deg, rgba(255, 149, 0, 0.25) 0%, rgba(255, 149, 0, 0.1) 100%);
-    border-color: rgba(255, 149, 0, 0.4);
-    box-shadow: 0 4px 20px rgba(255, 149, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(255, 149, 0, 0.4), 0 0 0 1px rgba(255, 149, 0, 0.25);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-direct {
-    background: linear-gradient(135deg, rgba(0, 113, 227, 0.25) 0%, rgba(0, 113, 227, 0.1) 100%);
-    border-color: rgba(0, 113, 227, 0.4);
-    box-shadow: 0 4px 20px rgba(0, 113, 227, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(9, 109, 217, 0.35), 0 0 0 1px rgba(9, 109, 217, 0.2);
 }
 body.dark-mode .quote-channel-card:hover .channel-brand-icon-bg.brand-icon-parcel {
-    background: linear-gradient(135deg, rgba(134, 134, 139, 0.25) 0%, rgba(134, 134, 139, 0.1) 100%);
-    border-color: rgba(134, 134, 139, 0.4);
-    box-shadow: 0 4px 20px rgba(134, 134, 139, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(134, 134, 139, 0.25), 0 0 0 1px rgba(134, 134, 139, 0.2);
 }
 
 /* Invert dark text/parts of logo in Dark Mode */
