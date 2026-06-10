@@ -336,6 +336,11 @@ function initAntigravityBackground() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Detect if embedded inside an iframe to natively remove headers
+    if (window.self !== window.top) {
+        document.body.classList.add('iframe-embed');
+    }
+
     // Start Antigravity background particles
     // initAntigravityBackground();
 

@@ -2866,3 +2866,43 @@ body.dark-mode .channel-price-area {
     border-top-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* --- Vercel-Native Embedding Layout Overrides --- */
+
+/* Cleanly remove headers and branding when embedded inside an iframe */
+body.iframe-embed .top-status-bar,
+body.iframe-embed .nav-left,
+body.iframe-embed .app-header {
+    display: none !important;
+}
+
+/* Align theme, language, and currency switchers to the right */
+body.iframe-embed .app-nav {
+    justify-content: flex-end;
+    margin-bottom: 24px;
+    padding: 12px 0;
+}
+
+/* Mobile responsive adjustments when embedded */
+@media (max-width: 768px) {
+    body.iframe-embed .app-nav {
+        grid-template-columns: 1fr; /* Single column layout for switchers */
+        row-gap: 12px;
+        margin-bottom: 16px;
+    }
+    body.iframe-embed .theme-toggle-btn {
+        grid-column: 1 / 2;
+        grid-row: 1;
+        justify-self: start;
+        margin-right: 0;
+    }
+    body.iframe-embed .currency-select-container {
+        grid-column: 1 / 2;
+        grid-row: 1;
+        justify-self: end;
+    }
+    body.iframe-embed .lang-toggle-pills {
+        grid-column: 1 / 2;
+        grid-row: 2;
+    }
+}
+
