@@ -1709,22 +1709,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${displaySubName ? `<div class="channel-subname-row"><div class="channel-ename"><i class="ri-corner-down-right-line"></i> ${displaySubName}</div></div>` : ''}
                     <div class="channel-meta-row">
                         <div class="channel-meta-item goods-type-badge ${getGoodsTypeClass(channel.GoodsType)}">
-                            <span><i class="ri-price-tag-3-line"></i> ${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
+                            <i class="ri-price-tag-3-line"></i>
+                            <span>${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
                         </div>
                         <div class="channel-meta-item">
-                            <span><i class="ri-weight-line"></i> ${CURRENT_LANG === 'en' ? 'Weight' : '重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
+                            <i class="ri-weight-line"></i>
+                            <span>${CURRENT_LANG === 'en' ? 'Weight' : '重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
                         </div>
                     </div>
                     ${pack > 0 ? `
                     <div class="channel-fee-row">
                         <div class="channel-meta-item packaging-fee">
-                            <span><i class="ri-box-3-line"></i> ${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>${target === 'CNY' ? `¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}` : `${targetSymbol}${pack.toFixed(2)} (≈ ¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)})`}</strong></span>
+                            <i class="ri-box-3-line"></i>
+                            <span>${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>${target === 'CNY' ? `¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}` : `${targetSymbol}${pack.toFixed(2)} (≈ ¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)})`}</strong></span>
                         </div>
                     </div>` : ''}
                     ${channel.Remark ? `
                     <div class="channel-remark-row">
                         <div class="channel-meta-item channel-remark-tag">
-                            <span><i class="ri-information-line"></i> ${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${sanitizeText(channel.Remark, channel.Remark)}</strong></span>
+                            <i class="ri-information-line"></i>
+                            <span>${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${sanitizeText(channel.Remark, channel.Remark)}</strong></span>
                         </div>
                     </div>` : ''}
                 </div>
