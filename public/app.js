@@ -1670,8 +1670,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return gType || '普货';
             };
 
-            const mainName = CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道');
-            const subName = CURRENT_LANG === 'en' ? (channel.CName || '') : (channel.EName || '');
+            const sanitizeText = (txt, fallback) => {
+                if (!txt) return fallback || '';
+                const cleaned = txt.replace(/YunExpress/gi, '').replace(/云途/g, '').trim();
+                return cleaned || fallback || '';
+            };
+
+            const rawMainName = CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道');
+            const rawSubName = CURRENT_LANG === 'en' ? (channel.CName || '') : (channel.EName || '');
+            const mainName = sanitizeText(rawMainName, rawMainName);
+            const subName = sanitizeText(rawSubName, rawSubName);
             const displaySubName = subName && subName !== mainName ? subName : '';
 
             const iconName = channel.EName || channel.CName || channel.Code;
@@ -1705,7 +1713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>` : ''}
                         ${channel.Remark ? `
                         <div class="channel-meta-item channel-remark-tag">
-                            <span>${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${channel.Remark}</strong></span>
+                            <span>${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${sanitizeText(channel.Remark, channel.Remark)}</strong></span>
                         </div>` : ''}
                     </div>
                 </div>
