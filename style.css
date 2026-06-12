@@ -1451,7 +1451,7 @@ body {
 .channel-meta-row {
     display: flex;
     gap: 14px;
-    margin-top: 8px;
+    margin-top: 2px;
     flex-wrap: wrap;
     align-items: center;
 }

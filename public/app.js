@@ -1695,12 +1695,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="channel-info-area">
-                    <div class="channel-title-row">
+                    <div class="channel-name-row">
                         <span class="channel-name">${mainName}</span>
-                        ${excelTransit ? `<span class="channel-days-badge transit-excel-badge"><i class="ri-calendar-todo-line"></i> ${CURRENT_LANG === 'en' ? 'Table Transit' : '报价表时效'}: ${translateTransitDays(excelTransit)}</span>` : ''}
-                        ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge"><i class="ri-time-line"></i> ${CURRENT_LANG === 'en' ? 'API Transit (Ref)' : 'API时效 (参考)'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>` : ''}
                     </div>
-                    ${displaySubName ? `<div class="channel-ename">${displaySubName}</div>` : ''}
+                    ${excelTransit ? `
+                    <div class="channel-badge-row">
+                        <span class="channel-days-badge transit-excel-badge"><i class="ri-calendar-todo-line"></i> ${CURRENT_LANG === 'en' ? 'Table Transit' : '报价表时效'}: ${translateTransitDays(excelTransit)}</span>
+                    </div>` : ''}
+                    ${channel.DeliveryDays ? `
+                    <div class="channel-badge-row">
+                        <span class="channel-days-badge transit-api-badge"><i class="ri-time-line"></i> ${CURRENT_LANG === 'en' ? 'API Transit (Ref)' : 'API时效 (参考)'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>
+                    </div>` : ''}
+                    ${displaySubName ? `<div class="channel-subname-row"><div class="channel-ename">${displaySubName}</div></div>` : ''}
                     <div class="channel-meta-row">
                         <div class="channel-meta-item goods-type-badge ${getGoodsTypeClass(channel.GoodsType)}">
                             <span><i class="ri-price-tag-3-line"></i> ${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
@@ -1708,15 +1714,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="channel-meta-item">
                             <span><i class="ri-scales-3-line"></i> ${CURRENT_LANG === 'en' ? 'Billable Wt' : '计费重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
                         </div>
-                        ${pack > 0 ? `
+                    </div>
+                    ${pack > 0 ? `
+                    <div class="channel-fee-row">
                         <div class="channel-meta-item packaging-fee">
                             <span><i class="ri-box-3-line"></i> ${CURRENT_LANG === 'en' ? 'Handling' : '打包费'}: <strong>${target === 'CNY' ? `¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)}` : `${targetSymbol}${pack.toFixed(2)} (≈ ¥${parseFloat(channel.PackagingFeeCNY).toFixed(2)})`}</strong></span>
-                        </div>` : ''}
-                        ${channel.Remark ? `
+                        </div>
+                    </div>` : ''}
+                    ${channel.Remark ? `
+                    <div class="channel-remark-row">
                         <div class="channel-meta-item channel-remark-tag">
                             <span><i class="ri-information-line"></i> ${CURRENT_LANG === 'en' ? 'Remark' : '备注'}: <strong>${sanitizeText(channel.Remark, channel.Remark)}</strong></span>
-                        </div>` : ''}
-                    </div>
+                        </div>
+                    </div>` : ''}
                 </div>
                 <div class="channel-price-area">
                     <div class="channel-total-badge">
