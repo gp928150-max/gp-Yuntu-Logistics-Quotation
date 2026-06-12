@@ -344,6 +344,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start Antigravity background particles
     // initAntigravityBackground();
 
+    const sanitizeText = (txt, fallback) => {
+        if (!txt) return fallback || '';
+        const cleaned = txt.replace(/YunExpress/gi, '').replace(/云途/g, '').trim();
+        return cleaned || fallback || '';
+    };
+
     let GLOBAL_BACKEND_URL = '';
 
     // Theme toggler (Light/Dark mode)
@@ -1398,7 +1404,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const cheapestSymbol = getCurrencySymbol();
             metricCheapestVal.innerHTML = `${cheapestSymbol}${cheapestDisplay.toFixed(2)} <span class="metric-converted-sub">≈ ¥${cheapestCNY.toFixed(2)}</span>`;
         }
-        metricCheapestName.textContent = CURRENT_LANG === 'en' ? (cheapest.EName || cheapest.CName || cheapest.Code) : (cheapest.CName || cheapest.Code);
+        const cheapestRawName = CURRENT_LANG === 'en' ? (cheapest.EName || cheapest.CName || cheapest.Code) : (cheapest.CName || cheapest.Code);
+        metricCheapestName.textContent = sanitizeText(cheapestRawName, cheapestRawName);
 
         // Helper to translate transit days from Excel
         const translateTransitDays = (transitStr) => {
@@ -1444,7 +1451,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             metricFastestVal.textContent = CURRENT_LANG === 'en' ? 'N/A' : '未提供';
         }
-        metricFastestName.textContent = CURRENT_LANG === 'en' ? (fastest.EName || fastest.CName || fastest.Code) : (fastest.CName || fastest.Code);
+        const fastestRawName = CURRENT_LANG === 'en' ? (fastest.EName || fastest.CName || fastest.Code) : (fastest.CName || fastest.Code);
+        metricFastestName.textContent = sanitizeText(fastestRawName, fastestRawName);
 
         // 3. Total Channels
         metricTotalVal.textContent = CURRENT_LANG === 'en' ? `${quoteData.length}` : `${quoteData.length} 个`;
@@ -1678,11 +1686,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return gType || '普货';
             };
 
-            const sanitizeText = (txt, fallback) => {
-                if (!txt) return fallback || '';
-                const cleaned = txt.replace(/YunExpress/gi, '').replace(/云途/g, '').trim();
-                return cleaned || fallback || '';
-            };
+
 
             const rawMainName = CURRENT_LANG === 'en' ? (channel.EName || channel.CName || 'Unknown Channel') : (channel.CName || '未知渠道');
             const rawSubName = CURRENT_LANG === 'en' ? (channel.CName || '') : (channel.EName || '');
