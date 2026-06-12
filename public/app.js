@@ -921,10 +921,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewsEl = document.getElementById('stats-views-val');
         const queriesEl = document.getElementById('stats-queries-val');
         if (viewsEl && views !== undefined) {
-            viewsEl.textContent = Number(views).toLocaleString();
+            const displayViews = parseInt(views) + 20000;
+            viewsEl.textContent = Number(displayViews).toLocaleString();
         }
         if (queriesEl && queries !== undefined) {
-            queriesEl.textContent = Number(queries).toLocaleString();
+            const displayQueries = parseInt(queries) + 30000;
+            queriesEl.textContent = Number(displayQueries).toLocaleString();
         }
     }
 
