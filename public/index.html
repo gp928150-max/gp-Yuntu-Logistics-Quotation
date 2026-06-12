@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graypoplar Dropshipping Shipping Cost Calculator | Dropshipping运费计算 | 3PL Fulfillment Rates China</title>
     <meta name="description" content="Graypoplar Dropshipping Shipping Cost Calculator provides real-time shipping rates from China to worldwide. Calculate 3PL fulfillment fees, shipping costs, and transit times instantly. | Graypoplar 智能物流测算系统直连接口提供实时跨境物流运费与时效估算。">
-    <meta name="keywords" content="dropshipping shipping cost calculator, dropshipping versandrechner, calculateur frais de port dropshipping, calculadora de envíos dropshipping, kalkulator kosztów wysyłki dropshipping, calcolatore costi spedizione dropshipping, 3pl fulfillment rates china, shipping cost from china, dropshipping运费计算, 云途运价查询">
+    <meta name="keywords" content="dropshipping shipping cost calculator, dropshipping versandrechner, calculateur frais de port dropshipping, calculadora de envíos dropshipping, kalkulator kosztów wysyłki dropshipping, calcolatore costi spedizione dropshipping, 3pl fulfillment rates china, shipping cost from china, dropshipping运费计算, 官方专线运价查询">
     <link rel="canonical" href="https://gp-yuntu-logistics-quotation.vercel.app/">
     <link rel="alternate" hreflang="zh" href="https://gp-yuntu-logistics-quotation.vercel.app/?lang=zh">
     <link rel="alternate" hreflang="en" href="https://gp-yuntu-logistics-quotation.vercel.app/?lang=en">
@@ -30,9 +30,9 @@
     <!-- Remix Icon CDN -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet">
     <!-- Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=1.8.8">
+    <link rel="stylesheet" href="style.css?v=1.8.9">
     <!-- App Logic -->
-    <script src="app.js?v=1.8.8" defer></script>
+    <script src="app.js?v=1.8.9" defer></script>
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
     {
@@ -51,7 +51,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Graypoplar Dropshipping运费计算 | Dropshipping Shipping Cost Calculator",
-      "description": "Graypoplar 智能物流测算系统提供专业的 Dropshipping 运费计算与云途 OMS 实时运价查询。支持全球多国快捷时效 and 最划算物流渠道智能对比筛选，助您优化跨境电商物流成本。",
+      "description": "Graypoplar 智能物流测算系统提供专业的 Dropshipping 运费计算与官方专线实时运价查询。支持全球多国快捷时效 and 最划算物流渠道智能对比筛选，助您优化跨境电商物流成本。",
       "url": "https://gp-yuntu-logistics-quotation.vercel.app/",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
@@ -69,9 +69,9 @@
         <div class="status-bar-content">
             <div class="status-bar-left">
                 <span class="status-indicator-dot"></span>
-                <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">云途 OMS API 正常 (200 OK)</span>
+                <span class="status-bar-text" id="api-status-text" data-translate="api_status_ok">官方履约 API 正常 (200 OK)</span>
                 <span class="status-bar-divider">/</span>
-                <span class="status-bar-text version">V1.8.8 Enterprise</span>
+                <span class="status-bar-text version">V1.8.9 Enterprise</span>
                 <span class="status-bar-divider">/</span>
                 <span class="status-bar-text admin-trigger" id="admin-trigger" data-translate="admin_trigger">系统管理</span>
             </div>
@@ -197,7 +197,7 @@
         <!-- Header -->
         <header class="app-header">
             <h1 class="main-title" data-translate="main_title">智能物流测算系统</h1>
-            <p class="main-subtitle" data-translate="main_subtitle">由 Graypoplar 独立研发，测算价格实时对接云途官方运费报价接口。</p>
+            <p class="main-subtitle" data-translate="main_subtitle">由 Graypoplar 独立研发，测算价格实时对接官方专线运费报价接口。</p>
         </header>
 
         <!-- Metrics Section (Dynamically updated) -->
@@ -238,7 +238,7 @@
                 <div class="metric-info">
                     <span class="metric-label" data-translate="metric_total">服务商可用渠道</span>
                     <h3 class="metric-val" id="metric-total-val">-</h3>
-                    <span class="metric-desc" data-translate="metric_total_desc">数据源：云途官方运价</span>
+                    <span class="metric-desc" data-translate="metric_total_desc">数据源：官方专线实时运价</span>
                 </div>
             </div>
         </div>
@@ -332,7 +332,7 @@
                         </svg>
                     </div>
                     <h3 data-translate="welcome_title">配置估算参数</h3>
-                    <p data-translate="welcome_desc">请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，Graypoplar 将实时通过云途接口计算运费详情与最优通道报价。</p>
+                    <p data-translate="welcome_desc">请在左侧面板配置您的包裹目的地、重量及类型。点击测算按钮，Graypoplar 将实时通过官方专线接口计算运费详情与最优通道报价。</p>
                 </div>
 
                 <!-- Loading State -->
@@ -363,7 +363,7 @@
                             <div class="skeleton-price-block"></div>
                         </div>
                     </div>
-                    <h3 data-translate="loading_title">正在调用实时云途报价接口...</h3>
+                    <h3 data-translate="loading_title">正在调用官方专线实时报价接口...</h3>
                     <p data-translate="loading_desc">请稍候，我们正在为您测算最佳的运输专线报价</p>
                 </div>
 
@@ -411,7 +411,7 @@
                                 <line x1="12" y1="16" x2="12" y2="12"></line>
                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                             </svg>
-                            <span class="alert-text" data-translate="alert_text">云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>Graypoplar</strong> 客服团队核实。</span>
+                            <span class="alert-text" data-translate="alert_text">官方专线 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>Graypoplar</strong> 客服团队核实。</span>
                         </div>
                         <a href="https://wa.me/85262508059" target="_blank" class="whatsapp-btn">
                             <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -430,7 +430,7 @@
 
         <!-- Footer -->
         <footer class="app-footer">
-            <p data-translate="footer_text">&copy; 2026 Graypoplar. 保留所有权利。本系统为独立研发，测算数据对接云途接口，仅用于运费评估参考。</p>
+            <p data-translate="footer_text">&copy; 2026 Graypoplar. 保留所有权利。本系统为独立研发，测算数据对接官方专线接口，仅用于运费评估参考。</p>
             <div class="footer-stats" id="footer-stats">
                 <span data-translate="stats_views">系统访问量:</span> <span class="stats-num" id="stats-views-val">-</span>
                 <span class="stats-divider">|</span>

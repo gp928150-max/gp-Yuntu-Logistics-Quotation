@@ -469,8 +469,8 @@ document.addEventListener('DOMContentLoaded', () => {
             dim_height: "高",
             btn_calculate: "生成运费测算分析",
             welcome_title: "等待评估货件信息",
-            welcome_desc: "请在左侧面板配置目的地、重量及类型。测算引擎将实时直连云途官方 OMS 接口，匹配最划算的运费与最快捷的专线通路。",
-            loading_title: "正在调用实时云途报价接口...",
+            welcome_desc: "请在左侧面板配置目的地、重量及类型。测算引擎将实时直连官方专线 OMS 接口，匹配最划算的运费与最快捷的专线通路。",
+            loading_title: "正在调用官方专线实时报价接口...",
             loading_desc: "请稍候，我们正在为您测算最佳的运输专线报价",
             error_title_default: "运费估算失败",
             error_desc_default: "请核对您的输入参数是否正确，或稍后再试。",
@@ -480,10 +480,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sort_price_asc: "价格从低到高",
             sort_price_desc: "价格从高到低",
             sort_time_asc: "时效从快到慢",
-            alert_text: "云途 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>Graypoplar</strong> 客服团队核实。",
+            alert_text: "官方专线 API 返回的预计时效可能存在些许差异。具体时效及特殊属性服务，请联系 <strong>Graypoplar</strong> 客服团队核实。",
             whatsapp_btn: "WhatsApp 咨询",
             footer_text: "© 2026 Graypoplar. All Rights Reserved. 本系统由 Graypoplar 独立研发，运费数据实时直连服务商 OMS 接口。评估结果仅作参考，实际以出货结算为准。",
-            api_status_ok: "云途 OMS API 正常 (200 OK)",
+            api_status_ok: "官方履约 API 正常 (200 OK)",
             admin_trigger: "系统管理",
             rate_label: "当前外汇折算价 (实时更新):",
             currency_base: "基准币种",
@@ -515,11 +515,11 @@ document.addEventListener('DOMContentLoaded', () => {
             nav_support: "Support",
             nav_badge: "DROPSHIPPING • FULFILLMENT • 3PL",
             main_title: "Graypoplar Fulfillment Quotation Engine",
-            main_subtitle: "Comprehensive dropshipping, order fulfillment, and 3PL warehousing services for global e-commerce. Synced in real-time with YunExpress OMS API.",
+            main_subtitle: "Comprehensive dropshipping, order fulfillment, and 3PL warehousing services for global e-commerce. Synced in real-time with official carrier OMS API.",
             metric_cheapest: "Cheapest Channel",
             metric_fastest: "Fastest Transit",
             metric_total: "Available Channels",
-            metric_total_desc: "Source: YunExpress Official Rates",
+            metric_total_desc: "Source: Official Live Rates",
             sidebar_title: "Shipment Details",
             label_origin: "Origin Country",
             val_origin: "China",
@@ -541,8 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
             dim_height: "H",
             btn_calculate: "Calculate Shipping Cost",
             welcome_title: "Configure Estimation Parameters",
-            welcome_desc: "Please configure your package destination, weight, and goods type in the left panel. Click 'Calculate Shipping Cost' to get live shipping fees and optimized routes via the YunExpress API.",
-            loading_title: "Calling live YunExpress API...",
+            welcome_desc: "Please configure your package destination, weight, and goods type in the left panel. Click 'Calculate Shipping Cost' to get live shipping fees and optimized routes via the official carrier API.",
+            loading_title: "Calling live official carrier API...",
             loading_desc: "Please wait while we calculate the best shipping channel rates for your package...",
             error_title_default: "Estimation Failed",
             error_desc_default: "Please verify that your inputs are correct or try again later.",
@@ -552,10 +552,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sort_price_asc: "Price: Low to High",
             sort_price_desc: "Price: High to Low",
             sort_time_asc: "Transit: Fast to Slow",
-            alert_text: "Estimated delivery times from the YunExpress API may vary. For official transit times and special services, please contact the <strong>Graypoplar</strong> customer support team.",
+            alert_text: "Estimated delivery times from the official carrier API may vary. For official transit times and special services, please contact the <strong>Graypoplar</strong> customer support team.",
             whatsapp_btn: "WhatsApp Support",
             footer_text: "© 2026 Graypoplar. All Rights Reserved. Synced with carrier OMS APIs in real-time. Calculated estimates are for reference only, subject to final outbound billing.",
-            api_status_ok: "YunExpress OMS API Normal (200 OK)",
+            api_status_ok: "Official Carrier API Normal (200 OK)",
             admin_trigger: "Admin settings",
             rate_label: "Live Exchange Rates:",
             currency_base: "Base Currency",
@@ -873,15 +873,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (data && (data.success || data.Code === '0000')) {
                     dot.classList.remove('error-state');
-                    textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Normal (200 OK)' : '云途 OMS API 正常 (200 OK)';
+                    textEl.textContent = CURRENT_LANG === 'en' ? 'Official Carrier API Normal (200 OK)' : '官方履约 API 正常 (200 OK)';
                     return;
                 }
             }
             dot.classList.add('error-state');
-            textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Error (500 Error)' : '云途 OMS API 异常 (连接失败)';
+            textEl.textContent = CURRENT_LANG === 'en' ? 'Official Carrier API Error (500 Error)' : '官方履约 API 异常 (连接失败)';
         } catch (e) {
             dot.classList.add('error-state');
-            textEl.textContent = CURRENT_LANG === 'en' ? 'YunExpress OMS API Offline' : '云途 OMS API 异常 (连接故障)';
+            textEl.textContent = CURRENT_LANG === 'en' ? 'Official Carrier API Offline' : '官方履约 API 异常 (连接故障)';
         }
     }
 
@@ -1361,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         errorMessage.textContent = (data && data.Message) || (data && data.message) || `HTTP Error ${response.status}`;
                     }
                 } else {
-                    errorMessage.textContent = (data && data.Message) || (data && data.message) || (CURRENT_LANG === 'en' ? 'YunExpress API did not return valid quotation data. Please check your parameters or destination code.' : '云途接口未返回有效报价数据，请核对您的测算参数或目的地代码。');
+                    errorMessage.textContent = (data && data.Message) || (data && data.message) || (CURRENT_LANG === 'en' ? 'Official carrier API did not return valid quotation data. Please check your parameters or destination code.' : '官方运价接口未返回有效报价数据，请核对您的测算参数或目的地代码。');
                 }
                 showState('error');
             }
@@ -1370,7 +1370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const errorTitle = document.getElementById('error-title');
             const errorMessage = document.getElementById('error-message');
             errorTitle.textContent = CURRENT_LANG === 'en' ? 'Network Request Error' : '网络请求故障';
-            errorMessage.textContent = (CURRENT_LANG === 'en' ? 'Unable to connect to the YunExpress pricing API.' : '无法连接至云途报价接口。') + ` (${error.name || 'Error'}: ${error.message || error})`;
+            errorMessage.textContent = (CURRENT_LANG === 'en' ? 'Unable to connect to the official pricing API.' : '无法连接至官方专线运费接口。') + ` (${error.name || 'Error'}: ${error.message || error})`;
             showState('error');
         }
     }
