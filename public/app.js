@@ -1712,7 +1712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span><i class="ri-price-tag-3-line"></i> ${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
                         </div>
                         <div class="channel-meta-item">
-                            <span><i class="ri-scales-3-line"></i> ${CURRENT_LANG === 'en' ? 'Billable Wt' : '计费重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
+                            <span><i class="ri-weight-line"></i> ${CURRENT_LANG === 'en' ? 'Weight' : '重量'}: <strong>${parseFloat(channel.Weight).toFixed(3)} kg</strong></span>
                         </div>
                     </div>
                     ${pack > 0 ? `
