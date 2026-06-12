@@ -1611,7 +1611,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Helper to format individual breakdown sub-fees in the selected currency
             const formatBreakdownItem = (label, cnyVal, convertedVal) => {
-                if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return '';
+                if (cnyVal === null || cnyVal === undefined || cnyVal <= 0) return null;
                 const labelMap = CURRENT_LANG === 'en' ? {
                     '运费': 'Shipping',
                     '挂号': 'Reg Fee',
@@ -1623,10 +1623,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     '打包费': 'Handling'
                 } : null;
                 const translatedLabel = (labelMap && labelMap[label]) ? labelMap[label] : label;
-                if (target === 'CNY') {
-                    return `${translatedLabel}: ¥${parseFloat(cnyVal).toFixed(2)}`;
-                }
-                return `${translatedLabel}: ${targetSymbol}${convertedVal.toFixed(2)}`;
+                const displayValue = target === 'CNY' 
+                    ? `¥${parseFloat(cnyVal).toFixed(2)}` 
+                    : `${targetSymbol}${convertedVal.toFixed(2)}`;
+                return { label: translatedLabel, value: displayValue };
             };
 
             // Generate detailed billing tooltip / breakdown subtext
@@ -1647,7 +1647,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sigItem) breakdownParts.push(sigItem);
             const packItem = formatBreakdownItem('打包费', channel.PackagingFeeCNY, pack);
             if (packItem) breakdownParts.push(packItem);
-            const breakdownText = breakdownParts.join(' + ');
+
+            const breakdownHtml = breakdownParts.map(item => `
+                <div class="breakdown-item-row">
+                    <span class="breakdown-label">${item.label}</span>
+                    <span class="breakdown-value">${item.value}</span>
+                </div>
+            `).join('');
 
             const excelTransitMap = transitTimesData[channel.Code];
             const excelTransit = getExcelTransit(excelTransitMap, countryCName);
@@ -1737,7 +1743,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="amount">${target === 'CNY' ? `¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}` : `${targetSymbol}${total.toFixed(2)}`}</span>
                     </div>
                     ${target !== 'CNY' ? `<div class="channel-converted-badge">≈ ¥${parseFloat(channel.TotalFeeCNY).toFixed(2)}</div>` : ''}
-                    <div class="channel-price-breakdown">${breakdownText}</div>
+                    <div class="channel-price-breakdown-box">
+                        ${breakdownHtml}
+                    </div>
                 </div>
             `;
             
