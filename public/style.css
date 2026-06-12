@@ -1423,8 +1423,9 @@ body {
 }
 
 .transit-api-badge {
-    background: rgba(9, 109, 217, 0.08) !important;
-    color: #096dd9 !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
 }
 
 .transit-excel-badge {
@@ -2776,8 +2777,8 @@ body.dark-mode .channel-days-badge {
 
 /* Transit API badge in dark mode */
 body.dark-mode .transit-api-badge {
-    background: rgba(41, 151, 255, 0.15) !important;
-    color: #2997ff !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--text-secondary) !important;
 }
 
 /* Transit Excel badge in dark mode */
@@ -2864,5 +2865,45 @@ body.dark-mode .app-nav .nav-links {
 
 body.dark-mode .channel-price-area {
     border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* --- Vercel-Native Embedding Layout Overrides --- */
+
+/* Cleanly remove headers and branding when embedded inside an iframe */
+body.iframe-embed .top-status-bar,
+body.iframe-embed .nav-left,
+body.iframe-embed .app-header {
+    display: none !important;
+}
+
+/* Align theme, language, and currency switchers to the right */
+body.iframe-embed .app-nav {
+    justify-content: flex-end;
+    margin-bottom: 24px;
+    padding: 12px 0;
+}
+
+/* Mobile responsive adjustments when embedded */
+@media (max-width: 768px) {
+    body.iframe-embed .app-nav {
+        grid-template-columns: 1fr; /* Single column layout for switchers */
+        row-gap: 12px;
+        margin-bottom: 16px;
+    }
+    body.iframe-embed .theme-toggle-btn {
+        grid-column: 1 / 2;
+        grid-row: 1;
+        justify-self: start;
+        margin-right: 0;
+    }
+    body.iframe-embed .currency-select-container {
+        grid-column: 1 / 2;
+        grid-row: 1;
+        justify-self: end;
+    }
+    body.iframe-embed .lang-toggle-pills {
+        grid-column: 1 / 2;
+        grid-row: 2;
+    }
 }
 

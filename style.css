@@ -1423,8 +1423,9 @@ body {
 }
 
 .transit-api-badge {
-    background: rgba(9, 109, 217, 0.08) !important;
-    color: #096dd9 !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
 }
 
 .transit-excel-badge {
@@ -2776,8 +2777,8 @@ body.dark-mode .channel-days-badge {
 
 /* Transit API badge in dark mode */
 body.dark-mode .transit-api-badge {
-    background: rgba(41, 151, 255, 0.15) !important;
-    color: #2997ff !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--text-secondary) !important;
 }
 
 /* Transit Excel badge in dark mode */
