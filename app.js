@@ -1706,7 +1706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="channel-badge-row">
                         <span class="channel-days-badge transit-api-badge"><i class="ri-time-line"></i> ${CURRENT_LANG === 'en' ? 'API Transit (Ref)' : 'API时效 (参考)'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>
                     </div>` : ''}
-                    ${displaySubName ? `<div class="channel-subname-row"><div class="channel-ename"><i class="ri-global-line"></i> ${displaySubName}</div></div>` : ''}
+                    ${displaySubName ? `<div class="channel-subname-row"><div class="channel-ename"><i class="ri-corner-down-right-line"></i> ${displaySubName}</div></div>` : ''}
                     <div class="channel-meta-row">
                         <div class="channel-meta-item goods-type-badge ${getGoodsTypeClass(channel.GoodsType)}">
                             <span><i class="ri-price-tag-3-line"></i> ${CURRENT_LANG === 'en' ? 'Type' : '属性'}: <strong>${translateGoodsType(channel.GoodsType)}</strong></span>
