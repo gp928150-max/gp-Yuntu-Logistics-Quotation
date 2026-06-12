@@ -1697,7 +1697,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="channel-info-area">
                     <div class="channel-title-row">
                         <span class="channel-name">${mainName}</span>
-                        <span class="channel-code">${channel.Code || '-'}</span>
                         ${excelTransit ? `<span class="channel-days-badge transit-excel-badge">📄 ${CURRENT_LANG === 'en' ? 'Table Transit' : '报价表时效'}: ${translateTransitDays(excelTransit)}</span>` : ''}
                         ${channel.DeliveryDays ? `<span class="channel-days-badge transit-api-badge">⏱️ ${CURRENT_LANG === 'en' ? 'API Transit (Ref)' : 'API时效 (参考)'}: ${channel.DeliveryDays} ${CURRENT_LANG === 'en' ? 'Days' : '天'}</span>` : ''}
                     </div>
