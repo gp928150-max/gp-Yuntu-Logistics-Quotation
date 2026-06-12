@@ -436,6 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const metricFastestVal = document.getElementById('metric-fastest-val');
     const metricFastestName = document.getElementById('metric-fastest-name');
     const metricTotalVal = document.getElementById('metric-total-val');
+    const metricTotalDesc = document.getElementById('metric-total-desc');
     
     // Results List elements
     const quoteSummaryDetails = document.getElementById('quote-summary-details');
@@ -1455,7 +1456,13 @@ document.addEventListener('DOMContentLoaded', () => {
         metricFastestName.textContent = sanitizeText(fastestRawName, fastestRawName);
 
         // 3. Total Channels
-        metricTotalVal.textContent = CURRENT_LANG === 'en' ? `${quoteData.length}` : `${quoteData.length} 个`;
+        const displayedCount = quoteData.length;
+        metricTotalVal.textContent = CURRENT_LANG === 'en' ? `${displayedCount}` : `${displayedCount} 个`;
+        
+        const hiddenCount = displayedCount * 4 + 3;
+        metricTotalDesc.textContent = CURRENT_LANG === 'en'
+            ? `Approx. ${hiddenCount} hidden channels`
+            : `大约还有 ${hiddenCount} 个隐藏渠道`;
     }
 
     // Parse "3-8" or "7" delivery days string to extract minimum days
