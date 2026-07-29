@@ -1023,6 +1023,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Defer render briefly to ensure DOM loaded
     setTimeout(() => {
         renderCountryOptions(countriesList);
+
+        // --- URL Parameter: ?country=US pre-selection ---
+        // Supports 2-letter ISO country codes (case-insensitive)
+        // Example: ?country=US  or  ?country=de
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCountry = urlParams.get('country');
+        if (urlCountry) {
+            const code = urlCountry.toUpperCase().trim();
+            const match = countriesList.find(c => c.CountryCode === code);
+            if (match) {
+                const flag = getFlagEmoji(match.CountryCode);
+                const name = getCountryDisplayName(match);
+                selectCountry(match.CountryCode, flag, name);
+            }
+        }
+        // --- End URL Parameter support ---
     }, 50);
 
     // Toggle dropdown
