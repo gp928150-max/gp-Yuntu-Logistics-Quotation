@@ -928,11 +928,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const viewsEl = document.getElementById('stats-views-val');
         const queriesEl = document.getElementById('stats-queries-val');
         if (viewsEl && views !== undefined) {
-            const displayViews = parseInt(views) + 20000;
+            const displayViews = parseInt(views) + 200000;
             viewsEl.textContent = Number(displayViews).toLocaleString();
         }
         if (queriesEl && queries !== undefined) {
-            const displayQueries = parseInt(queries) + 30000;
+            const displayQueries = parseInt(queries) + 300000;
             queriesEl.textContent = Number(displayQueries).toLocaleString();
         }
     }
