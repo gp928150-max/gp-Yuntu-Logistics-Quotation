@@ -997,6 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lang !== CURRENT_LANG) {
                 CURRENT_LANG = lang;
                 localStorage.setItem('gp_lang', CURRENT_LANG);
+                document.documentElement.lang = CURRENT_LANG; // SEO: sync html lang attribute
                 
                 langPills.forEach(p => {
                     if (p.getAttribute('data-lang') === CURRENT_LANG) {
